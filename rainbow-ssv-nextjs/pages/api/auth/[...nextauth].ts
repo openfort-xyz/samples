@@ -51,7 +51,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
             // Store the player.id from Openfort with the player in the database.
             // Hardcoded player_id for testing purposes.
 
-            const player_id = "pla_96a0b33d-1399-438b-840d-4be1ed7cc622";
+            const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
             player = await openfort.players.getPlayer(player_id);
           } catch (e: any) {
             console.log(e);

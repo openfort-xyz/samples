@@ -139,7 +139,6 @@ const Home: NextPage = (props: any) => {
             disabled={registerLoading}
             onClick={handleRegisterButtonClick}
           >
-            {" "}
             {registerLoading ? "Registering..." : "Register session key"}
           </button>
           <button disabled={collectLoading} onClick={handleCollectButtonClick}>

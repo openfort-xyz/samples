@@ -17,11 +17,11 @@ export default async function handler(
     // Get address from req.query
 
     const { address } = req.body;
-    const policy_id = "pol_dd95acbb-cae9-453f-8db5-e3df7c88f078";
-    const player_id = "pla_96a0b33d-1399-438b-840d-4be1ed7cc622";
+    const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
+    const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
     const valid_until = 281474976710655;
     const valid_after = 0;
-    const chain_id = 80001;
+    const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
     try {
       const session = await openfort.players.createPlayerSession(
         player_id,
