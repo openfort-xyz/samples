@@ -6,10 +6,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
 import { Interaction } from "@openfort/openfort-node/dist/model/interaction";
 
-const openfort = new Openfort(
-  process.env.NEXTAUTH_OPENFORT_SECRET_KEY!,
-  "http://localhost:3000"
-);
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,18 +21,23 @@ export default async function handler(
     // can use address to find the player in the game server and the Openfort player_id associated to it.
 
     const player_id = "pla_96a0b33d-1399-438b-840d-4be1ed7cc622";
+    const policy_id = "pol_dd95acbb-cae9-453f-8db5-e3df7c88f078";
+    const contract_id = "con_d2b78731-7563-44a4-8ebe-902ed3183ea2";
+    const chain_id = 80001;
+    const optimistic = true;
+
     const interaction: Interaction = {
-      contract: "con_d2b78731-7563-44a4-8ebe-902ed3183ea2",
+      contract: contract_id,
       functionName: "mint",
       functionArgs: [player_id],
     };
     const transactionIntent =
       await openfort.transactions.createTransactionIntent(
         player_id,
-        80001,
-        true,
+        chain_id,
+        optimistic,
         [interaction],
-        "pol_dd95acbb-cae9-453f-8db5-e3df7c88f078"
+        policy_id
       );
 
     return res.send({

@@ -1,46 +1,46 @@
-import '../styles/global.css';
-import '@rainbow-me/rainbowkit/styles.css';
-import type { AppProps } from 'next/app';
+import "../styles/global.css";
+import "@rainbow-me/rainbowkit/styles.css";
+import type { AppProps } from "next/app";
 import {
   RainbowKitProvider,
   getDefaultWallets,
   connectorsForWallets,
-} from '@rainbow-me/rainbowkit';
+} from "@rainbow-me/rainbowkit";
 
-import { configureChains, createConfig, WagmiConfig } from 'wagmi';
-import { mainnet, polygon, goerli, polygonMumbai } from 'wagmi/chains';
-import { publicProvider } from 'wagmi/providers/public';
-import { SessionProvider } from 'next-auth/react';
-import type { Session } from 'next-auth';
+import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { mainnet, polygon, goerli, polygonMumbai } from "wagmi/chains";
+import { publicProvider } from "wagmi/providers/public";
+import { SessionProvider } from "next-auth/react";
+import type { Session } from "next-auth";
 import {
   RainbowKitSiweNextAuthProvider,
   GetSiweMessageOptions,
-} from '@rainbow-me/rainbowkit-siwe-next-auth';
+} from "@rainbow-me/rainbowkit-siwe-next-auth";
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
     mainnet,
     polygon,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === 'true' ? [goerli, polygonMumbai] : []),
+    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
+      ? [goerli, polygonMumbai]
+      : []),
   ],
   [publicProvider()]
 );
 
-const projectId = 'YOUR_PROJECT_ID';
+const projectId = "YOUR_PROJECT_ID";
 
 const { wallets } = getDefaultWallets({
-  appName: 'RainbowKit demo',
+  appName: "RainbowKit demo",
   projectId,
   chains,
 });
 
 const demoAppInfo = {
-  appName: 'Rainbowkit Demo',
+  appName: "Rainbowkit Demo",
 };
 
-const connectors = connectorsForWallets([
-  ...wallets,
-]);
+const connectors = connectorsForWallets([...wallets]);
 
 const wagmiConfig = createConfig({
   autoConnect: true,
@@ -50,7 +50,7 @@ const wagmiConfig = createConfig({
 });
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: 'Sign in to the RainbowKit + SIWE example app',
+  statement: "Sign in to the RainbowKit + SIWE example app",
 });
 
 export default function App({

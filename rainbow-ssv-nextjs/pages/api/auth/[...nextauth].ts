@@ -10,10 +10,7 @@ import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import Openfort from "@openfort/openfort-node";
 
-const openfort = new Openfort(
-  process.env.NEXTAUTH_OPENFORT_SECRET_KEY!,
-  "http://localhost:3000"
-);
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   const providers = [
@@ -43,27 +40,22 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
           }
 
           await siwe.verify({ signature: credentials?.signature || "" });
-          const walletAddress = siwe.address;
 
           let player;
           try {
-            // store of the address of the wallet that is logging in and check if it exists.
-            // Openfort player_id hard coded for convenience
-            const player_id = "pla_96a0b33d-1399-438b-840d-4be1ed7cc622";
+            // Store the player that is logging in in the database.
+            // const username = "username";
+            // const description = siwe.addres;
+            // player = await openfort.players.createPlayer(username, description);
 
-            // Try to get the player. If it doesn't exist, it w ill throw an error.
+            // Store the player.id from Openfort with the player in the database.
+            // Hardcoded player_id for testing purposes.
+
+            const player_id = "pla_96a0b33d-1399-438b-840d-4be1ed7cc622";
             player = await openfort.players.getPlayer(player_id);
-            const account = await openfort.players.createPlayerAccount(
-              player_id,
-              80001
-            );
           } catch (e: any) {
             console.log(e);
             throw e;
-            // player = await openfort.players.createPlayer(
-            //   "username",
-            //   walletAddress
-            // );
           }
 
           return {
