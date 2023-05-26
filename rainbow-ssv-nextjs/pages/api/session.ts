@@ -25,6 +25,7 @@ export default async function handler(
     const valid_after = 0;
     const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
     const external_owner_address = session.user?.name!;
+
     try {
       const playerSession = await openfort.players.createPlayerSession(
         player_id,
@@ -39,8 +40,8 @@ export default async function handler(
       return res.send({
         data: playerSession.body,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.body);
       return res.send({
         data: null,
       });

@@ -44,8 +44,8 @@ export default async function handler(
       return res.send({
         data: transactionIntent.body,
       });
-    } catch (e) {
-      console.log(e);
+    } catch (e: any) {
+      console.log(e.body);
       return res.send({
         data: null,
       });
