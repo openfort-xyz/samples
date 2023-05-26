@@ -72,7 +72,7 @@ const Home: NextPage = () => {
 
         // -----
         if (res_session.status === 200) {
-          console.log("success:", res_session);
+          console.log("success:", res_session.body);
           alert("Session created successfully");
         }
       }
@@ -122,7 +122,7 @@ const Home: NextPage = () => {
         );
         // -----
         if (res_transaction.status === 200) {
-          console.log("success:", res_transaction);
+          console.log("success:", res_transaction.body);
           alert("Asset collected successfully");
         }
       }
