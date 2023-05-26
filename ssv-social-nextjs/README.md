@@ -1,22 +1,19 @@
-# Pop-upless minting with Openfort
+# Social login with Openfort
 
-This sample shows you how to integrate with Openfort [session keys](https://www.openfort.xyz/docs/session-keys).
+NextAuth.js is a complete open-source authentication solution.
 
-Interacting with injected wallets is a UX challenge. This sample shows you how to use Openfort session keys to mint tokens without a pop-up.
+This is an example application that shows how `next-auth` is applied to a basic Next.js app with Openfort.
+
 
 ## Demo
-- [Live demo video](https://youtu.be/MmAIi-JXUnM)
 
-This demo authenticates a player using NextAuth. It assumes that there exists a database where the relation betweeen an address and an Openfort player is created.
+This demo authenticates a player using NextAuth. It will create a custodial account for the player.
 
 
 ## Features
 
-- 🌍 Built-in support for [RainbowKit](https://www.rainbowkit.com/).
-- 🍎⌚️ Built-in support for [Wagmi](https://wagmi.sh/).
-- 🔒 Built-in support for [SIWE](https://login.xyz/).
 - 🍨 Next.JS as ⚛️ React client framework with NextAuth for authentication.
-
+  
 
 ## How to run locally
 
@@ -24,7 +21,7 @@ This demo authenticates a player using NextAuth. It assumes that there exists a 
 
 ```
 git clone https://github.com/openfort-xyz/samples
-cd rainbow-ssv-nextjs
+cd ssv-social-nextjs
 ```
 
 Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
@@ -46,9 +43,33 @@ The other environment variables are configurable:
 
 `NEXTAUTH_URL` is the URL of the server. By default, it is set to `http://localhost:3000` and does not need to be modified unless you change the port number or host name.
 
-`NEXT_PUBLIC_ENABLE_TESTNETS` is a boolean that enables the use of testnets.
+Add details for one or more providers (e.g. Google, Twitter, GitHub, Email, etc).
 
-**2. Create a Player, Policy and Contract**
+
+**2. Configure Authentication Providers**
+
+1. Review and update options in `pages/api/auth/[...nextauth].js` as needed.
+
+2. When setting up OAuth, in the developer admin page for each of your OAuth services, you should configure the callback URL to use a callback path of `{server}/api/auth/callback/{provider}`.
+
+e.g. For Google OAuth you would use: `http://localhost:3000/api/auth/callback/google`
+
+A list of configured providers and their callback URLs is available from the endpoint `/api/auth/providers`. You can find more information at https://next-auth.js.org/configuration/providers/oauth
+
+3. You can also choose to specify an SMTP server for passwordless sign in via email.
+
+**2.1. Database**
+
+A database is needed to persist user accounts and to support email sign in. However, you can still use NextAuth.js for authentication without a database by using OAuth for authentication. If you do not specify a database, [JSON Web Tokens](https://jwt.io/introduction) will be enabled by default.
+
+You **can** skip configuring a database and come back to it later if you want.
+
+For more information about setting up a database, please check out the following links:
+
+- Docs: [next-auth.js.org/adapters/overview](https://next-auth.js.org/adapters/overview)
+
+
+**3. Create a Player, Policy and Contract**
 
 [![Required](https://img.shields.io/badge/REQUIRED-TRUE-ORANGE.svg)](https://shields.io/)
 
@@ -62,7 +83,7 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 `NEXTAUTH_OPENFORT_POLICY` is the ID of a [Policy](https://www.openfort.xyz/docs/api/policies#create-a-policy) for your contract. A policy has a contract and chain_id. For this demo to work, the policy must have both the contract and the register sessions as rules.
 
 
-**3. Follow the server instructions on how to run**
+**4. Follow the server instructions on how to run**
 
 Install & Run:
 

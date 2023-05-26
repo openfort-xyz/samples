@@ -1,0 +1,24 @@
+{
+  "name": "ssv-social-nextjs",
+  "private": true,
+  "description": "An example project for NextAuth.js with Next.js",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start"
+  },
+  "author": "Openfort",
+  "dependencies": {
+    "@openfort/openfort-node": "^0.2.6",
+    "ethers": "^5.6.8",
+    "next": "13.4.3",
+    "next-auth": "latest",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.2",
+    "@types/react": "^18.2.0",
+    "typescript": "^5.0.4"
+  }
+}

@@ -4,7 +4,6 @@ import { getAuthOptions } from "./auth/[...nextauth]";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
-// import { SiweMessage } from "siwe";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -15,10 +14,9 @@ export default async function handler(
   const session = await getServerSession(req, res, getAuthOptions(req));
 
   if (session) {
-    // Get address from req.query
-    // const siwe = new SiweMessage(JSON.parse("{}"));
-
+    // Get the address of the session key.
     const { address } = req.body;
+
     const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
     const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
     const valid_until = 281474976710655;

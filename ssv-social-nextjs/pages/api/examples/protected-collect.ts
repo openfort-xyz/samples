@@ -1,6 +1,6 @@
 // This is an example of to protect an API route
 import { getServerSession } from "next-auth/next";
-import { getAuthOptions } from "./auth/[...nextauth]";
+import { authOptions } from "../auth/[...nextauth]";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
@@ -12,13 +12,10 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const session = await getServerSession(req, res, getAuthOptions(req));
+  const session = await getServerSession(req, res, authOptions);
 
   if (session) {
     // Get address from req.query
-
-    const { address } = req.query;
-    // Could use the address to find the player in the game server and the Openfort player_id associated to it.
 
     const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
     const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
