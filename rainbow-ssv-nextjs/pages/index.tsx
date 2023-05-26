@@ -18,8 +18,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-export const MessagePrefix: string = "\x19Ethereum Signed Message:\n";
-
 const Home: NextPage = () => {
   const { status } = useSession();
 
