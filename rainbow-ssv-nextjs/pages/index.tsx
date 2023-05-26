@@ -4,10 +4,11 @@ import { getServerSession } from "next-auth";
 import { getAuthOptions } from "./api/auth/[...nextauth]";
 
 import { getFormData, getItem, setItem } from "../helpers/web";
-import { useSignMessage } from "wagmi";
+import { useWalletClient } from "wagmi";
 import { ethers } from "ethers";
 import { arrayify } from "ethers/lib/utils";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -17,8 +18,13 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-const Home: NextPage = (props: any) => {
-  const { signMessageAsync } = useSignMessage();
+export const MessagePrefix: string = "\x19Ethereum Signed Message:\n";
+
+const Home: NextPage = () => {
+  const { status } = useSession();
+
+  const { data: walletClient } = useWalletClient();
+
   // Add states for the buttons
   const [registerLoading, setRegisterLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
@@ -42,16 +48,18 @@ const Home: NextPage = (props: any) => {
       });
       const response = await res.json();
 
-      if (response.data.next_action) {
-        const result = await signMessageAsync({
-          message: response.data.next_action.payload.user_op_hash,
-        });
-
-        const pub_key = process.env.NEXTAUTH_OPENFORT_PUBLIC_KEY;
+      if (response.data.nextAction) {
+        const provider = new ethers.providers.Web3Provider(walletClient as any);
+        const signer = provider.getSigner();
+        const result = await signer.signMessage(
+          arrayify(response.data.nextAction.payload.user_op_hash)
+        );
+        // -----
+        // Code below will be implemented inside the Client SDK
+        const pub_key = process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY;
         const formData = getFormData({ signature: result });
-
         const res_session = await fetch(
-          "http://localhost:3000/v1/sessions/" +
+          "https://api.openfort.xyz/v1/sessions/" +
             response.data.id +
             "/signature",
           {
@@ -63,8 +71,11 @@ const Home: NextPage = (props: any) => {
             body: formData,
           }
         );
+
+        // -----
         if (res_session.status === 200) {
-          console.log("success");
+          console.log("success:", res_session);
+          alert("Session created successfully");
         }
       }
     } catch (error) {
@@ -81,24 +92,25 @@ const Home: NextPage = (props: any) => {
     const wallet_imported = getItem("session_key");
     try {
       const res = await fetch(`/api/collect`, {
-        method: "GET", // or 'POST', 'PUT', etc.
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
       });
       const response = await res.json();
-      if (response.data.next_action) {
-        // -----
-        // Code below will be implemented inside the Client SDK
+      if (response.data.nextAction) {
+
         const wallet = new ethers.Wallet(wallet_imported.private_key);
         const result = await wallet.signMessage(
-          arrayify(response.data.next_action.payload.user_op_hash)
+          arrayify(response.data.nextAction.payload.user_op_hash)
         );
-        const pub_key = process.env.NEXTAUTH_OPENFORT_PUBLIC_KEY;
+        // -----
+        // Code below will be implemented inside the Client SDK
+        const pub_key = process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY;
         const formData = getFormData({ signature: result });
 
-        const res_session = await fetch(
-          "http://localhost:3000/v1/transaction_intents/" +
+        const res_transaction = await fetch(
+          "https://api.openfort.xyz/v1/transaction_intents/" +
             response.data.id +
             "/signature",
           {
@@ -111,14 +123,14 @@ const Home: NextPage = (props: any) => {
           }
         );
         // -----
-        if (res_session.status === 200) {
-          console.log("success");
+        if (res_transaction.status === 200) {
+          console.log("success:", res_transaction);
+          alert("Asset collected successfully");
         }
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      // Remember to set loading state to false in a finally block to ensure it's executed no matter what
       setCollectLoading(false);
     }
   };
@@ -133,7 +145,7 @@ const Home: NextPage = (props: any) => {
     >
       <ConnectButton showBalance={false} />
 
-      {props.session && (
+      {status === "authenticated" && (
         <div>
           <button
             disabled={registerLoading}

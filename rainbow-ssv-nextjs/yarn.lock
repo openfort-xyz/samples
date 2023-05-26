@@ -651,10 +651,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openfort/openfort-node@^0.2.4":
-  version "0.2.4"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.2.4.tgz#9ef7e98f62c454ae42d8c7c91dc2fc38e2d9d8d5"
-  integrity sha512-BcrUA4QUFdw5CNAeRqRMp+eAt6xPsPmx7soHxUpsILDAe4H8h2MU7ItpHGvkJ7WQr+TxPNalpqP0Co9bSFtk0A==
+"@openfort/openfort-node@^0.2.6":
+  version "0.2.6"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.2.6.tgz#4f7753695a531488cb2312ed706599750d414aff"
+  integrity sha512-3aQsNbLoBrr0ujvOqf9ktO2/UCDM7onZ5h6JwbHjRHKjQZqPBXfLyjYihV6pLyvndKb875CoUT6TnfqFYI4NMA==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"

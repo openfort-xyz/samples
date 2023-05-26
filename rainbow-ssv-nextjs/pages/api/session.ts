@@ -4,8 +4,12 @@ import { getAuthOptions } from "./auth/[...nextauth]";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
+// import { SiweMessage } from "siwe";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
+const openfort = new Openfort(
+  process.env.NEXTAUTH_OPENFORT_SECRET_KEY!,
+  "http://localhost:3000"
+);
 
 export default async function handler(
   req: NextApiRequest,
@@ -15,6 +19,7 @@ export default async function handler(
 
   if (session) {
     // Get address from req.query
+    // const siwe = new SiweMessage(JSON.parse("{}"));
 
     const { address } = req.body;
     const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
@@ -22,17 +27,20 @@ export default async function handler(
     const valid_until = 281474976710655;
     const valid_after = 0;
     const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
+    const external_owner_address = session.user?.name!;
     try {
-      const session = await openfort.players.createPlayerSession(
+      const playerSession = await openfort.players.createPlayerSession(
         player_id,
         address!.toString(),
         chain_id,
         valid_until,
         valid_after,
-        policy_id
+        policy_id,
+        external_owner_address
       );
+
       return res.send({
-        data: session,
+        data: playerSession.body,
       });
     } catch (e) {
       console.log(e);

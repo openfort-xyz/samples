@@ -21,7 +21,7 @@ This demo authenticates a player using NextAuth. It assumes that there exists a 
 **Installing and cloning manually**
 
 ```
-git clone https://github.com/openfort-xyz/smaples
+git clone https://github.com/openfort-xyz/samples
 cd rainbow-ssv-nextjs
 ```
 
@@ -34,7 +34,7 @@ cp .env.local.example .env.local
 You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
 
 ```
-NEXTAUTH_OPENFORT_PUBLIC_KEY=<replace-with-your-publishable-key>
+NEXT_PUBLIC_OPENFORT_PUBLIC_KEY=<replace-with-your-publishable-key>
 NEXTAUTH_OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
 ```
 
@@ -44,9 +44,9 @@ The other environment variables are configurable:
 
 `NEXTAUTH_URL` is the URL of the server. By default, it is set to `http://localhost:3000` and does not need to be modified unless you change the port number or host name.
 
-`NEXT_PUBLIC_ENABLE_TESTNETS` is a boolean that enables the use of testnet tokens. This is useful for testing your integration.
+`NEXT_PUBLIC_ENABLE_TESTNETS` is a boolean that enables the use of testnets.
 
-**2. Create a Price**
+**2. Create a Player, Policy and Contract**
 
 [![Required](https://img.shields.io/badge/REQUIRED-TRUE-ORANGE.svg)](https://shields.io/)
 
@@ -73,7 +73,7 @@ yarn dev
 
 
 ## Get support
-If you found a bug or want to suggest a new [feature/use case/sample], please [file an issue](../../issues).
+If you found a bug or want to suggest a new [feature/use case/sample], please [file an issue](../../../issues).
 
 If you have questions, comments, or need help with code, we're here to help:
 - on [Discord](https://discord.com/invite/t7x7hwkJF4)

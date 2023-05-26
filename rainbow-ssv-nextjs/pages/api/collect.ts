@@ -6,7 +6,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
 import { Interaction } from "@openfort/openfort-node/model/interaction";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
+const openfort = new Openfort(
+  process.env.NEXTAUTH_OPENFORT_SECRET_KEY!,
+  "http://localhost:3000"
+);
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,18 +34,25 @@ export default async function handler(
       functionName: "mint",
       functionArgs: [player_id],
     };
-    const transactionIntent =
-      await openfort.transactions.createTransactionIntent(
-        player_id,
-        chain_id,
-        optimistic,
-        [interaction],
-        policy_id
-      );
+    try {
+      const transactionIntent =
+        await openfort.transactions.createTransactionIntent(
+          player_id,
+          chain_id,
+          optimistic,
+          [interaction],
+          policy_id
+        );
 
-    return res.send({
-      data: transactionIntent,
-    });
+      return res.send({
+        data: transactionIntent.body,
+      });
+    } catch (e) {
+      console.log(e);
+      return res.send({
+        data: null,
+      });
+    }
   }
 
   res.send({
