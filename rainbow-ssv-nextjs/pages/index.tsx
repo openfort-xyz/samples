@@ -2,14 +2,12 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type { GetServerSideProps, NextPage } from "next";
 import { getServerSession } from "next-auth";
 import { getAuthOptions } from "./api/auth/[...nextauth]";
-
-import { getFormData, getItem, setItem } from "../helpers/web";
 import { useWalletClient } from "wagmi";
 import { ethers } from "ethers";
-import { arrayify } from "ethers/lib/utils";
+import { arrayify, computeAddress } from "ethers/lib/utils";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
-// import Openfort from "@openfort/openfort-js";
+import Openfort from "@openfort/openfort-js";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -19,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-// const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY)
+const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 const Home: NextPage = () => {
   const { status } = useSession();
@@ -28,15 +26,11 @@ const Home: NextPage = () => {
   const [collectLoading, setCollectLoading] = useState(false);
 
   const handleRegisterButtonClick = async () => {
-    setRegisterLoading(true);
-
-    const wallet = ethers.Wallet.createRandom();
-    setItem("session_key", {
-      address: wallet.address,
-      private_key: wallet.privateKey,
-    });
-    const address = wallet.address;
     try {
+      setRegisterLoading(true);
+      openfort.createSessionKey();
+      await openfort.saveSessionKeyToLocalStorage();
+      const address = computeAddress(openfort.keyPair.publicKey);
       const sessionResponse = await fetch(`/api/register-session`, {
         method: "POST",
         headers: {
@@ -46,51 +40,37 @@ const Home: NextPage = () => {
       });
       const sessionResponseJSON = await sessionResponse.json();
 
-      if (sessionResponseJSON.data.nextAction) {
+      if (sessionResponseJSON.data?.nextAction) {
         const provider = new ethers.providers.Web3Provider(walletClient as any);
         const signer = provider.getSigner();
         const ownerSignedSession = await signer.signMessage(
           arrayify(sessionResponseJSON.data.nextAction.payload.user_op_hash)
         );
-        //const openfortSessionResponse = await openfort.sendSignatureSessionRequest(sessionResponseJSON.data.id, signed_session);
+        const openfortSessionResponse =
+          await openfort.sendSignatureSessionRequest(
+            sessionResponseJSON.data.id,
+            ownerSignedSession
+          );
 
-        // -----
-        // Code below will be implemented inside the Client SDK
-        const pub_key = process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY;
-        const formData = getFormData({ signature: ownerSignedSession });
-        const openfortSessionResponse = await fetch(
-          "https://api.openfort.xyz/v1/sessions/" +
-            sessionResponseJSON.data.id +
-            "/signature",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${pub_key}`,
-            },
-            body: formData,
-          }
-        );
-
-        // -----
-        if (openfortSessionResponse.status === 200) {
-          console.log("success:", openfortSessionResponse.body);
+        if (openfortSessionResponse) {
+          console.log("success:", openfortSessionResponse);
           alert("Session created successfully");
         }
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      // Remember to set loading state to false in a finally block to ensure it's executed no matter what
       setRegisterLoading(false);
     }
   };
 
   const handleCollectButtonClick = async () => {
-    setCollectLoading(true); // Set loading state to true when request starts
-
-    const wallet_imported = getItem("session_key");
     try {
+      setCollectLoading(true);
+      if(!(await openfort.loadSessionKeyFromLocalStorage())){
+        alert("Session key not found. Please register session key first");
+        return;
+      }
       const collectResponse = await fetch(`/api/collect`, {
         method: "GET",
         headers: {
@@ -98,33 +78,18 @@ const Home: NextPage = () => {
         },
       });
       const collectResponseJSON = await collectResponse.json();
-      if (collectResponseJSON.data.nextAction) {
-        const wallet = new ethers.Wallet(wallet_imported.private_key);
-        const sessionSignedTransaction = await wallet.signMessage(
-          arrayify(collectResponseJSON.data.nextAction.payload.user_op_hash)
+      if (collectResponseJSON.data?.nextAction) {
+        const sessionSignedTransaction = openfort.signMessage(
+          collectResponseJSON.data.nextAction.payload.user_op_hash
         );
-        //const openfortTransactionResponse= await openfort.sendSignatureSessionRequest(collectResponseJSON.data.id, signed_session);
+        const openfortTransactionResponse =
+          await openfort.sendSignatureTransactionIntentRequest(
+            collectResponseJSON.data.id,
+            sessionSignedTransaction
+          );
 
-        // -----
-        // Code below will be implemented inside the Client SDK
-        const pub_key = process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY;
-        const formData = getFormData({ signature: sessionSignedTransaction });
-        const openfortTransactionResponse = await fetch(
-          "https://api.openfort.xyz/v1/transaction_intents/" +
-            collectResponseJSON.data.id +
-            "/signature",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${pub_key}`,
-            },
-            body: formData,
-          }
-        );
-        // -----
-        if (openfortTransactionResponse.status === 200) {
-          console.log("success:", openfortTransactionResponse.body);
+        if (openfortTransactionResponse) {
+          console.log("success:", openfortTransactionResponse);
           alert("Asset collected successfully");
         }
       }

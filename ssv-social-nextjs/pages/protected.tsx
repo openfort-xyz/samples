@@ -2,12 +2,10 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Layout from "../components/layout";
 import AccessDenied from "../components/access-denied";
-import { ethers } from "ethers";
-import { arrayify } from "ethers/lib/utils";
-import { getFormData, getItem, setItem } from "../helpers/web";
-// import Openfort from "@openfort/openfort-js";
+import { computeAddress } from "ethers/lib/utils";
+import Openfort from "@openfort/openfort-js";
 
-// const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY)
+const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 export default function ProtectedPage() {
   const { data: session } = useSession();
@@ -28,41 +26,40 @@ export default function ProtectedPage() {
   }, [session]);
 
   const handleRegisterButtonClick = async () => {
-    setRegisterLoading(true);
-
-    const wallet = ethers.Wallet.createRandom();
-    setItem("session_key", {
-      address: wallet.address,
-      private_key: wallet.privateKey,
-    });
-    const address = wallet.address;
     try {
-      const sessionResponse = await fetch(`/api/examples/protected-register-session`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ address }),
-      });
+      setRegisterLoading(true);
+      openfort.createSessionKey();
+      await openfort.saveSessionKeyToLocalStorage();
+      const address = computeAddress(openfort.keyPair.publicKey);
+      const sessionResponse = await fetch(
+        `/api/examples/protected-register-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ address }),
+        }
+      );
       const sessionResponseJSON = await sessionResponse.json();
-      console.log(sessionResponseJSON)
-      if(sessionResponseJSON.data){
+      console.log("success:", sessionResponseJSON);
+      if (sessionResponseJSON.data) {
         alert("Session created successfully");
       }
-
     } catch (error) {
       console.error("Error:", error);
     } finally {
-      // Remember to set loading state to false in a finally block to ensure it's executed no matter what
       setRegisterLoading(false);
     }
   };
 
   const handleCollectButtonClick = async () => {
-    setCollectLoading(true); // Set loading state to true when request starts
-
-    const wallet_imported = getItem("session_key");
     try {
+      setCollectLoading(true);
+      if(!(await openfort.loadSessionKeyFromLocalStorage())){
+        alert("Session key not found. Please register session key first");
+        return;
+      }
       const collectResponse = await fetch(`/api/examples/protected-collect`, {
         method: "GET",
         headers: {
@@ -70,33 +67,17 @@ export default function ProtectedPage() {
         },
       });
       const collectResponseJSON = await collectResponse.json();
-      if (collectResponseJSON.data.nextAction) {
-        const wallet = new ethers.Wallet(wallet_imported.private_key);
-        const sessionSignedTransaction = await wallet.signMessage(
-          arrayify(collectResponseJSON.data.nextAction.payload.user_op_hash)
+      if (collectResponseJSON.data?.nextAction) {
+        const sessionSignedTransaction = openfort.signMessage(
+          collectResponseJSON.data.nextAction.payload.user_op_hash
         );
-        //const openfortTransactionResponse= await openfort.sendSignatureSessionRequest(collectResponseJSON.data.id, signed_session);
-
-        // -----
-        // Code below will be implemented inside the Client SDK
-        const pub_key = process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY;
-        const formData = getFormData({ signature: sessionSignedTransaction });
-        const openfortTransactionResponse = await fetch(
-          "https://api.openfort.xyz/v1/transaction_intents/" +
-            collectResponseJSON.data.id +
-            "/signature",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-              Authorization: `Bearer ${pub_key}`,
-            },
-            body: formData,
-          }
-        );
-        // -----
-        if (openfortTransactionResponse.status === 200) {
-          console.log("success:", openfortTransactionResponse.body);
+        const openfortTransactionResponse =
+          await openfort.sendSignatureTransactionIntentRequest(
+            collectResponseJSON.data.id,
+            sessionSignedTransaction
+          );
+        if (openfortTransactionResponse) {
+          console.log("success:", openfortTransactionResponse);
           alert("Asset collected successfully");
         }
       }

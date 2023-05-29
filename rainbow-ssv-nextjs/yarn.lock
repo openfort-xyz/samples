@@ -651,11 +651,14 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openfort/openfort-js@^0.0.2":
-  version "0.0.2"
-  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.0.2.tgz#6a84cb98f7cda03ab0039e71880095a3d9b9d9e9"
-  integrity sha512-VPup2h4Iu1Vs1FwMyhvrWVutZxNHyupL+3Me94FPbwvZYWfgdX1fC7j4xUVfOK7ka93GoD6uNYSSuHj8ntgMYw==
+"@openfort/openfort-js@^0.1.3":
+  version "0.1.3"
+  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.1.3.tgz#3cfaedc1243612b6e4bae860e6ed6364bac1fe1e"
+  integrity sha512-1KKQalFJmgcGThygg9HoCsgtZ2ny1u6nGq9FojqY27LdQV654uk5v6nsD41wHRz4RsL18n0R8eAwvHakYb7rqg==
   dependencies:
+    "@ethersproject/bytes" "^5.7.0"
+    "@ethersproject/hash" "^5.7.0"
+    "@ethersproject/signing-key" "^5.7.0"
     axios "^1.4.0"
     es6-promise "^4.2.8"
     ethereum-cryptography "^2.0.0"
