@@ -5,7 +5,7 @@ import { getAuthOptions } from "./auth/[...nextauth]";
 import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!,'http://localhost:3000');
 
 export default async function handler(
   req: NextApiRequest,

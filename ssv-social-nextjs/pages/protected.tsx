@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import Layout from "../components/layout";
 import AccessDenied from "../components/access-denied";
-import { computeAddress } from "ethers/lib/utils";
 import Openfort from "@openfort/openfort-js";
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
@@ -30,7 +29,7 @@ export default function ProtectedPage() {
       setRegisterLoading(true);
       openfort.createSessionKey();
       await openfort.saveSessionKey();
-      const address = computeAddress(openfort.sessionKey.publicKey);
+      const address = openfort.sessionKey.address
       const sessionResponse = await fetch(
         `/api/examples/protected-register-session`,
         {

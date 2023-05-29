@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth";
 import { getAuthOptions } from "./api/auth/[...nextauth]";
 import { useWalletClient } from "wagmi";
 import { ethers } from "ethers";
-import { arrayify, computeAddress } from "ethers/lib/utils";
+import { arrayify } from "ethers/lib/utils";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Openfort from "@openfort/openfort-js";
@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
+const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!, 'http://localhost:3000');
 
 const Home: NextPage = () => {
   const { status } = useSession();
@@ -29,8 +29,8 @@ const Home: NextPage = () => {
     try {
       setRegisterLoading(true);
       openfort.createSessionKey();
-      await openfort.saveSessionKeyToLocalStorage();
-      const address = computeAddress(openfort.keyPair.publicKey);
+      await openfort.saveSessionKey();
+      const address = openfort.sessionKey.address
       const sessionResponse = await fetch(`/api/register-session`, {
         method: "POST",
         headers: {
@@ -67,7 +67,7 @@ const Home: NextPage = () => {
   const handleCollectButtonClick = async () => {
     try {
       setCollectLoading(true);
-      if(!(await openfort.loadSessionKeyFromLocalStorage())){
+      if(!(await openfort.loadSessionKey())){
         alert("Session key not found. Please register session key first");
         return;
       }
