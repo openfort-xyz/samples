@@ -29,8 +29,8 @@ export default function ProtectedPage() {
     try {
       setRegisterLoading(true);
       openfort.createSessionKey();
-      await openfort.saveSessionKeyToLocalStorage();
-      const address = computeAddress(openfort.keyPair.publicKey);
+      await openfort.saveSessionKey();
+      const address = computeAddress(openfort.sessionKey.publicKey);
       const sessionResponse = await fetch(
         `/api/examples/protected-register-session`,
         {
@@ -56,7 +56,7 @@ export default function ProtectedPage() {
   const handleCollectButtonClick = async () => {
     try {
       setCollectLoading(true);
-      if(!(await openfort.loadSessionKeyFromLocalStorage())){
+      if(!(await openfort.loadSessionKey())){
         alert("Session key not found. Please register session key first");
         return;
       }
