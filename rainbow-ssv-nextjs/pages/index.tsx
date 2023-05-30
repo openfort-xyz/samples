@@ -5,6 +5,9 @@ import { getAuthOptions } from "./api/auth/[...nextauth]";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Openfort from "@openfort/openfort-js";
+import {ethers} from "ethers";
+import {arrayify} from "@ethersproject/bytes";
+import {useWalletClient} from "wagmi";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
@@ -18,6 +21,7 @@ const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!, proc
 
 const Home: NextPage = () => {
   const { status } = useSession();
+  const { data: walletClient } = useWalletClient();
   const [registerLoading, setRegisterLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
 
@@ -37,7 +41,11 @@ const Home: NextPage = () => {
       const sessionResponseJSON = await sessionResponse.json();
 
       if (sessionResponseJSON.data?.nextAction) {
-        const ownerSignedSession = openfort.signMessage(sessionResponseJSON.data.nextAction.payload.user_op_hash);
+        const provider = new ethers.providers.Web3Provider(walletClient as any);
+        const signer = provider.getSigner();
+        const ownerSignedSession = await signer.signMessage(
+            arrayify(sessionResponseJSON.data.nextAction.payload.user_op_hash)
+        );
 
         const openfortSessionResponse =
           await openfort.sendSignatureSessionRequest(
