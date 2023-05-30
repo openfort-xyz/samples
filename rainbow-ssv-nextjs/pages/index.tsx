@@ -2,9 +2,6 @@ import { ConnectButton } from "@rainbow-me/rainbowkit";
 import type { GetServerSideProps, NextPage } from "next";
 import { getServerSession } from "next-auth";
 import { getAuthOptions } from "./api/auth/[...nextauth]";
-import { useWalletClient } from "wagmi";
-import { ethers } from "ethers";
-import { arrayify } from "ethers/lib/utils";
 import { useState } from "react";
 import { useSession } from "next-auth/react";
 import Openfort from "@openfort/openfort-js";
@@ -17,11 +14,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   };
 };
 
-const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!, 'http://localhost:3000');
+const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!, process.env.NEXTAUTH_URL);
 
 const Home: NextPage = () => {
   const { status } = useSession();
-  const { data: walletClient } = useWalletClient();
   const [registerLoading, setRegisterLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
 
@@ -41,11 +37,8 @@ const Home: NextPage = () => {
       const sessionResponseJSON = await sessionResponse.json();
 
       if (sessionResponseJSON.data?.nextAction) {
-        const provider = new ethers.providers.Web3Provider(walletClient as any);
-        const signer = provider.getSigner();
-        const ownerSignedSession = await signer.signMessage(
-          arrayify(sessionResponseJSON.data.nextAction.payload.user_op_hash)
-        );
+        const ownerSignedSession = openfort.signMessage(sessionResponseJSON.data.nextAction.payload.user_op_hash);
+
         const openfortSessionResponse =
           await openfort.sendSignatureSessionRequest(
             sessionResponseJSON.data.id,
