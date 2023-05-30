@@ -10,7 +10,7 @@ import { getCsrfToken } from "next-auth/react";
 import { SiweMessage } from "siwe";
 import Openfort from "@openfort/openfort-node";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, process.env.NEXTAUTH_URL);
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
   const providers = [
