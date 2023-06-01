@@ -11,7 +11,7 @@ export default function ProtectedPage() {
   const [content, setContent] = useState();
   const [registerLoading, setRegisterLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
-
+  const [transferOwnershipLoading, setTransferOwnershipLoading] = useState(false);
   // Fetch content from protected route
   useEffect(() => {
     const fetchData = async () => {
@@ -60,7 +60,7 @@ export default function ProtectedPage() {
         return;
       }
       const collectResponse = await fetch(`/api/examples/protected-collect`, {
-        method: "GET",
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
@@ -77,13 +77,42 @@ export default function ProtectedPage() {
           );
         if (openfortTransactionResponse) {
           console.log("success:", openfortTransactionResponse);
-          alert("Asset collected successfully");
+          alert("Action performed successfully");
         }
+      } else{
+        console.log("success:", collectResponseJSON.data);
+        alert("Action performed successfully");
       }
     } catch (error) {
       console.error("Error:", error);
     } finally {
       setCollectLoading(false);
+    }
+  };
+
+  const handleTransaferOwnershipButtonClick = async () => {
+    try {
+      setTransferOwnershipLoading(true);
+      if(!(await openfort.loadSessionKey())){
+        alert("Session key not found. Please register session key first");
+        return;
+      }
+      const transagerResponse = await fetch(`/api/examples/transfer-ownership`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address:0x9590Ed0C18190a310f4e93CAccc4CC17270bED40 }),
+      });
+      const transagerResponseJSON = await transagerResponse.json();
+      console.log("success:", transagerResponseJSON.data)
+      if (transagerResponseJSON.data) {
+        alert("Request sent successfully");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setTransferOwnershipLoading(false);
     }
   };
 
@@ -103,11 +132,17 @@ export default function ProtectedPage() {
       <p>
         <strong>{content ?? "\u00a0"}</strong>
       </p>
-      <button disabled={registerLoading} onClick={handleRegisterButtonClick}>
-        {registerLoading ? "Registering..." : "Register session key"}
-      </button>
-      <button disabled={collectLoading} onClick={handleCollectButtonClick}>
-        {collectLoading ? "Collecting..." : "Collect item"}
+      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+        <button style={{ margin: '10px' }} disabled={registerLoading} onClick={handleRegisterButtonClick}>
+          {registerLoading ? "Registering..." : "Register session key"}
+        </button>
+        <p>{'--->'}</p>
+        <button style={{ margin: '10px' }} disabled={collectLoading} onClick={handleCollectButtonClick}>
+          {collectLoading ? "Collecting..." : "Collect item"}
+        </button>
+      </div>
+      <button style={{ margin: '10px' }} disabled={transferOwnershipLoading} onClick={handleTransaferOwnershipButtonClick}>
+        {transferOwnershipLoading ? "Requesting..." : "Request tranfer ownership"}
       </button>
     </Layout>
   );

@@ -4,7 +4,6 @@ import { authOptions } from "../auth/[...nextauth]";
 
 import type { NextApiRequest, NextApiResponse } from "next";
 import Openfort from "@openfort/openfort-node";
-import { Interaction } from "@openfort/openfort-node/model/interaction";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -15,31 +14,25 @@ export default async function handler(
   const session = await getServerSession(req, res, authOptions);
 
   if (session) {
-    // Get address from req.query
+    // Get the address of the session key.
+    const { address } = req.body;
 
-    const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
     const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
-    const contract_id = process.env.NEXTAUTH_OPENFORT_CONTRACT!;
+    const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
+    const new_owner_address = address;
     const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
-    const optimistic = true;
 
-    const interaction_mint: Interaction = {
-      contract: contract_id,
-      functionName: "mint",
-      functionArgs: ['0x68Eae76287B996fBD2D2950CECe8eBAF7764e99C'],
-    };
     try {
-      const transactionIntent =
-        await openfort.transactions.createTransactionIntent(
+      const playerTransferOwnership =
+        await openfort.players.transferAccountOwnership(
           player_id,
           chain_id,
-          optimistic,
-          [interaction_mint],
+          new_owner_address,
           policy_id
         );
 
       return res.send({
-        data: transactionIntent.body,
+        data: playerTransferOwnership.body,
       });
     } catch (e: any) {
       console.log(e.body);
