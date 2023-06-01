@@ -16,6 +16,7 @@ This demo authenticates a player using NextAuth. It assumes that there exists a 
 - 🍎⌚️ Built-in support for [Wagmi](https://wagmi.sh/).
 - 🔒 Built-in support for [SIWE](https://login.xyz/).
 - 🍨 Next.JS as ⚛️ React client framework with NextAuth for authentication.
+- 🏰 Openfort Session Keys.
 
 
 ## How to run locally

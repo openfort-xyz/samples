@@ -14,7 +14,9 @@ This demo authenticates a player using NextAuth. It will create a custodial acco
 ## Features
 
 - 🍨 Next.JS as ⚛️ React client framework with NextAuth for authentication.
-  
+- 🍎⌚️ Built-in support for Wagmi.
+- 🏰 Openfort Session Keys.
+- 🏰 Openfort TransferOwnership.
 
 ## How to run locally
 
