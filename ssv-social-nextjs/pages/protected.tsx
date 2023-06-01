@@ -108,6 +108,7 @@ export default function ProtectedPage() {
         alert("Session key not found. Please register session key first");
         return;
       }
+      const newOwnerAddress = '0x9590Ed0C18190a310f4e93CAccc4CC17270bED40'
       const transagerResponse = await fetch(
         `/api/examples/protected-transfer-ownership`,
         {
@@ -116,7 +117,7 @@ export default function ProtectedPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            address: address,
+            address: newOwnerAddress,
           }),
         }
       );
