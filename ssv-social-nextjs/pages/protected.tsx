@@ -3,15 +3,26 @@ import { useSession } from "next-auth/react";
 import Layout from "../components/layout";
 import AccessDenied from "../components/access-denied";
 import Openfort from "@openfort/openfort-js";
+import { useAccount, useConnect, useDisconnect } from "wagmi";
+import { InjectedConnector } from "wagmi/connectors/injected";
+import { AcceptOwnership } from "../components/accept-ownership";
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 export default function ProtectedPage() {
+  const [requestTransferOwnership, setRequestTransferOwnership] =
+    useState(null);
+  const { address, isConnected } = useAccount();
+  const { connect } = useConnect({
+    connector: new InjectedConnector(),
+  });
+  const { disconnect } = useDisconnect();
   const { data: session } = useSession();
   const [content, setContent] = useState();
   const [registerLoading, setRegisterLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
-  const [transferOwnershipLoading, setTransferOwnershipLoading] = useState(false);
+  const [transferOwnershipLoading, setTransferOwnershipLoading] =
+    useState(false);
   // Fetch content from protected route
   useEffect(() => {
     const fetchData = async () => {
@@ -29,7 +40,7 @@ export default function ProtectedPage() {
       setRegisterLoading(true);
       openfort.createSessionKey();
       await openfort.saveSessionKey();
-      const address = openfort.sessionKey.address
+      const address = openfort.sessionKey.address;
       const sessionResponse = await fetch(
         `/api/examples/protected-register-session`,
         {
@@ -55,7 +66,7 @@ export default function ProtectedPage() {
   const handleCollectButtonClick = async () => {
     try {
       setCollectLoading(true);
-      if(!(await openfort.loadSessionKey())){
+      if (!(await openfort.loadSessionKey())) {
         alert("Session key not found. Please register session key first");
         return;
       }
@@ -79,7 +90,7 @@ export default function ProtectedPage() {
           console.log("success:", openfortTransactionResponse);
           alert("Action performed successfully");
         }
-      } else{
+      } else {
         console.log("success:", collectResponseJSON.data);
         alert("Action performed successfully");
       }
@@ -93,21 +104,27 @@ export default function ProtectedPage() {
   const handleTransaferOwnershipButtonClick = async () => {
     try {
       setTransferOwnershipLoading(true);
-      if(!(await openfort.loadSessionKey())){
+      if (!(await openfort.loadSessionKey())) {
         alert("Session key not found. Please register session key first");
         return;
       }
-      const transagerResponse = await fetch(`/api/examples/transfer-ownership`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ address:0x9590Ed0C18190a310f4e93CAccc4CC17270bED40 }),
-      });
-      const transagerResponseJSON = await transagerResponse.json();
-      console.log("success:", transagerResponseJSON.data)
-      if (transagerResponseJSON.data) {
+      const transagerResponse = await fetch(
+        `/api/examples/protected-transfer-ownership`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            address: address,
+          }),
+        }
+      );
+      const response = await transagerResponse.json();
+      console.log("success:", response.data.tranferRequest);
+      if (response.data.tranferRequest) {
         alert("Request sent successfully");
+        setRequestTransferOwnership(response.data.accountAddress);
       }
     } catch (error) {
       console.error("Error:", error);
@@ -132,18 +149,57 @@ export default function ProtectedPage() {
       <p>
         <strong>{content ?? "\u00a0"}</strong>
       </p>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <button style={{ margin: '10px' }} disabled={registerLoading} onClick={handleRegisterButtonClick}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          maxWidth: "300px",
+        }}
+      >
+        <button
+          style={{ margin: "10px" }}
+          disabled={registerLoading}
+          onClick={handleRegisterButtonClick}
+        >
           {registerLoading ? "Registering..." : "Register session key"}
         </button>
-        <p>{'--->'}</p>
-        <button style={{ margin: '10px' }} disabled={collectLoading} onClick={handleCollectButtonClick}>
+        <p>{"--->"}</p>
+        <button
+          style={{ margin: "10px" }}
+          disabled={collectLoading}
+          onClick={handleCollectButtonClick}
+        >
           {collectLoading ? "Collecting..." : "Collect item"}
         </button>
       </div>
-      <button style={{ margin: '10px' }} disabled={transferOwnershipLoading} onClick={handleTransaferOwnershipButtonClick}>
-        {transferOwnershipLoading ? "Requesting..." : "Request tranfer ownership"}
-      </button>
+      {!requestTransferOwnership ? (
+        <button
+          style={{ margin: "10px" }}
+          disabled={transferOwnershipLoading}
+          onClick={handleTransaferOwnershipButtonClick}
+        >
+          {transferOwnershipLoading
+            ? "Requesting..."
+            : "Request account custody"}
+        </button>
+      ) : isConnected ? (
+        <div>
+          <p>
+            <small>Connected to signer with address: {address}</small>
+          </p>
+          <AcceptOwnership accountAddress={requestTransferOwnership!} />
+          <button style={{ marginTop: "20px" }} onClick={() => disconnect()}>
+            Disconnect Wallet
+          </button>
+        </div>
+      ) : (
+        <button
+          style={{ marginTop: "20px", marginLeft: "10px" }}
+          onClick={() => connect()}
+        >
+          Connect Wallet
+        </button>
+      )}
     </Layout>
   );
 }
