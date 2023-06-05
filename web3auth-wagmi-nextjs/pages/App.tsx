@@ -103,7 +103,7 @@ function App() {
     const pubkey = getPublicCompressed(Buffer.from(privKey, "hex")).toString(
       "hex"
     );
-    const toastId = toast.loading("Registering session...");
+    let toastId = toast.loading("Registering session...");
 
     const sessionResponse = await fetch("/api/register-session", {
       method: "POST",
@@ -116,7 +116,7 @@ function App() {
     const sessionResponseJSON = await sessionResponse.json();
     if (sessionResponseJSON.data?.nextAction) {
       toast.dismiss(toastId);
-      toast.success("Session Key Waiting for Signature");
+      toastId = toast.loading("Session Key Waiting for Signature");
 
       const rpc = new RPC(web3auth.provider!);
       const ownerSignedSession = await rpc.signMessage(
@@ -130,6 +130,7 @@ function App() {
         );
 
       if (openfortSessionResponse) {
+        toast.dismiss(toastId);
         console.log("success:", openfortSessionResponse);
         toast.success("Session Key Registered Successfully");
       }
@@ -157,7 +158,7 @@ function App() {
     const pubkey = getPublicCompressed(Buffer.from(privKey, "hex")).toString(
       "hex"
     );
-    const toastId = toast.loading("Collecting item...");
+    let toastId = toast.loading("Collecting item...");
     // Validate idToken with server
     const collectResponse = await fetch("/api/collect-asset", {
       method: "POST",
@@ -173,19 +174,19 @@ function App() {
         collectResponseJSON.data.nextAction.payload.user_op_hash
       );
       toast.dismiss(toastId);
-      toast.success("Session Key Waiting for Signature");
+      toastId = toast.loading("Session Key Waiting for Signature");
       const openfortTransactionResponse =
         await openfort.sendSignatureTransactionIntentRequest(
           collectResponseJSON.data.id,
           sessionSignedTransaction
         );
       if (openfortTransactionResponse) {
+        toast.dismiss(toastId);
         toast.success("Item Collected Successfully");
       }
     } else {
       toast.dismiss(toastId);
       toast.error("JWT Verification Failed");
-      console.log("JWT Verification Failed");
       await logout();
     }
     return collectResponseJSON;
@@ -206,7 +207,7 @@ function App() {
       "hex"
     );
 
-    const toastId = toast.loading("Registering...");
+    const toastId = toast.loading("Validating server-side...");
 
     // Validate idToken with server
     const loginRequest = await fetch("/api/login", {
@@ -256,7 +257,7 @@ function App() {
         </div>
         <div>
           <button onClick={registerSessionKey} className="card">
-            Register session
+            Register session key
           </button>
         </div>
         <div>
