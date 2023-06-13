@@ -25,10 +25,10 @@ This demo authenticates a player using NextAuth. It will create a custodial acco
 
 ```
 git clone https://github.com/openfort-xyz/samples
-cd ssv-social-nextjs
+cd web3auth-wagmi-nextjs
 ```
 
-Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
+Copy the .env.local.example file into a file named .env.local in the folder of the server you want to use. For example:
 
 ```
 cp .env.local.example .env.local

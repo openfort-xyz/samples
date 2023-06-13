@@ -1,7 +1,7 @@
 {
   "name": "ssv-social-nextjs",
   "private": true,
-  "description": "An example project for NextAuth.js with Next.js",
+  "description": "Server Side Validation with social login powered by Next.js and Openfort",
   "scripts": {
     "dev": "next",
     "build": "next build",

@@ -1,6 +1,6 @@
 {
   "name": "rainbow-ssv-nextjs",
-  "description": "Rainbow SSV Next.js",
+  "description": "Rainbow SSV Next.js with Openfort",
   "private": true,
   "version": "0.0.36",
   "scripts": {
