@@ -1,15 +1,19 @@
-# Create a Gaming Ecosystem with Openfort
+# Create a Gaming Ecosystem & OAuth with Openfort
 
-This is an example application that shows how you can create your own gaming ecosystem with Openfort.
+This sample shows you how you can create your own gaming ecosystem by having your own OAuth service you can include in games.
 
-![gaming-ecosystem.svg](https://blog-cms.openfort.xyz/uploads/gaming_ecosystem_diagram_64758d2d96.svg)
-
+Ecosystems are a powerful way to support a network of games with a consistent and standard single sign-on auth flow across them to enable new degrees of game interoperability, frictionless player experiences, and more.
 
 ## Demo
-- [Live demo video]()
+[Live demo video](https://youtu.be/s8wMDpTTzJE)
 
+This sample ecosystem's allows things such as:
 
-
+- Single Sign On Across Games: Use one player profile at the ecosystem level as a single sign-on (SSO) for any game within the ecosystem.
+- Interoperability: Cross-game interoperability of a player's game currencies and assets through their ecosystem profile's managed or connected external wallet. This means ecosystem-level or game-specific assets can be interoperated across other games in a secure, permissioned, and standard way.
+- Achievement Tracking: Full support for soul-bound tokens at the player's ecosystem-level profile, such as achievements, "XP," rank, etc, across games.
+  
+![gaming-ecosystem.svg](https://blog-cms.openfort.xyz/uploads/gaming_ecosystem_diagram_64758d2d96.svg)
 
 ## Features
 

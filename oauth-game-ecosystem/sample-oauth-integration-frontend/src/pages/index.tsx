@@ -60,7 +60,7 @@ const Home: React.FC = () => {
             <InventoryComponent />
           </div>
         ) : (
-          <OAuthButton popup={false} />
+          <OAuthButton popup={true} />
         )}
       </div>
     </div>
