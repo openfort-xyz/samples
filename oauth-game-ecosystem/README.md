@@ -28,6 +28,28 @@ This is an example application that shows how you can create your own gaming eco
 **Sample OAuth integration**
 - 🍨 [Next.JS](https://nextjs.org/) as ⚛️ React client framework.
 
+## Authentication patterns
+
+Depending on your games needs, here's a few possible patterns you may choose to integrate your auth page through.
+
+**Redirect Pattern**
+
+Redirect patterns are common for web-based games or UI's where your players need to be redirected to some page on your game's website, or perhaps a settings page on the web for your game.
+
+Setting the redirect_uri, your game may choose to link the "Register" or "Login" button from your game's website to the https://connect.trymetafab.com?... auth flow page. From there, your player would be able to login or register. After successfully logging in or registering, the player would be redirected to the redirectUri you set in the auth page's query parameters.
+
+This redirect uri will have the authenticated player's jwtToken and player. For example, a redirect uri may be https://mygame.com/game and the resulting redirect will become https://mygame.com/game#token=PLAYER_ACCESS_TOKEN&player=PLAYER_ID. From here, your game's webpage logic can grab the player jwtToken and player from the fragment (#) url parameters and perform any final login/authentication logic needed for your game.
+
+**Embed Pattern**
+
+The embed pattern is intended for mobile apps, native games, or any non-web implementations.
+
+For example, you may choose to build a mobile app or desktop game and use our auth page for login or registration.
+
+You can use the embed pattern by excluding the redirect_uri from the auth page's query parameters. This allows you to do an in-app or in-game web browser/modal window that opens your Ecosystem auth page. Your player would complete the specified flow (login or registration) and once finished the player's jwtToken and player will be set and update the auth page's URL.
+
+You can use a url change listener for your in-app or in-game browser modal and wait for the #jwtToken=, &player= fragment properties to be set on the url. Once set, you can extract the player's jwtToken and player and perform any additional auth logic for your game from there and automatically close the browser modal/pop-up.
+
 ## How to run locally
 
 **1. Clone and configure the sample**
