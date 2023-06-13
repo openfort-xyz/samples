@@ -36,7 +36,7 @@ Depending on your games needs, here's a few possible patterns you may choose to 
 
 Redirect patterns are common for web-based games or UI's where your players need to be redirected to some page on your game's website, or perhaps a settings page on the web for your game.
 
-Setting the redirect_uri, your game may choose to link the "Register" or "Login" button from your game's website to the https://connect.trymetafab.com?... auth flow page. From there, your player would be able to login or register. After successfully logging in or registering, the player would be redirected to the redirectUri you set in the auth page's query parameters.
+Setting the redirect_uri, your game may choose to link the "Register" or "Login" button from your game's website to the Ecosystem auth flow page. From there, your player would be able to login or register. After successfully logging in or registering, the player would be redirected to the redirectUri you set in the auth page's query parameters.
 
 This redirect uri will have the authenticated player's jwtToken and player. For example, a redirect uri may be https://mygame.com/game and the resulting redirect will become https://mygame.com/game#token=PLAYER_ACCESS_TOKEN&player=PLAYER_ID. From here, your game's webpage logic can grab the player jwtToken and player from the fragment (#) url parameters and perform any final login/authentication logic needed for your game.
 
