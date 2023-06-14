@@ -599,10 +599,10 @@
     ethereum-cryptography "^2.0.0"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.2.7":
-  version "0.2.7"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.2.7.tgz#67a75dc92082c60e46b8d9e312eb38b7bdd5f054"
-  integrity sha512-55R+JrmNLK9iHqNGzsfZnpB7rsiMoKNDAPa5S4Tk/BzRYf9erU3hkdvnIxtVPCQV3+NmtXQasri4adSBMsPXqA==
+"@openfort/openfort-node@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.2.8.tgz#9e1f143be42281a3ed7088490f99b1f00eb2ab81"
+  integrity sha512-3sbp4rFAnSbvXFuEtT8XQtB//8rSPU1Uigen9Mt1huvA5KUB0zwBG5GjHYkIGsVdtuSF/UAtymm9FNRWYSmAJA==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"
