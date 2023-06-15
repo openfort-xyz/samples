@@ -47,18 +47,9 @@ The other environment variables are configurable:
 
 `NEXT_PUBLIC_WEB3_AUTH_ID` is the client_id from Web3Auth. You can get it from https://dashboard.web3auth.io
 
+You can follow the instructions on how to set up the Web3Auth sample in the [Web3Auth Google documentation](https://web3auth.io/docs/content-hub/guides/google).
 
-**2. Configure Authentication Providers**
-
-1. When setting up Web3Auth, get your client_id from the Plug_and_play solution.
-
-2. When setting up OAuth, in the developer admin page for each of your OAuth services, you should configure the callback URL to use a callback path of `{server}/api/auth/callback/{provider}`.
-
-e.g. For Google OAuth you would use: `http://localhost:3000/api/auth/callback/google`
-
-A list of configured providers and their callback URLs is available from the endpoint `/api/auth/providers`. You can find more information at https://next-auth.js.org/configuration/providers/oauth
-
-**3. Create a Player, Policy and Contract**
+**2. Create a Player, Policy and Contract**
 
 [![Required](https://img.shields.io/badge/REQUIRED-TRUE-ORANGE.svg)](https://shields.io/)
 
@@ -72,7 +63,7 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 `NEXTAUTH_OPENFORT_POLICY` is the ID of a [Policy](https://www.openfort.xyz/docs/api/policies#create-a-policy) for your contract. A policy has a contract and chain_id. For this demo to work, the policy must have both the contract and the register sessions as rules.
 
 
-**4. Follow the server instructions on how to run**
+**3. Follow the server instructions on how to run**
 
 Install & Run:
 
@@ -83,7 +74,6 @@ npm run dev
 yarn
 yarn dev
 ```
-
 
 ## Get support
 If you found a bug or want to suggest a new [feature/use case/sample], please [file an issue](../../../issues).

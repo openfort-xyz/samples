@@ -10,6 +10,8 @@ This is an example application that shows how `next-auth` is applied to a basic 
 
 This demo authenticates a player using NextAuth. It will create a custodial account for the player and collect an asset with it. Then, it transfers the account ownership from a Openfort custodial to a self-custodial account.
 
+When running the application, after you log in, head to `/protected` route to see the demo in action.
+
 
 ## Features
 
