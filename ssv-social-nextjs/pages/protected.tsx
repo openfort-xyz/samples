@@ -20,6 +20,7 @@ export default function ProtectedPage() {
   const { data: session } = useSession();
   const [content, setContent] = useState();
   const [registerLoading, setRegisterLoading] = useState(false);
+  const [revokeLoading, setRevokeLoading] = useState(false);
   const [collectLoading, setCollectLoading] = useState(false);
   const [transferOwnershipLoading, setTransferOwnershipLoading] =
     useState(false);
@@ -55,6 +56,34 @@ export default function ProtectedPage() {
       console.log("success:", sessionResponseJSON);
       if (sessionResponseJSON.data) {
         alert("Session created successfully");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setRegisterLoading(false);
+    }
+  };
+
+  const handleRevokeButtonClick = async () => {
+    try {
+      setRevokeLoading(true);
+      openfort.loadSessionKey();
+      await openfort.saveSessionKey();
+      const address = openfort.sessionKey.address;
+      const sessionResponse = await fetch(
+        `/api/examples/protected-revoke-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ address }),
+        }
+      );
+      const sessionResponseJSON = await sessionResponse.json();
+      console.log("success:", sessionResponseJSON);
+      if (sessionResponseJSON.data) {
+        alert("Session revoked successfully");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -108,7 +137,7 @@ export default function ProtectedPage() {
         alert("Session key not found. Please register session key first");
         return;
       }
-      const newOwnerAddress = '0x9590Ed0C18190a310f4e93CAccc4CC17270bED40'
+      const newOwnerAddress = "0x9590Ed0C18190a310f4e93CAccc4CC17270bED40";
       const transagerResponse = await fetch(
         `/api/examples/protected-transfer-ownership`,
         {
@@ -164,7 +193,13 @@ export default function ProtectedPage() {
         >
           {registerLoading ? "Registering..." : "Register session key"}
         </button>
-        <p>{"--->"}</p>
+        <button
+          style={{ margin: "10px" }}
+          disabled={revokeLoading}
+          onClick={handleRevokeButtonClick}
+        >
+          {revokeLoading ? "Revoking..." : "Revoke session key"}
+        </button>
         <button
           style={{ margin: "10px" }}
           disabled={collectLoading}

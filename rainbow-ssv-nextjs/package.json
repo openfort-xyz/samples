@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@openfort/openfort-js": "^0.1.7",
-    "@openfort/openfort-node": "^0.2.8",
+    "@openfort/openfort-node": "^0.2.9",
     "@rainbow-me/rainbowkit": "1.0.1",
     "@rainbow-me/rainbowkit-siwe-next-auth": "0.2.0",
     "ethers": "^5.6.8",

@@ -8,7 +8,7 @@
     "db:migrate": "prisma migrate dev"
   },
   "dependencies": {
-    "@openfort/openfort-node": "^0.2.8",
+    "@openfort/openfort-node": "^0.2.9",
     "@prisma/client": "^4.11.0",
     "@types/cors": "^2.8.13",
     "axios": "^1.4.0",

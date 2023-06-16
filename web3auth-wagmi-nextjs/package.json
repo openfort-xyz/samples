@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@openfort/openfort-js": "^0.1.7",
-    "@openfort/openfort-node": "^0.2.8",
+    "@openfort/openfort-node": "^0.2.9",
     "@solana/web3.js": "^1.76.0",
     "@toruslabs/eccrypto": "^1.1.8",
     "@web3auth/base": "^5.2.0",
