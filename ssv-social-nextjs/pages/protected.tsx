@@ -67,8 +67,10 @@ export default function ProtectedPage() {
   const handleRevokeButtonClick = async () => {
     try {
       setRevokeLoading(true);
-      openfort.loadSessionKey();
-      await openfort.saveSessionKey();
+      if (!(await openfort.loadSessionKey())) {
+        alert("Session key not found. Please register session key first");
+        return;
+      }
       const address = openfort.sessionKey.address;
       const sessionResponse = await fetch(
         `/api/examples/protected-revoke-session`,
@@ -106,6 +108,7 @@ export default function ProtectedPage() {
         },
       });
       const collectResponseJSON = await collectResponse.json();
+
       if (collectResponseJSON.data?.nextAction) {
         const sessionSignedTransaction = openfort.signMessage(
           collectResponseJSON.data.nextAction.payload.user_op_hash

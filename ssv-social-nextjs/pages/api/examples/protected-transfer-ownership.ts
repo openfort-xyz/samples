@@ -26,15 +26,17 @@ export default async function handler(
       const playerTransferOwnership =
         await openfort.players.transferAccountOwnership(
           player_id,
+          policy_id,
           chain_id,
-          new_owner_address,
-          policy_id
+          new_owner_address
         );
 
-      const playerAccountAddress = await openfort.players.getPlayer(player_id);
-      // Find the player's accounts, the one at the same chain_id
+      const playerAccountAddress = await openfort.players.getPlayerAccounts(
+        player_id,
+        ["accounts"]
+      );
 
-      const address = playerAccountAddress.body.accounts.find(
+      const address = playerAccountAddress.body.data.find(
         (account) => account.chainId === chain_id
       )?.address;
 
