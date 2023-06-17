@@ -83,8 +83,10 @@ export default function ProtectedPage() {
         }
       );
       const sessionResponseJSON = await sessionResponse.json();
-      console.log("success:", sessionResponseJSON);
       if (sessionResponseJSON.data) {
+        localStorage.removeItem("OPENFORT/SESSION-KEY");
+        console.log("success:", sessionResponseJSON);
+
         alert("Session revoked successfully");
       }
     } catch (error) {
