@@ -26,7 +26,5 @@
 
 Sample integrations built by Openfort.
 
-## Development
-```
-  yarn
-```
+## Usage
+To test a sample, follow the instructions inside its folder.
