@@ -72,7 +72,9 @@ app.get('/', async (req: Request, res: Response) => {
     console.error('Error:', error);
     throw error;
   }
-  res.send('Send a request to /FULL_KMS_EXAMPLE to create a transaction intent and sign it using our KMS');
+  let message = 'Send a request to /FULL_KMS_EXAMPLE to create a transaction intent and sign it using your own KMS.';
+  message += '</br></br>If you already have a userOp hash you want to sign, send it using the endpoint /Sign_KMS?userOpHash= to get the signature';
+  res.send(message);
   console.log(result);
 });
 
@@ -128,7 +130,7 @@ app.get('/FULL_KMS_EXAMPLE', async (req: Request, res: Response) => {
     console.error('Error:', error);
     throw error;
   }
-  response += '</br>  </br>4- Submitting the signature above by sending a POST request to /v1/transaction_intents/<transaction_UUID>/signature';
+  response += '</br>  </br>4- Submitting the signature above by sending a POST request to /v1/transaction_intents/transaction_id/signature';
   res.send(response);
 });
 
