@@ -5,6 +5,7 @@ This sample uses
 ## Features
 
 - [Express](https://expressjs.com/) as the web server framework.
+- [TypeScript](https://www.typescriptlang.org/) for type checking.
 - 🏰 Openfort
 
 ## How to run locally
