@@ -5,12 +5,13 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "format": "prettier --write \"**/*.ts\""
   },
   "author": "Openfort",
   "dependencies": {
     "@openfort/openfort-js": "^0.1.7",
-    "@openfort/openfort-node": "^0.2.9",
+    "@openfort/openfort-node": "^0.3.1",
     "next": "13.4.3",
     "next-auth": "latest",
     "react": "^18.2.0",
@@ -21,6 +22,7 @@
   "devDependencies": {
     "@types/node": "^18.16.2",
     "@types/react": "^18.2.0",
+    "prettier": "^2.8.8",
     "typescript": "^5.0.4"
   }
 }
