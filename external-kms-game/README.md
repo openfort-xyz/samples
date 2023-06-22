@@ -1,7 +1,9 @@
 # External KMS to sign transaction intents
 
 Players can decide whether they want to use custodial accounts (Openfort protecting their private keys in a managed KMS) or non-custodial accounts (manage and store their own private keys).
-In the cases where users use non-custodial accounts, they may use an external KMS to securely store the private keys. This sample shows you how to sign Openfort's transaction intents using your own KMS system.
+In the cases where users use non-custodial accounts, they may use an external KMS to securely store the private keys.
+
+This sample shows you how to sign Openfort's transaction intents using your own KMS system.
 
 ## Demo
 [Live demo video](https://www.youtube.com/watch?v=uHigZXdTECw)
@@ -47,8 +49,27 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 
 `OPENFORT_POLICY` is the ID of a [Policy](https://www.openfort.xyz/docs/api/policies#create-a-policy) for your contract. A policy has a contract and chain_id. For this demo to work, the policy must have both the contract and the register sessions as rules.
 
+**3. Provide the KMS information**
+In our example, we use Google Cloud Platform's KMS. In order to be able to use this sample, you will need to provide the details of the key to use: 
 
-**3. Follow the server instructions on how to run**
+```
+# Address of the PK stored in the Key of the KMS below
+EXTERNAL_OWNER_ADDRESS=
+
+# KMS info
+ # Your project id in GCP
+PROJECTID=
+ # The location where your key ring was created
+LOCATIONID=
+ # The id of the key ring
+KEYRINGID=
+ # The name/id of your key in the key ring (the addres of this PK should be the EXTERNAL_OWNER_ADDRESS above)
+KEYID=
+ # The version of the key
+KEYVERSION=
+```
+
+**4. Follow the server instructions on how to run**
 
 Install & Run:
 
