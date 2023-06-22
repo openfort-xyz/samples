@@ -1,6 +1,10 @@
 # External KMS to sign transaction intents
 
-This sample uses 
+Players can decide whether they want to use custodial accounts (Openfort protecting their private keys in a managed KMS) or non-custodial accounts (manage and store their own private keys).
+In the cases where users use non-custodial accounts, they may use an external KMS to securely store the private keys. This sample shows you how to sign Openfort's transaction intents using your own KMS system.
+
+## Demo
+[Live demo video](https://www.youtube.com/watch?v=uHigZXdTECw)
 
 ## Features
 
@@ -20,7 +24,7 @@ cd external-kms-game
 Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
 
 ```
-cp .env.example .env.local
+cp .env.example .env
 ```
 
 You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
