@@ -7,16 +7,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.ts\""
   },
   "dependencies": {
     "@openfort/openfort-js": "^0.1.7",
-    "@openfort/openfort-node": "^0.2.9",
+    "@openfort/openfort-node": "^0.3.1",
     "@rainbow-me/rainbowkit": "1.0.1",
     "@rainbow-me/rainbowkit-siwe-next-auth": "0.2.0",
     "ethers": "^5.6.8",
     "next": "^13.4.3",
     "next-auth": "4.20.1",
+    "prettier": "^2.8.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "siwe": "^2.1.4",
