@@ -6,11 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "prettier --write \"**/*.ts\""
   },
   "dependencies": {
     "@openfort/openfort-js": "^0.1.7",
-    "@openfort/openfort-node": "^0.2.9",
+    "@openfort/openfort-node": "^0.3.1",
     "@solana/web3.js": "^1.76.0",
     "@toruslabs/eccrypto": "^1.1.8",
     "@web3auth/base": "^5.2.0",
@@ -19,6 +20,7 @@
     "ethers": "^5.7.2",
     "jose": "^4.11.1",
     "next": "^12.3.1",
+    "node": "^16.18.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-toastify": "^9.1.1",
@@ -30,6 +32,7 @@
     "@types/react-dom": "18.0.10",
     "eslint": "8.30.0",
     "eslint-config-next": "12.3.1",
+    "prettier": "^2.8.8",
     "typescript": "4.9.4",
     "zlib-browserify": "^0.0.3"
   }
