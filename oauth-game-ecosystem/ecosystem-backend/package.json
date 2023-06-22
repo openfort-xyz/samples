@@ -5,10 +5,11 @@
   "license": "MIT",
   "scripts": {
     "dev": "nodemon --watch routes/*.ts --watch ./index.ts --exec 'ts-node' ./index.ts",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "format": "prettier --write \"**/*.ts\""
   },
   "dependencies": {
-    "@openfort/openfort-node": "^0.2.9",
+    "@openfort/openfort-node": "^0.3.1",
     "@prisma/client": "^4.11.0",
     "@types/cors": "^2.8.13",
     "axios": "^1.4.0",
@@ -33,6 +34,7 @@
     "@types/passport-jwt": "^3.0.8",
     "@types/passport-local": "^1.0.35",
     "nodemon": "^2.0.22",
+    "prettier": "^2.8.8",
     "prisma": "^4.11.0",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.3"
