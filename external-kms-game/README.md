@@ -18,20 +18,20 @@ This sample shows you how to sign Openfort's transaction intents using your own 
 
 **1. Clone and configure the sample**
 
-```
+```bash
 git clone https://github.com/openfort-xyz/samples
 cd external-kms-game
 ```
 
 Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
 
-```
+```bash
 cp .env.example .env
 ```
 
 You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
 
-```
+```bash
 OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
 OPENFORT_PUBLIC_KEY=<replace-with-your-publishable-key>
 ```
@@ -52,7 +52,7 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 **3. Provide the KMS information**
 In our example, we use Google Cloud Platform's KMS. In order to be able to use this sample, you will need to provide the details of the key to use: 
 
-```
+```bash
 # Address of the PK stored in the Key of the KMS below
 EXTERNAL_OWNER_ADDRESS=
 
