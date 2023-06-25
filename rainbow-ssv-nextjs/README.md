@@ -1,4 +1,4 @@
-# Pop-upless minting with Openfort
+# Popup-less minting with Openfort
 
 This sample shows you how to integrate with Openfort [session keys](https://www.openfort.xyz/docs/session-keys).
 
