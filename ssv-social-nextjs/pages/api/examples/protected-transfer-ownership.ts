@@ -1,60 +1,51 @@
 // This is an example of to protect an API route
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "../auth/[...nextauth]";
+import {getServerSession} from "next-auth/next";
+import {authOptions} from "../auth/[...nextauth]";
 
-import type { NextApiRequest, NextApiResponse } from "next";
+import type {NextApiRequest, NextApiResponse} from "next";
 import Openfort from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  const session = await getServerSession(req, res, authOptions);
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+    const session = await getServerSession(req, res, authOptions);
 
-  if (session) {
-    // Get the address of the session key.
-    const { address } = req.body;
+    if (session) {
+        // Get the address of the session key.
+        const {address} = req.body;
+        const playerId = process.env.NEXTAUTH_OPENFORT_PLAYER!;
+        const chainId = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
 
-    const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
-    const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
-    const new_owner_address = address;
-    const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
+        try {
+            const playerTransferOwnership = await openfort.players.transferAccountOwnership({
+                id: playerId,
+                policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
+                chain_id: chainId,
+                new_owner_address: address!,
+            });
 
-    try {
-      const playerTransferOwnership =
-        await openfort.players.transferAccountOwnership(
-          player_id,
-          policy_id,
-          chain_id,
-          new_owner_address
-        );
+            const playerAccountAddress = await openfort.players.listAccounts({
+                id: playerId,
+                expand: ["accounts"],
+            });
 
-      const playerAccountAddress = await openfort.players.getPlayerAccounts(
-        player_id,
-        ["accounts"]
-      );
+            const accountAddress = playerAccountAddress.data.find((account) => account.chainId === chainId)?.address;
 
-      const address = playerAccountAddress.body.data.find(
-        (account) => account.chainId === chain_id
-      )?.address;
-
-      return res.send({
-        data: {
-          tranferRequest: playerTransferOwnership.body,
-          accountAddress: address,
-        },
-      });
-    } catch (e: any) {
-      console.log(e.body);
-      return res.send({
-        data: null,
-      });
+            return res.send({
+                data: {
+                    tranferRequest: playerTransferOwnership,
+                    accountAddress,
+                },
+            });
+        } catch (e: any) {
+            console.log(e);
+            return res.send({
+                data: null,
+            });
+        }
     }
-  }
 
-  res.send({
-    error: "You must be signed in to view the protected content on this page.",
-  });
+    res.send({
+        error: "You must be signed in to view the protected content on this page.",
+    });
 }
