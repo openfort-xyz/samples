@@ -4,6 +4,7 @@ This sample shows you how to use Firebase auth and firestore with Openfort.
 
 It supports both login with all regular auth providers and with the wallet of the user.
 
+- [Video walkthrough](https://youtu.be/zuKhhOLLR50)
 - [Live demo](https://sample-firebase-wagmi-nextjs.vercel.app/)
 ## Features
 
