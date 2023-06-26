@@ -41,7 +41,7 @@ function App() {
           adapterSettings: {
             loginConfig: {
               google: {
-                verifier: "web3auth-google-example",
+                verifier: "openfort-web3auth-sample",
                 typeOfLogin: "google",
                 clientId: process.env.NEXT_PUBLIC_GOOGLE_ID, // use your app client id you got from google
               },

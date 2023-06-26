@@ -49,7 +49,6 @@ The other environment variables are configurable:
 
 `NEXT_PUBLIC_WEB3_AUTH_ID` is the client_id from Web3Auth. You can get it from https://dashboard.web3auth.io
 
-Test variables have been provided for you to use.
 
 You can follow the instructions on how to set up the Web3Auth sample in the [Web3Auth Google documentation](https://web3auth.io/docs/content-hub/guides/google).
 
