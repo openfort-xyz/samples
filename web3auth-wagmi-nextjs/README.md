@@ -9,6 +9,8 @@ It is lightly based off of [a sample from Web3Auth](https://github.com/Web3Auth/
 
 ## Demo
 
+- [Live demo](https://sample-web3auth-wagmi-nextjs.vercel.app/)
+
 This demo authenticates a player using NextAuth. It will create a custodial account for the player and collect an asset with it. Then, it transfers the account ownership from a Openfort custodial to a self-custodial account.
 
 
