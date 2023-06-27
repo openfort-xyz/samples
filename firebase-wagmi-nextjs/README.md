@@ -51,28 +51,32 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 
 `NEXTAUTH_OPENFORT_POLICY` is the ID of a [Policy](https://www.openfort.xyz/docs/api/policies#create-a-policy) for your contract. A policy has a contract and chain_id. For this demo to work, the policy must have both the contract and the register sessions as rules.
 
-**3. Follow the server instructions on how to run**
+**3. Get your Firebase Config**
 
-Install & Run:
+First go to Firebase config: Console > Project settings > General adn create an app for your prohject if you still don't have one. 
 
-```bash
-npm install
-npm run dev
-# or
-yarn
-yarn dev
-```
+<img width="1083" alt="image" src="https://github.com/openfort-xyz/samples/assets/62625514/f5884f03-ebbd-4c16-a154-b04803d40874">
 
+Copy the FirebaseConfir and continue
 
-## Firebase Config
+<img width="1066" alt="image" src="https://github.com/openfort-xyz/samples/assets/62625514/46067ccc-7821-4a9e-91c2-728ec17782c5">
 
-Firebase config: Console > Project settings > General.
+Then go to Firebase-Admin config: Console > Project settings > Service accounts and generate a "New Private Key"
 
-Firebase-Admin config: Console > Project settings > Service accounts.
+<img width="1005" alt="image" src="https://github.com/openfort-xyz/samples/assets/62625514/2281e7d8-096e-49d4-b0d4-d2344e933f34">
 
 Update `.env`
 
 ```bash
+#firebase
+NEXT_PUBLIC_apiKey=
+NEXT_PUBLIC_authDomain=
+NEXT_PUBLIC_projectId=
+NEXT_PUBLIC_storageBucket=
+NEXT_PUBLIC_messagingSenderId=
+NEXT_PUBLIC_appId=
+
+
 #Firebase-admin
 type=
 project_id=
@@ -84,15 +88,20 @@ auth_uri=
 token_uri=
 auth_provider_x509_cert_url=
 client_x509_cert_url=
-
-#firebase
-NEXT_PUBLIC_apiKey=
-NEXT_PUBLIC_authDomain=
-NEXT_PUBLIC_projectId=
-NEXT_PUBLIC_storageBucket=
-NEXT_PUBLIC_messagingSenderId=
-NEXT_PUBLIC_appId=
 ```
+
+**4. Follow the server instructions on how to run**
+
+Install & Run:
+
+```bash
+npm install
+npm run dev
+# or
+yarn
+yarn dev
+```
+
 
 ## Get support
 If you found a bug or want to suggest a new [feature/use case/sample], please [file an issue](../../../issues).
