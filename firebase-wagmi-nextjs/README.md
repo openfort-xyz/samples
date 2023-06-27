@@ -75,7 +75,7 @@ NEXT_PUBLIC_projectId=
 NEXT_PUBLIC_storageBucket=
 NEXT_PUBLIC_messagingSenderId=
 NEXT_PUBLIC_appId=
-```
+
 
 #Firebase-admin
 type=
@@ -88,6 +88,7 @@ auth_uri=
 token_uri=
 auth_provider_x509_cert_url=
 client_x509_cert_url=
+```
 
 **4. Follow the server instructions on how to run**
 
