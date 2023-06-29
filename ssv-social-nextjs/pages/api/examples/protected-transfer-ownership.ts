@@ -18,10 +18,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         try {
             const playerTransferOwnership = await openfort.players.transferAccountOwnership({
-                id: playerId,
+                playerId: playerId,
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-                chain_id: chainId,
-                new_owner_address: address!,
+                chainId: chainId,
+                newOwnerAddress: address!,
             });
 
             const playerAccountAddress = await openfort.players.listAccounts({

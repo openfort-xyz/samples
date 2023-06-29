@@ -34,8 +34,8 @@ const handler: NextApiHandler = async (
       let newOFAccount;
       if (!existingAddress) {
         newOFAccount = await openfort.accounts.create({
-          external_owner_address: address,
-          chain_id: 80001,
+          externalOwnerAddress: address,
+          chainId: 80001,
           player: existingPlayerOf,
         });
       }
