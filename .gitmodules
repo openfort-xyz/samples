@@ -1,0 +1,3 @@
+[submodule "seaport-js"]
+	path = seaport-js
+	url = git@github.com:eloi010/seaport-js.git
