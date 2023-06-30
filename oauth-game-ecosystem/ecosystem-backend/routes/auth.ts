@@ -316,7 +316,7 @@ router.post("/mint", passport.authenticate("jwt", {session: false}), async (req,
     const player_id = (req.user as User).playerOf!;
     const policy_id = "pol_182c7c1f-1e8d-4363-8b66-532f57b2e56e";
     const contract_id = "con_542f32a1-f895-447b-b9cd-e7a109671b0f";
-    const chain_id = 80001;
+    const chainId = 80001;
     const optimistic = true;
 
     const interaction_mint: Interaction = {
@@ -327,7 +327,7 @@ router.post("/mint", passport.authenticate("jwt", {session: false}), async (req,
 
     const transactionIntent = await openfort.transactionIntents.create({
         player: player_id,
-        chain_id,
+        chainId,
         optimistic,
         interactions: [interaction_mint],
         policy: policy_id,

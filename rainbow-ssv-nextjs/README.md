@@ -5,7 +5,9 @@ This sample shows you how to integrate with Openfort [session keys](https://www.
 Interacting with injected wallets is a UX challenge. This sample shows you how to use Openfort session keys to mint tokens without a pop-up.
 
 ## Demo
-- [Live demo video](https://youtu.be/rh2E02PATlU)
+
+- [Video walkthrough](https://youtu.be/rh2E02PATlU)
+- [Live demo](https://sample-rainbow-ssv-nextjs.vercel.app/)
 
 This demo authenticates a player using NextAuth. It assumes that there exists a database where the relation betweeen an address and an Openfort player is created.
 

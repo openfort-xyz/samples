@@ -15,13 +15,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const {address} = req.body;
 
         const createSessionRequest: CreatePlayerSessionRequest = {
-            id: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+            playerId: process.env.NEXTAUTH_OPENFORT_PLAYER!,
             address: address!.toString(),
-            chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
-            valid_until: 281474976710655,
-            valid_after: 0,
+            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+            validUntil: 281474976710655,
+            validAfter: 0,
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-            external_owner_address: session.user?.name!,
+            externalOwnerAddress: session.user?.name!,
         };
 
         try {

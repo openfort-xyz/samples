@@ -34,14 +34,14 @@ function App() {
             chainId: "0x13881",
             rpcTarget: "https://rpc.ankr.com/polygon_mumbai",
           },
-          web3AuthNetwork: "cyan",
+          web3AuthNetwork: "mainnet",
         });
 
         const openloginAdapter = new OpenloginAdapter({
           adapterSettings: {
             loginConfig: {
               google: {
-                verifier: "web3auth-google-example",
+                verifier: "openfort-sample",
                 typeOfLogin: "google",
                 clientId: process.env.NEXT_PUBLIC_GOOGLE_ID, // use your app client id you got from google
               },

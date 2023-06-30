@@ -43,8 +43,8 @@ const handler: NextApiHandler = async (
         // Create an Openfort account with a external owner address
         await openfort.accounts.create({
           player: playerOfID,
-          external_owner_address: request.body.address,
-          chain_id: 80001,
+          externalOwnerAddress: request.body.address,
+          chainId: 80001,
         });
       }
 
