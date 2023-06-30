@@ -37,3 +37,4 @@ To test a sample, follow the instructions inside its folder.
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Complete open-source authentication solution](ssv-social-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-wagmi-nextjs)
+- [Seaport JS example](https://github.com/eloi010/seaport-js/tree/5663e74c21d236d2a79e57fbf2a6270e3f29a176)
