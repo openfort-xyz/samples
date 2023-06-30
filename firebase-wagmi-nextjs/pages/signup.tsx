@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useAuth } from "../lib/authContext";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { useConnect, useSignMessage } from "wagmi";
+import Link from "next/link";
 
 const Home: NextPage = () => {
   const { user, loading } = useAuth();
@@ -32,9 +33,9 @@ const Home: NextPage = () => {
     return (
       <div className="flex space-x-2">
         <h1>{"You already logged. Head to "}</h1>
-        <a href="/private" className="underline text-blue-600">
+        <Link href="/private" className="underline text-blue-600">
           /Private
-        </a>
+        </Link>
       </div>
     );
 

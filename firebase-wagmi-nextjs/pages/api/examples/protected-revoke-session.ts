@@ -34,7 +34,7 @@ export default async function handler(
       const playerSession = await openfort.sessions.revoke({
         player: player_id,
         address: address!.toString(),
-        chain_id: chain_id,
+        chainId: chain_id,
         policy: policy_id,
       });
 

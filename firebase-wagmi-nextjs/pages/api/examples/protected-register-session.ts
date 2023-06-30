@@ -33,9 +33,9 @@ export default async function handler(
     try {
       const playerSession = await openfort.sessions.create({
         player: player_id,
-        chain_id: chain_id,
-        valid_after: valid_after,
-        valid_until: valid_until,
+        chainId: chain_id,
+        validAfter: valid_after,
+        validUntil: valid_until,
         policy: policy_id,
         address: address!.toString(),
       });

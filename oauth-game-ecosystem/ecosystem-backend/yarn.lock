@@ -42,10 +42,10 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
-"@openfort/openfort-node@^0.3.1":
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/@openfort/openfort-node/-/openfort-node-0.3.1.tgz#28adb0c8fac3ec3142b2d20e8b949a56541f166a"
-  integrity sha512-kZPL/HHeie11GGrHae0Gb817XR2PL/kjVY73KCsfzqHDz/d6jY5OcJfloVHhOboSbRT2TTYPs30ibw1hwBHGfg==
+"@openfort/openfort-node@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.4.0.tgz#bf8d6859549f8457668e62174d220941b53a655c"
+  integrity sha512-95wyln+4I5MugFqxfC5ik81lRyVVetyW4WPPw6LXkMFHkswLw8aIfwn6J8He3/TGgmvkx7Y4OI1MWEMbhDQDaw==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"

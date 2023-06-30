@@ -9,6 +9,8 @@ It is lightly based off of [a sample from Web3Auth](https://github.com/Web3Auth/
 
 ## Demo
 
+- [Live demo](https://sample-web3auth-wagmi-nextjs.vercel.app/)
+
 This demo authenticates a player using NextAuth. It will create a custodial account for the player and collect an asset with it. Then, it transfers the account ownership from a Openfort custodial to a self-custodial account.
 
 
@@ -47,7 +49,6 @@ The other environment variables are configurable:
 
 `NEXT_PUBLIC_WEB3_AUTH_ID` is the client_id from Web3Auth. You can get it from https://dashboard.web3auth.io
 
-Test variables have been provided for you to use.
 
 You can follow the instructions on how to set up the Web3Auth sample in the [Web3Auth Google documentation](https://web3auth.io/docs/content-hub/guides/google).
 
