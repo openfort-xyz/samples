@@ -24,7 +24,7 @@
 
 # Openfort Samples
 
-Sample integrations built by Openfort.
+Catalogue of various sample integrations using Openfort and built by Openfort. Each example contains its own README with further instructions and explanations.
 
 ## Usage
 To test a sample, follow the instructions inside its folder.
