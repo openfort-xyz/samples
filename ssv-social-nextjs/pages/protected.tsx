@@ -186,10 +186,12 @@ export default function ProtectedPage() {
                     {collectLoading ? "Collecting..." : "Collect item"}
                 </button>
             </div>
+            <p>{"Remove disabled locally to enable transfer ownership. Disabled in live demo."}</p>
             {!requestTransferOwnership ? (
                 <button
                     style={{margin: "10px"}}
-                    disabled={transferOwnershipLoading}
+                    disabled={transferOwnershipLoading || true}
+                    // Remove disabled to enable transfer ownership
                     onClick={handleTransaferOwnershipButtonClick}
                 >
                     {transferOwnershipLoading ? "Requesting..." : "Request account custody"}
