@@ -31,7 +31,7 @@ export default async function handler(
       const interaction_mint = {
         contract: contract_id,
         functionName: "mint",
-        functionArgs: ["0x68Eae76287B996fBD2D2950CECe8eBAF7764e99C"],
+        functionArgs: [player_id],
       };
 
       try {
@@ -47,7 +47,7 @@ export default async function handler(
           data: transactionIntent,
         });
       } catch (e: any) {
-        console.log(e.body);
+        console.log(e);
         return res.send({
           data: null,
         });
