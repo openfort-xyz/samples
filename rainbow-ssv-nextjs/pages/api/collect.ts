@@ -11,9 +11,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, getAuthOptions(req));
 
     if (session) {
-        // Get address from req.query
-
-        const {address} = req.query;
         // Could use the address to find the player in the game server and the Openfort player_id associated to it.
 
         const interaction: Interaction = {
