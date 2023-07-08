@@ -24,7 +24,7 @@
 
 # Openfort Samples
 
-Sample integrations built by Openfort.
+Catalogue of various sample integrations using Openfort and built by Openfort. Each example contains its own README with further instructions and explanations.
 
 ## Usage
 To test a sample, follow the instructions inside its folder.
@@ -37,4 +37,4 @@ To test a sample, follow the instructions inside its folder.
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Complete open-source authentication solution](ssv-social-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-wagmi-nextjs)
-- [Seaport JS example](https://github.com/eloi010/seaport-js)
+- [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)

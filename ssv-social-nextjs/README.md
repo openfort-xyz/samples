@@ -108,5 +108,5 @@ If you found a bug or want to suggest a new [feature/use case/sample], please [f
 
 If you have questions, comments, or need help with code, we're here to help:
 - on [Discord](https://discord.com/invite/t7x7hwkJF4)
-- on Twitter at [@openfortxyz](https://twitter.com/StripeDev)
+- on Twitter at [@openfortxyz](https://twitter.com/openfortxyz)
 - by [email](mailto:support+github@openfort.xyz)
