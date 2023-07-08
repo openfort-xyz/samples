@@ -1,3 +1,6 @@
 [submodule "seaport-js"]
 	path = seaport-js
 	url = git@github.com:eloi010/seaport-js.git
+[submodule "walletconnect-wallet-sample"]
+	path = walletconnect-wallet-sample
+	url = git@github.com:openfort-xyz/walletconnect-wallet-sample.git
