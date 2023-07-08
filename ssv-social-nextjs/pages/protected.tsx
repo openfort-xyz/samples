@@ -19,9 +19,10 @@ export default function ProtectedPage() {
     const {data: session} = useSession();
     const [content, setContent] = useState();
     const [registerLoading, setRegisterLoading] = useState(false);
-    const [revokeLoading, setRevokeLoading] = useState(false);
+
     const [collectLoading, setCollectLoading] = useState(false);
     const [transferOwnershipLoading, setTransferOwnershipLoading] = useState(false);
+
     // Fetch content from protected route
     useEffect(() => {
         const fetchData = async () => {
@@ -51,35 +52,6 @@ export default function ProtectedPage() {
             console.log("success:", sessionResponseJSON);
             if (sessionResponseJSON.data) {
                 alert("Session created successfully");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            setRegisterLoading(false);
-        }
-    };
-
-    const handleRevokeButtonClick = async () => {
-        try {
-            setRevokeLoading(true);
-            if (!(await openfort.loadSessionKey())) {
-                alert("Session key not found. Please register session key first");
-                return;
-            }
-            const address = openfort.sessionKey.address;
-            const sessionResponse = await fetch(`/api/examples/protected-revoke-session`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({address}),
-            });
-            const sessionResponseJSON = await sessionResponse.json();
-            if (sessionResponseJSON.data) {
-                localStorage.removeItem("OPENFORT/SESSION-KEY");
-                console.log("success:", sessionResponseJSON);
-
-                alert("Session revoked successfully");
             }
         } catch (error) {
             console.error("Error:", error);
@@ -130,6 +102,7 @@ export default function ProtectedPage() {
                 alert("Session key not found. Please register session key first");
                 return;
             }
+            // Set to the address you want to transfer ownership to
             const newOwnerAddress = "0x9590Ed0C18190a310f4e93CAccc4CC17270bED40";
             const transagerResponse = await fetch(`/api/examples/protected-transfer-ownership`, {
                 method: "POST",
@@ -176,20 +149,19 @@ export default function ProtectedPage() {
                     maxWidth: "300px",
                 }}
             >
+                <button style={{margin: "10px"}} disabled={collectLoading} onClick={handleCollectButtonClick}>
+                    {collectLoading ? "Minting..." : "Mint NFT"}
+                </button>
                 <button style={{margin: "10px"}} disabled={registerLoading} onClick={handleRegisterButtonClick}>
                     {registerLoading ? "Registering..." : "Register session key"}
                 </button>
-                <button style={{margin: "10px"}} disabled={revokeLoading} onClick={handleRevokeButtonClick}>
-                    {revokeLoading ? "Revoking..." : "Revoke session key"}
-                </button>
-                <button style={{margin: "10px"}} disabled={collectLoading} onClick={handleCollectButtonClick}>
-                    {collectLoading ? "Collecting..." : "Collect item"}
-                </button>
             </div>
+            <p>{"Transfer ownership is disabled in live demo."}</p>
             {!requestTransferOwnership ? (
                 <button
                     style={{margin: "10px"}}
-                    disabled={transferOwnershipLoading}
+                    disabled={transferOwnershipLoading || true}
+                    // Remove disabled to enable transfer ownership
                     onClick={handleTransaferOwnershipButtonClick}
                 >
                     {transferOwnershipLoading ? "Requesting..." : "Request account custody"}
