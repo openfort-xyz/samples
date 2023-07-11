@@ -38,3 +38,4 @@ To test a sample, follow the instructions inside its folder.
 - [Complete open-source authentication solution](ssv-social-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-wagmi-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
+- [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
