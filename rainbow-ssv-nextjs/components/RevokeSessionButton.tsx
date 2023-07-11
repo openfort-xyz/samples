@@ -58,7 +58,7 @@ export function RevokeButton() {
     return (
         <div>
             <button type="button" disabled={revokeLoading} onClick={handleRevokeButtonClick}>
-                {revokeLoading ? "Revoke..." : "Revoke item"}
+                {revokeLoading ? "Revoke..." : "Revoke session"}
             </button>
         </div>
     );
