@@ -8,5 +8,6 @@ declare module "next-auth" {
         /** The user's public Ethereum address. */
         address?: string;
         user: DefaultSession["user"];
+        player_id: string;
     }
 }

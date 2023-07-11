@@ -40,15 +40,14 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                     let player;
                     try {
                         // Store the player that is logging in in the database.
-                        // const username = "username";
-                        // const description = siwe.addres;
-                        // player = await openfort.players.createPlayer(username, description);
 
-                        // Store the player.id from Openfort with the player in the database.
-                        // Hardcoded player_id for testing purposes.
-
-                        const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
-                        player = await openfort.players.get({id: player_id});
+                        player = await openfort.players.create({name: siwe.address});
+                        // create an account for the new player and specify the external owner address
+                        await openfort.accounts.create({
+                            player: player.id,
+                            chainId: 80001,
+                            externalOwnerAddress: siwe.address,
+                        });
                     } catch (e: any) {
                         console.log(e);
                         throw e;
@@ -56,6 +55,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 
                     return {
                         id: siwe.address,
+                        name: player.id,
                     };
                 } catch (e) {
                     console.log(e);
@@ -82,6 +82,8 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
         callbacks: {
             async session({session, token}) {
                 session.address = token.sub;
+                session.player_id = session?.user?.name ?? "";
+
                 session.user = {
                     name: token.sub,
                 };
@@ -101,6 +103,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 // https://next-auth.js.org/configuration/options
 export default async function auth(req: NextApiRequest, res: NextApiResponse) {
     const authOptions = getAuthOptions(req);
+
     // console.log("req.query.nextauth: ", req.query.nextauth);
     if (!Array.isArray(req.query.nextauth)) {
         res.status(400).send("Bad request");

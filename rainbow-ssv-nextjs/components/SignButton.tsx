@@ -6,7 +6,7 @@ import {arrayify} from "@ethersproject/bytes";
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
-export function CollectButton({}) {
+export function CollectButton() {
     const [collectLoading, setCollectLoading] = React.useState(false);
     const {data: walletClient} = useWalletClient();
 
@@ -15,7 +15,7 @@ export function CollectButton({}) {
             setCollectLoading(true);
 
             const collectResponse = await fetch(`/api/collect`, {
-                method: "POST",
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -58,7 +58,7 @@ export function CollectButton({}) {
     return (
         <div>
             <button type="button" disabled={collectLoading} onClick={handleCollectButtonClick}>
-                {collectLoading ? "Minting..." : "Mint NFT"}
+                {"Sign typed data"}
             </button>
         </div>
     );

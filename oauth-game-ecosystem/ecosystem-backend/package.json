@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.ts\""
   },
   "dependencies": {
-    "@openfort/openfort-node": "^0.4.0",
+    "@openfort/openfort-node": "^0.4.2",
     "@prisma/client": "^4.11.0",
     "@types/cors": "^2.8.13",
     "axios": "^1.4.0",
