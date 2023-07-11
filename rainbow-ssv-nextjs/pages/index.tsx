@@ -6,6 +6,7 @@ import {useSession} from "next-auth/react";
 import {RegisterButton} from "../components/RegisterSessionButton";
 import {RevokeButton} from "../components/RevokeSessionButton";
 import {CollectButton} from "../components/CollectButton";
+import Notice from "../components/Notice";
 
 export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     return {
@@ -32,7 +33,7 @@ const Home: NextPage = () => {
             <h2>Openfort + Rainbow + Wagmi</h2>
 
             <ConnectButton showBalance={false} accountStatus={"avatar"} />
-
+            <Notice />
             {status === "authenticated" && (
                 <div
                     style={{
