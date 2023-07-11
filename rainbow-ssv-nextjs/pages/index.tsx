@@ -44,11 +44,18 @@ const Home: NextPage = () => {
                         gap: "10px",
                     }}
                 >
-                    <p>1. Collect an NFT without a session key (MM pop-up will appear)</p>
+                    <p>
+                        1. Press on <strong>Mint an NFT</strong> without a session key (MM pop-up will appear)
+                    </p>
                     <CollectButton />
-                    <p>2. Register a session key and collect and NFT again (no pop-up this time).</p>
+                    <p>
+                        2. Press on <strong>Register session</strong> and on <strong>Mint an NFT</strong> again (no
+                        pop-up this time).
+                    </p>
                     <RegisterButton />
-                    <p>3. Revoke the session key</p>
+                    <p>
+                        3. Press on <strong>Revoke session</strong> Revoke the session key
+                    </p>
                     <RevokeButton />
                 </div>
             )}
