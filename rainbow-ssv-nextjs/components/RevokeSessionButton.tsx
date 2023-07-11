@@ -34,10 +34,11 @@ export function RevokeButton() {
                 let signedTransaction = await signer.signMessage(
                     arrayify(revokeResponseJSON.data.nextAction.payload.user_op_hash),
                 );
-
+                const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
                     revokeResponseJSON.data.id,
                     signedTransaction,
+                    optimistic,
                 );
                 if (openfortTransactionResponse) {
                     openfort.removeSessionKey();

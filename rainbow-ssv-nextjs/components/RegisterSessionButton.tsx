@@ -32,10 +32,11 @@ export function RegisterButton() {
                 let signedTransaction = await signer.signMessage(
                     arrayify(registerResponseJSON.data.nextAction.payload.user_op_hash),
                 );
-
+                const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
                     registerResponseJSON.data.id,
                     signedTransaction,
+                    optimistic,
                 );
                 if (openfortTransactionResponse) {
                     console.log("success:", openfortTransactionResponse);
