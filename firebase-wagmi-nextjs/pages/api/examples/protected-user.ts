@@ -30,7 +30,7 @@ const handler: NextApiHandler = async (
         const generatedNonce = Math.floor(Math.random() * 1000000).toString();
         // Create an Auth user
         let playerOf = await openfort.players.create({
-          name: fbInfo.email,
+          name: fbInfo.email ?? "Anonymous",
         });
         let playerOfID = playerOf.id;
 
