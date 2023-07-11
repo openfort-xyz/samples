@@ -49,7 +49,7 @@ const Home: NextPage = () => {
                         <a
                             style={{display: "flex", alignItems: "center", marginLeft: "4px"}}
                             target="_blank"
-                            href={"https://polygonscan.com/address/" + data.OF_address}
+                            href={"https://mumbai.polygonscan.com/address/" + data.OF_address}
                         >
                             {data.OF_address}
                         </a>
@@ -64,7 +64,7 @@ const Home: NextPage = () => {
                     </p>
                     <RegisterButton />
                     <p>
-                        3. Press on <strong>Revoke session</strong> Revoke the session key
+                        3. Press on <strong>Revoke session</strong> to revoke the session key
                     </p>
                     <RevokeButton />
                 </div>

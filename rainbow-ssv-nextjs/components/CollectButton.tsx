@@ -35,12 +35,13 @@ export function CollectButton({}) {
                         arrayify(collectResponseJSON.data.nextAction.payload.user_op_hash),
                     );
                 }
-
+                const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
                     collectResponseJSON.data.id,
                     signedTransaction,
+                    optimistic,
                 );
-                if (openfortTransactionResponse) {
+                if (openfortTransactionResponse.response?.status === 1) {
                     console.log("success:", openfortTransactionResponse);
                     alert("Mint performed successfully");
                 }
