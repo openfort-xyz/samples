@@ -37,13 +37,13 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 
                     await siwe.verify({signature: credentials?.signature || ""});
 
-                    let player;
+                    let player, account;
                     try {
                         // Store the player that is logging in in the database.
 
                         player = await openfort.players.create({name: siwe.address});
                         // create an account for the new player and specify the external owner address
-                        await openfort.accounts.create({
+                        account = await openfort.accounts.create({
                             player: player.id,
                             chainId: 80001,
                             externalOwnerAddress: siwe.address,
@@ -56,6 +56,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                     return {
                         id: siwe.address,
                         name: player.id,
+                        email: account.address,
                     };
                 } catch (e) {
                     console.log(e);
@@ -83,7 +84,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
             async session({session, token}) {
                 session.address = token.sub;
                 session.player_id = session?.user?.name ?? "";
-
+                session.OF_address = session?.user?.email ?? "";
                 session.user = {
                     name: token.sub,
                 };

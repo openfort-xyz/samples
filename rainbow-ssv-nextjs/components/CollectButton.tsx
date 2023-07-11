@@ -42,11 +42,11 @@ export function CollectButton({}) {
                 );
                 if (openfortTransactionResponse) {
                     console.log("success:", openfortTransactionResponse);
-                    alert("Action performed successfully");
+                    alert("Mint performed successfully");
                 }
             } else {
                 console.log("success:", collectResponseJSON.data);
-                alert("Action performed successfully");
+                alert("Mint performed successfully");
             }
         } catch (error) {
             console.error("Error:", error);

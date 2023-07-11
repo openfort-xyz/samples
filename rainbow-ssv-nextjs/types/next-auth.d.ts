@@ -9,5 +9,6 @@ declare module "next-auth" {
         address?: string;
         user: DefaultSession["user"];
         player_id: string;
+        OF_address: string;
     }
 }

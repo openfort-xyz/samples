@@ -39,11 +39,11 @@ export function RegisterButton() {
                 );
                 if (openfortTransactionResponse) {
                     console.log("success:", openfortTransactionResponse);
-                    alert("Action performed successfully");
+                    alert("Session registered successfully");
                 }
             } else {
                 console.log("success:", registerResponseJSON.data);
-                alert("Action performed successfully");
+                alert("Session registered successfully");
             }
         } catch (error) {
             console.error("Error:", error);

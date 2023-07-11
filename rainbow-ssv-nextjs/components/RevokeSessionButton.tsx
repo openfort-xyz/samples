@@ -42,11 +42,11 @@ export function RevokeButton() {
                 if (openfortTransactionResponse) {
                     openfort.removeSessionKey();
                     console.log("success:", openfortTransactionResponse);
-                    alert("Action performed successfully");
+                    alert("Session revoked successfully");
                 }
             } else {
                 console.log("success:", revokeResponseJSON.data);
-                alert("Action performed successfully");
+                alert("Session revoked successfully");
             }
         } catch (error) {
             console.error("Error:", error);
