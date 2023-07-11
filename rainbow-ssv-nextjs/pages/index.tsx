@@ -30,7 +30,7 @@ const Home: NextPage = () => {
                 padding: 12,
             }}
         >
-            <h2>Openfort + Rainbow + Wagmi</h2>
+            <h2>Openfort + SIWE + Wagmi</h2>
 
             <ConnectButton showBalance={false} accountStatus={"avatar"} />
             <Notice />
