@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
 };
 
 const Home: NextPage = () => {
-    const {status} = useSession();
+    const {status, data} = useSession();
 
     return (
         <div
@@ -44,6 +44,16 @@ const Home: NextPage = () => {
                         gap: "10px",
                     }}
                 >
+                    <div style={{display: "inline-flex"}}>
+                        <p>{"Openfort account address:"}</p>
+                        <a
+                            style={{display: "flex", alignItems: "center", marginLeft: "4px"}}
+                            target="_blank"
+                            href={"https://polygonscan.com/address/" + data.OF_address}
+                        >
+                            {data.OF_address}
+                        </a>
+                    </div>
                     <p>
                         1. Press on <strong>Mint an NFT</strong> without a session key (MM pop-up will appear)
                     </p>
