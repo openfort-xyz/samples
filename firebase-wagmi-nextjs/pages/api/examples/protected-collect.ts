@@ -30,16 +30,16 @@ export default async function handler(
 
       const interaction_mint = {
         contract: contract_id,
-        functionName: "mint",
-        functionArgs: [player_id],
+        function_name: "mint",
+        function_args: [player_id],
       };
 
       try {
         const transactionIntent = await openfort.transactionIntents.create({
           player: player_id,
           policy: policy_id,
-          chainId: chain_id,
-          optimistic: optimistic,
+          chain_id,
+          optimistic,
           interactions: [interaction_mint],
         });
 

@@ -15,12 +15,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
         const interaction: Interaction = {
             contract: process.env.NEXTAUTH_OPENFORT_CONTRACT!,
-            functionName: "mint",
-            functionArgs: [session.player_id],
+            function_name: "mint",
+            function_args: [session.player_id],
         };
         const transactionIntentRequest: TransactionIntentRequest = {
             player: session.player_id,
-            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+            chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             optimistic: true,
             interactions: [interaction],
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
