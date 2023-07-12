@@ -321,13 +321,13 @@ router.post("/mint", passport.authenticate("jwt", {session: false}), async (req,
 
     const interaction_mint: Interaction = {
         contract: contract_id,
-        functionName: "mint",
-        functionArgs: [player_id],
+        function_name: "mint",
+        function_args: [player_id],
     };
 
     const transactionIntent = await openfort.transactionIntents.create({
         player: player_id,
-        chainId,
+        chain_id: chainId,
         optimistic,
         interactions: [interaction_mint],
         policy: policy_id,

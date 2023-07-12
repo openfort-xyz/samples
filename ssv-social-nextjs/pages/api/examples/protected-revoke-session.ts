@@ -14,9 +14,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Get the address of the session key.
         const {address} = req.body;
         const revokeSessionRequest: RevokePlayerSessionRequest = {
-            playerId: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+            player_id: process.env.NEXTAUTH_OPENFORT_PLAYER!,
             address: address!.toString(),
-            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+            chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
         };
 

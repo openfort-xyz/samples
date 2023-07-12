@@ -34,13 +34,13 @@ export default async function handler(
         });
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
             const createSessionRequest: CreatePlayerSessionRequest = {
-                playerId: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+                player_id: process.env.NEXTAUTH_OPENFORT_PLAYER!,
                 address: sessionKeyAddress,
-                chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
-                validUntil: 281474976710655,
-                validAfter: 0,
+                chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+                valid_until: 281474976710655,
+                valid_after: 0,
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-                externalOwnerAddress: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
+                external_owner_address: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
             };
             const playerSession = await openfort.players.createSession(createSessionRequest);
 
