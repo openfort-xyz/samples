@@ -94,16 +94,16 @@ app.get("/FULL_KMS_EXAMPLE", async (req: Request, res: Response) => {
   let result;
   const requestData = {
     player: process.env.OPENFORT_PLAYER,
-    chain_id: process.env.CHAIN_ID,
+    chainId: process.env.CHAIN_ID,
     optimistic: true,
     interactions: [
       {
         contract: process.env.OPENFORT_CONTRACT,
-        function_name: "mint",
-        function_args: ["0x8a16DBD0970D7829C7375eE86E58AC33Ee8ECE4a"],
+        functionName: "mint",
+        functionArgs: ["0x8a16DBD0970D7829C7375eE86E58AC33Ee8ECE4a"],
       },
     ],
-    external_owner_address: process.env.EXTERNAL_OWNER_ADDRESS,
+    externalOwnerAddress: process.env.EXTERNAL_OWNER_ADDRESS,
     policy: process.env.OPENFORT_POLICY,
   };
 
@@ -117,7 +117,7 @@ app.get("/FULL_KMS_EXAMPLE", async (req: Request, res: Response) => {
     console.error("Error:", error);
     throw error;
   }
-  let userop_hash = result.next_action.payload.user_op_hash;
+  let userop_hash = result.nextAction.payload.userOpHash;
   let tin = result.id;
   console.log(userop_hash);
   let response =

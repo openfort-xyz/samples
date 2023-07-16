@@ -11,8 +11,8 @@
         "format": "prettier --write \"**/*.ts\""
     },
     "dependencies": {
-        "@openfort/openfort-js": "^0.2.5",
-        "@openfort/openfort-node": "^0.4.8",
+        "@openfort/openfort-js": "^0.3.0",
+        "@openfort/openfort-node": "^0.5.0",
         "@rainbow-me/rainbowkit": "1.0.1",
         "@rainbow-me/rainbowkit-siwe-next-auth": "0.2.0",
         "ethers": "^5.6.8",

@@ -27,7 +27,7 @@ export function CollectButton() {
         if (await openfort.loadSessionKey()) {
           // sign with the session key
           signedTransaction = openfort.signMessage(
-            collectResponseJSON.data.nextAction.payload.user_op_hash
+            collectResponseJSON.data.nextAction.payload.userOpHash
           );
         } else {
           // sign with the owner signer
@@ -36,7 +36,7 @@ export function CollectButton() {
           );
           const signer = provider.getSigner();
           signedTransaction = await signer.signMessage(
-            arrayify(collectResponseJSON.data.nextAction.payload.user_op_hash)
+            arrayify(collectResponseJSON.data.nextAction.payload.userOpHash)
           );
         }
 

@@ -32,7 +32,7 @@ export function RevokeButton() {
                 const provider = new ethers.providers.Web3Provider(walletClient as any);
                 const signer = provider.getSigner();
                 let signedTransaction = await signer.signMessage(
-                    arrayify(revokeResponseJSON.data.nextAction.payload.user_op_hash),
+                    arrayify(revokeResponseJSON.data.nextAction.payload.userOpHash),
                 );
                 const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(

@@ -24,18 +24,18 @@ export default async function handler(
 
   if (fbInfo && userDoc.exists) {
     // Get the address of the session key.
-    const player_id = userDoc.data()?.playerOf;
+    const playerId = userDoc.data()?.playerOf;
     const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
-    const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
-    const valid_until = 281474976710655;
-    const valid_after = 0;
+    const chainId = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
+    const validUntil = 281474976710655;
+    const validAfter = 0;
 
     try {
       const playerSession = await openfort.sessions.create({
-        player: player_id,
-        chain_id,
-        valid_after,
-        valid_until,
+        player: playerId,
+        chainId,
+        validAfter,
+        validUntil,
         policy: policy_id,
         address: address!.toString(),
       });

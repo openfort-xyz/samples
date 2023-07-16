@@ -31,12 +31,12 @@ export default async function handler(
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
             const interaction: Interaction = {
                 contract: process.env.NEXTAUTH_OPENFORT_CONTRACT!,
-                function_name: "mint",
-                function_args: [process.env.NEXTAUTH_OPENFORT_PLAYER!],
+                functionName: "mint",
+                functionArgs: [process.env.NEXTAUTH_OPENFORT_PLAYER!],
             };
             const createTransactionIntentRequest: TransactionIntentRequest = {
                 player: process.env.NEXTAUTH_OPENFORT_PLAYER!,
-                chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+                chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
                 optimistic: true,
                 interactions: [interaction],
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
