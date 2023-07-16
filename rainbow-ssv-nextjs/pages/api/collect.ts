@@ -11,16 +11,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, getAuthOptions(req));
 
     if (session) {
-        // Could use the address to find the player in the game server and the Openfort player_id associated to it.
+        // Could use the address to find the player in the game server and the Openfort playerId associated to it.
 
         const interaction: Interaction = {
             contract: process.env.NEXTAUTH_OPENFORT_CONTRACT!,
-            function_name: "mint",
-            function_args: [session.player_id],
+            functionName: "mint",
+            functionArgs: [session.playerId],
         };
         const transactionIntentRequest: TransactionIntentRequest = {
-            player: session.player_id,
-            chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+            player: session.playerId,
+            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             optimistic: true,
             interactions: [interaction],
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,

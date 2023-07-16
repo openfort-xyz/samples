@@ -15,9 +15,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const {address} = req.body;
 
         const revokeSessionRequest: RevokePlayerSessionRequest = {
-            player_id: session.player_id,
+            playerId: session.playerId,
             address: address!.toString(),
-            chain_id: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
         };
         try {

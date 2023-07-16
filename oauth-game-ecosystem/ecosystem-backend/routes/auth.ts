@@ -313,7 +313,7 @@ router.get("/profile", passport.authenticate("jwt", {session: false}), (req, res
 });
 
 router.post("/mint", passport.authenticate("jwt", {session: false}), async (req, res) => {
-    const player_id = (req.user as User).playerOf!;
+    const playerId = (req.user as User).playerOf!;
     const policy_id = "pol_182c7c1f-1e8d-4363-8b66-532f57b2e56e";
     const contract_id = "con_542f32a1-f895-447b-b9cd-e7a109671b0f";
     const chainId = 80001;
@@ -321,13 +321,13 @@ router.post("/mint", passport.authenticate("jwt", {session: false}), async (req,
 
     const interaction_mint: Interaction = {
         contract: contract_id,
-        function_name: "mint",
-        function_args: [player_id],
+        functionName: "mint",
+        functionArgs: [playerId],
     };
 
     const transactionIntent = await openfort.transactionIntents.create({
-        player: player_id,
-        chain_id: chainId,
+        player: playerId,
+        chainId: chainId,
         optimistic,
         interactions: [interaction_mint],
         policy: policy_id,
@@ -339,11 +339,11 @@ router.post("/mint", passport.authenticate("jwt", {session: false}), async (req,
 });
 
 router.get("/inventory", passport.authenticate("jwt", {session: false}), async (req, res) => {
-    const player_id = (req.user as User).playerOf!;
-    const chain_id = 80001;
+    const playerId = (req.user as User).playerOf!;
+    const chainId = 80001;
     let playerInventory;
     try {
-        playerInventory = await openfort.players.getInventory({id: player_id, chain_id});
+        playerInventory = await openfort.players.getInventory({id: playerId, chainId});
     } catch (error) {
         console.log(error);
     }

@@ -21,24 +21,24 @@ export default async function handler(
   const userDoc = await userDocRef.get();
   if (fbInfo) {
     if (userDoc.exists) {
-      const player_id = userDoc.data()?.playerOf;
+      const playerId = userDoc.data()?.playerOf;
 
       const policy_id = process.env.NEXTAUTH_OPENFORT_POLICY!;
       const contract_id = process.env.NEXTAUTH_OPENFORT_CONTRACT!;
-      const chain_id = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
+      const chainId = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
       const optimistic = true;
 
       const interaction_mint = {
         contract: contract_id,
-        function_name: "mint",
-        function_args: [player_id],
+        functionName: "mint",
+        functionArgs: [playerId],
       };
 
       try {
         const transactionIntent = await openfort.transactionIntents.create({
-          player: player_id,
+          player: playerId,
           policy: policy_id,
-          chain_id,
+          chainId,
           optimistic,
           interactions: [interaction_mint],
         });

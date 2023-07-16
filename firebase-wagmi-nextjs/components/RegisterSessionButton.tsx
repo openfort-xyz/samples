@@ -32,7 +32,7 @@ export function RegisterButton() {
         const provider = new ethers.providers.Web3Provider(walletClient as any);
         const signer = provider.getSigner();
         let signedTransaction = await signer.signMessage(
-          arrayify(registerResponseJSON.data.nextAction.payload.user_op_hash)
+          arrayify(registerResponseJSON.data.nextAction.payload.userOpHash)
         );
 
         const openfortTransactionResponse =

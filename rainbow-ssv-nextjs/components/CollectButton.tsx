@@ -26,13 +26,13 @@ export function CollectButton({}) {
                 let signedTransaction;
                 if (await openfort.loadSessionKey()) {
                     // sign with the session key
-                    signedTransaction = openfort.signMessage(collectResponseJSON.data.nextAction.payload.user_op_hash);
+                    signedTransaction = openfort.signMessage(collectResponseJSON.data.nextAction.payload.userOpHash);
                 } else {
                     // sign with the owner signer
                     const provider = new ethers.providers.Web3Provider(walletClient as any);
                     const signer = provider.getSigner();
                     signedTransaction = await signer.signMessage(
-                        arrayify(collectResponseJSON.data.nextAction.payload.user_op_hash),
+                        arrayify(collectResponseJSON.data.nextAction.payload.userOpHash),
                     );
                 }
                 const optimistic = false;

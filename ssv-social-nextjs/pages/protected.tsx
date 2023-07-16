@@ -74,7 +74,7 @@ export default function ProtectedPage() {
 
             if (collectResponseJSON.data?.nextAction) {
                 const sessionSignedTransaction = openfort.signMessage(
-                    collectResponseJSON.data.nextAction.payload.user_op_hash,
+                    collectResponseJSON.data.nextAction.payload.userOpHash,
                 );
                 const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
                     collectResponseJSON.data.id,

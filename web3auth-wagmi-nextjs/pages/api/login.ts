@@ -25,10 +25,10 @@ export default async function handler(
             algorithms: ["ES256"],
         });
 
-        const player_id = process.env.NEXTAUTH_OPENFORT_PLAYER!;
+        const playerId = process.env.NEXTAUTH_OPENFORT_PLAYER!;
 
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
-            const playerAccountAddress = await openfort.players.get({id: player_id});
+            const playerAccountAddress = await openfort.players.get({id: playerId});
 
             if (playerAccountAddress) {
                 console.log("Player found. ", playerAccountAddress);

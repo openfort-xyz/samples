@@ -45,8 +45,8 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                         // create an account for the new player and specify the external owner address
                         account = await openfort.accounts.create({
                             player: player.id,
-                            chain_id: 80001,
-                            external_owner_address: siwe.address,
+                            chainId: 80001,
+                            externalOwnerAddress: siwe.address,
                         });
                     } catch (e: any) {
                         console.log(e);
@@ -83,7 +83,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
         callbacks: {
             async session({session, token}) {
                 session.address = token.sub;
-                session.player_id = session?.user?.name ?? "";
+                session.playerId = session?.user?.name ?? "";
                 session.OF_address = session?.user?.email ?? "";
                 session.user = {
                     name: token.sub,
