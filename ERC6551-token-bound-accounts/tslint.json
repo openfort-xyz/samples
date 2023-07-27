@@ -1,0 +1,7 @@
+{
+    "extends": ["tslint:recommended", "tslint-config-prettier"],
+    "linterOptions": {},
+    "rules": {
+        "no-console": false
+    }
+}
