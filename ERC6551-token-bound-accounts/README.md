@@ -2,13 +2,17 @@
 
 This samples shows your how to use [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) Token Bound Accounts with Openfort.
 
-It displays two options:
+- Blog article [here](https://www.openfort.xyz/blog/technical-dive-combining-token-bound-account-tba-with-account-abstraction-aa).
+
+It includes two options:
 
 ## Option 1
 An upgradeable Openfort account owns the NFT that owns the 6551 account
+![Option 1](https://blog-cms.openfort.xyz/uploads/Group_348_05b11271b9.svg)
 
 ## Option 2
 An EAO owns the NFT that owns the 6551 account.
+![Option 2](https://blog-cms.openfort.xyz/uploads/Group_349_48e9e86864.svg)
 
 ## How to run locally
 
