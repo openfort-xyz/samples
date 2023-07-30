@@ -4,8 +4,11 @@ This sample shows you how you can create your own gaming ecosystem by having you
 
 Ecosystems are a powerful way to support a network of games with a consistent and standard single sign-on auth flow across them to enable new degrees of game interoperability, frictionless player experiences, and more.
 
+- [Video walkthrough](https://youtu.be/s8wMDpTTzJE)
+- [Blog article](https://www.openfort.xyz/blog/openfort-interoperability-the-rise-of-cross-game-ecosystems)
+- [Ecosystem documentation](https://www.openfort.xyz/docs/ecosystem)
+
 ## Demo
-[Live demo video](https://youtu.be/s8wMDpTTzJE)
 
 This sample ecosystem's allows things such as:
 
@@ -35,6 +38,7 @@ This sample ecosystem's allows things such as:
 ## Authentication patterns
 
 Depending on your games needs, here's a few possible patterns you may choose to integrate your auth page through.
+
 
 **Redirect Pattern**
 
