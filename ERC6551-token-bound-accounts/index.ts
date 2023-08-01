@@ -286,7 +286,7 @@ async function Option2() {
         const player_upgradeable = await openfort.players.create({
             name: "upgradeable account",
         });
-        // Create a 6551 OF account
+        // Create a upgradeable OF account
         const upgradeable_account = await openfort.accounts.create({
             player: player_upgradeable.id,
             chainId: chainId,
@@ -338,6 +338,7 @@ async function Option2() {
             accountType: DataAccountTypes.Erc6551,
             tokenContract: SimpleNFT.id,
             tokenId: simpleOwnerNFTTokenId,
+            externalOwnerAddress: upgradeable_account.address,
         });
         console.log("6551 account address:", account.address);
 
