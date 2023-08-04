@@ -14,13 +14,16 @@ const Home: React.FC = () => {
         return;
       }
 
-      const response = await fetch(process.env.NEXT_PUBLIC_ECOSYSTEM_BACKEND_URL + "auth/profile", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_ECOSYSTEM_BACKEND_URL + "auth/profile",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       setProfile(data);
     }
@@ -36,14 +39,13 @@ const Home: React.FC = () => {
     fetchProfile(token);
   }, [router.query.token]);
 
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
       <div className="flex w-96 flex-row mt-6">
         {profile ? (
           <div className="w-full">
-            <div className='flex'>
-              <p className='flex-1'>{profile.email}</p>
+            <div className="flex">
+              <p className="flex-1">{profile.email}</p>
               <button
                 className="underline text-blue-500"
                 onClick={() => {
@@ -60,7 +62,7 @@ const Home: React.FC = () => {
             <InventoryComponent />
           </div>
         ) : (
-          <OAuthButton popup={true} />
+          <OAuthButton popup={false} />
         )}
       </div>
     </div>

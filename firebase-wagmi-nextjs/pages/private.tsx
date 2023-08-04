@@ -20,12 +20,15 @@ const Home: NextPage = () => {
       </Head>
 
       <main>
-        <h1 className="uppercase font-bold">Private</h1>
+        <h1 className="uppercase mb-5 underline font-bold">Private</h1>
         <p>Email : {user?.claims.email ?? "Anonymous"}</p>
         <br />
         <div className="space-y-2">
           <p className="text-sm">Mint an NFT</p>
           <CollectButton />
+          <h2 className="pt-10 pb-3">
+            Did you sign in with wallet? Enable a popup-less experience
+          </h2>
           <p className="text-sm">
             Create a popup-less experience registering a session key
           </p>

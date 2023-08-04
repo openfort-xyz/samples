@@ -390,10 +390,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@openfort/openfort-node@^0.5.4":
-  version "0.5.6"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.5.6.tgz#63a4896824f265a1feb58c3815b653309173107a"
-  integrity sha512-6oD74EOnlJBpEtqv1J1pkCN5izYmL+6x05Ha343j+FEER6ODxMBPoWBmgr8FMJ9x2iIxR2crhIH64Yk5BocVIw==
+"@openfort/openfort-node@^0.5.11":
+  version "0.5.11"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.5.11.tgz#37b79f9ed7e13a9855123b73d3eb4ceb94d4e026"
+  integrity sha512-EImp2fHBbW5kAjdSshJQB6UuQH23CyDIQQTR3a2BtXCOFbZV0IvWPV2L1m9islusx9E71x0d/2bEEl5Ob8kRRw==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"
