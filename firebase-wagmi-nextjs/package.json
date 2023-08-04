@@ -12,7 +12,7 @@
   "dependencies": {
     "@metamask/eth-sig-util": "^5.1.0",
     "@openfort/openfort-js": "^0.3.0",
-    "@openfort/openfort-node": "^0.5.0",
+    "@openfort/openfort-node": "^0.5.11",
     "ethers": "^5.7.2",
     "firebase": "^9.12.1",
     "firebase-admin": "^9.11.1",

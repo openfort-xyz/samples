@@ -1246,10 +1246,10 @@
     es6-promise "^4.2.8"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.5.0.tgz#e45f687cf601de9f9b84f545daaca9fda1c843f0"
-  integrity sha512-riNMXBMSAbd0NQTaPmleiSR3Xrjo9ffLJ3JvIpzTXEtYU1BFEe4NAzrt0JSKR/fnVtDkQJh0h5QlWM79HRwyqg==
+"@openfort/openfort-node@^0.5.11":
+  version "0.5.11"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.5.11.tgz#37b79f9ed7e13a9855123b73d3eb4ceb94d4e026"
+  integrity sha512-EImp2fHBbW5kAjdSshJQB6UuQH23CyDIQQTR3a2BtXCOFbZV0IvWPV2L1m9islusx9E71x0d/2bEEl5Ob8kRRw==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"
