@@ -3,7 +3,7 @@ import {getServerSession} from "next-auth/next";
 import {authOptions} from "../auth/[...nextauth]";
 
 import type {NextApiRequest, NextApiResponse} from "next";
-import Openfort, {Interaction, TransactionIntentRequest} from "@openfort/openfort-node";
+import Openfort, {Interaction, CreateTransactionIntentRequest} from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             functionName: "mint",
             functionArgs: [process.env.NEXTAUTH_OPENFORT_PLAYER!],
         };
-        const createTransactionIntentRequest: TransactionIntentRequest = {
+        const createTransactionIntentRequest: CreateTransactionIntentRequest = {
             player: process.env.NEXTAUTH_OPENFORT_PLAYER!,
             chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             optimistic: true,

@@ -17,7 +17,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         const chainId = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
 
         try {
-            const playerTransferOwnership = await openfort.players.transferAccountOwnership({
+            const playerTransferOwnership = await openfort.players.requestTransferAccountOwnership({
                 playerId: playerId,
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
                 chainId: chainId,
@@ -26,7 +26,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
             const playerAccountAddress = await openfort.players.listAccounts({
                 id: playerId,
-                expand: ["accounts"],
             });
 
             const accountAddress = playerAccountAddress.data.find((account) => account.chainId === chainId)?.address;
