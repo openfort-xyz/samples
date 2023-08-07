@@ -4,3 +4,6 @@
 [submodule "walletconnect-wallet-sample"]
 	path = walletconnect-wallet-sample
 	url = git@github.com:openfort-xyz/walletconnect-wallet-sample.git
+[submodule "authentication-unity-sample"]
+	path = authentication-unity-sample
+	url = https://github.com/openfort-xyz/authentication-unity-sample
