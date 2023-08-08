@@ -13,39 +13,17 @@ export function CompleteRecoveryButton() {
     const handleCompleteRecoveryButtonClick = async () => {
         try {
             setCompleteRecoveryLoading(true);
-            // openfort.startRecoveryProcess(); //
-            await openfort.saveSessionKey();
-            const address = openfort.sessionKey.address;
             const completeResponse = await fetch(`/api/complete-recovery`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({address}),
+                body: "",
             });
 
             const completeResponseJSON = await completeResponse.json();
-
-            if (completeResponseJSON.data?.nextAction) {
-                const provider = new ethers.providers.Web3Provider(walletClient as any);
-                const signer = provider.getSigner();
-                let signedTransaction = await signer.signMessage(
-                    arrayify(completeResponseJSON.data.nextAction.payload.userOpHash),
-                );
-                const optimistic = false;
-                const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
-                    completeResponseJSON.data.id,
-                    signedTransaction,
-                    optimistic,
-                );
-                if (openfortTransactionResponse) {
-                    console.log("success:", openfortTransactionResponse);
-                    alert("Recovery completed successfully");
-                }
-            } else {
-                console.log("success:", completeResponseJSON.data);
-                alert("Recovery completed successfully");
-            }
+            console.log("success:", completeResponseJSON.data);
+            alert("Recovery completed successfully");
         } catch (error) {
             console.error("Error:", error);
         } finally {

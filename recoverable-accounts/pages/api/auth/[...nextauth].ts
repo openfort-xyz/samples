@@ -8,7 +8,7 @@ import NextAuth, {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {getCsrfToken} from "next-auth/react";
 import {SiweMessage} from "siwe";
-import Openfort from "@openfort/openfort-node";
+import Openfort, { DataAccountTypes } from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http://localhost:3000");
 
@@ -37,15 +37,14 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 
                     await siwe.verify({signature: credentials?.signature || ""});
 
-                    let player, account;
+                    let account;
                     try {
                         // Store the player that is logging in in the database.
-
-                        player = await openfort.players.create({name: siwe.address});
                         // create an account for the new player and specify the external owner address
                         account = await openfort.accounts.create({
-                            player: player.id,
-                            chainId: 80001,
+                            player: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+                            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
+                            accountType: DataAccountTypes.Recoverable,
                             externalOwnerAddress: siwe.address,
                         });
                     } catch (e: any) {
@@ -55,7 +54,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
 
                     return {
                         id: siwe.address,
-                        name: player.id,
+                        name: process.env.NEXTAUTH_OPENFORT_PLAYER!,
                         email: account.address,
                     };
                 } catch (e) {
