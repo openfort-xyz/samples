@@ -1,8 +1,10 @@
 # Recoverable Accounts
 
-This sample shows you 
+This sample shows you how to use Openfort's recoverable accounts.
+They are a type of accounts that, apart from the regular owner, they can have guardians.
+Guardians are wallets used to recover the account (change the owner) in case the private key of the original owner is lost or stolen.
 
-I.
+For more information about social recovery, you can read: https://vitalik.ca/general/2021/01/11/recovery.html.
 
 ## Demo
 
