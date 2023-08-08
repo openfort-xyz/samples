@@ -3,7 +3,7 @@ import {getServerSession} from "next-auth/next";
 import {getAuthOptions} from "./auth/[...nextauth]";
 
 import type {NextApiRequest, NextApiResponse} from "next";
-import Openfort, {CreatePlayerSessionRequest} from "@openfort/openfort-node";
+import Openfort, {CompleteRecoveryRequest} from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http://localhost:3000");
 
@@ -11,11 +11,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const session = await getServerSession(req, res, getAuthOptions(req));
 
     if (session) {
-        // Get the address of the session key.
-        const {newOwnerAddress} = req.body;
-
         const completeRecoveryRequest: CompleteRecoveryRequest = {
-            newOwnerAddress: newOwnerAddress,
+            accountId: process.env.NEXTAUTH_OPENFORT_ACCOUNT!,
+            newOwnerAddress: process.env.NEW_OWNER!,
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!
         };
 

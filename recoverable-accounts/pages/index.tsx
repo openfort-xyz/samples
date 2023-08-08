@@ -6,6 +6,7 @@ import {useSession} from "next-auth/react";
 import {StartRecoveryButton} from "../components/StartRecoveryButton";
 import { CompleteRecoveryButton } from "../components/CompleteRecoveryButton";
 import Notice from "../components/Notice";
+import { CollectButton } from "../components/CollectButton";
 
 export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     return {
@@ -54,11 +55,15 @@ const Home: NextPage = () => {
                         </a>
                     </div>
                     <p>
-                        1. Press on <strong>Start recovery</strong> to initiate the recovery process with the default guardian.
+                        1. Press on <strong>Mint an NFT</strong> to deploy the account (MM pop-up will appear)
+                    </p>
+                    <CollectButton />
+                    <p>
+                        2. Press on <strong>Start recovery</strong> to initiate the recovery process with the default guardian.
                     </p>
                     <StartRecoveryButton />
                     <p>
-                        2. Press on <strong>Complete recovery</strong> to complete a recovery process with the default guardian.
+                        3. Press on <strong>Complete recovery</strong> to complete a recovery process with the default guardian.
                     </p>
                     <CompleteRecoveryButton />
                 </div>
