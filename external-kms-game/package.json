@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@openfort/openfort-node": "^0.5.11",
+    "@openfort/openfort-node": "^0.5.14",
     "dotenv": "^16.3.1",
     "ethers": "5.7.2",
     "ethers-gcp-kms-signer": "^1.1.6",

@@ -40,3 +40,4 @@ To test a sample, follow the instructions inside its folder.
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
 - [Openfort Auth in Unity](https://github.com/openfort-xyz/authentication-unity-sample)
+- [Recoverable Accounts](recoverable-accounts)
