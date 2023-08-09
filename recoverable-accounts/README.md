@@ -8,7 +8,7 @@ For more information about social recovery, you can read: https://vitalik.ca/gen
 
 ## Demo
 
-- [Video walkthrough](https://)
+- [Video walkthrough](https://youtu.be/E8e1pklBbgw)
 
 This demo authenticates a player using NextAuth. It assumes that there exists a database where the relation betweeen an address and an Openfort player is created.
 
