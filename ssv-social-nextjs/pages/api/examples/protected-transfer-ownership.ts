@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             });
 
             const playerAccountAddress = await openfort.players.listAccounts({
-                id: playerId,
+                player: playerId,
             });
 
             const accountAddress = playerAccountAddress.data.find((account) => account.chainId === chainId)?.address;
