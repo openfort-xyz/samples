@@ -8,7 +8,7 @@ For more information about social recovery, you can read: https://vitalik.ca/gen
 
 ## Demo
 
-- [Video walkthrough](https://)
+- [Video walkthrough](https://youtu.be/E8e1pklBbgw)
 
 This demo authenticates a player using NextAuth. It assumes that there exists a database where the relation betweeen an address and an Openfort player is created.
 
@@ -34,7 +34,7 @@ cd rainbow-ssv-nextjs
 Copy the .env.local.example file into a file named .env.local in the folder of the server you want to use. For example:
 
 ```
-cp .env.local.example .env.local
+cp .env.local.example .env
 ```
 
 You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
