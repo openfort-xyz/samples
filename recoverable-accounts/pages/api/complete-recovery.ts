@@ -10,9 +10,11 @@ const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http:/
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, getAuthOptions(req));
 
+    const account = await openfort.players.listAccounts({id: process.env.NEXTAUTH_OPENFORT_PLAYER!});
+
     if (session) {
         const completeRecoveryRequest: CompleteRecoveryRequest = {
-            accountId: process.env.NEXTAUTH_OPENFORT_ACCOUNT!,
+            accountId: account.data[0].id,
             newOwnerAddress: process.env.NEW_OWNER!,
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!
         };
