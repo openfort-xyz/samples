@@ -1,8 +1,6 @@
 import * as React from "react";
 import Openfort from "@openfort/openfort-js";
 import {useWalletClient} from "wagmi";
-import {ethers} from "ethers";
-import {arrayify} from "@ethersproject/bytes";
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
@@ -23,17 +21,15 @@ export function CollectButton({}) {
             const collectResponseJSON = await collectResponse.json();
 
             if (collectResponseJSON.data?.nextAction) {
-                let signedTransaction;
-                if (await openfort.loadSessionKey()) {
+                let signedTransaction: string;
+                if (openfort.loadSessionKey()) {
                     // sign with the session key
                     signedTransaction = openfort.signMessage(collectResponseJSON.data.nextAction.payload.userOpHash);
                 } else {
                     // sign with the owner signer
-                    const provider = new ethers.providers.Web3Provider(walletClient as any);
-                    const signer = provider.getSigner();
-                    signedTransaction = await signer.signMessage(
-                        arrayify(collectResponseJSON.data.nextAction.payload.userOpHash),
-                    );
+                    signedTransaction = await walletClient!.signMessage({
+                        message: {raw: collectResponseJSON.data.nextAction.payload.userOpHash},
+                    });
                 }
                 const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(

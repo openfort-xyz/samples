@@ -45,7 +45,7 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                         // create an account for the new player and specify the external owner address
                         account = await openfort.accounts.create({
                             player: player.id,
-                            chainId: 80001,
+                            chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
                             externalOwnerAddress: siwe.address,
                         });
                     } catch (e: any) {

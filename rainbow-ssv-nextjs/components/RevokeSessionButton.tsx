@@ -1,7 +1,5 @@
 import * as React from "react";
 import Openfort from "@openfort/openfort-js";
-import {ethers} from "ethers";
-import {arrayify} from "@ethersproject/bytes";
 import {useWalletClient} from "wagmi";
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
@@ -29,11 +27,9 @@ export function RevokeButton() {
             const revokeResponseJSON = await revokeResponse.json();
 
             if (revokeResponseJSON.data?.nextAction) {
-                const provider = new ethers.providers.Web3Provider(walletClient as any);
-                const signer = provider.getSigner();
-                let signedTransaction = await signer.signMessage(
-                    arrayify(revokeResponseJSON.data.nextAction.payload.userOpHash),
-                );
+                let signedTransaction = await walletClient!.signMessage({
+                    message: {raw: revokeResponseJSON.data.nextAction.payload.userOpHash},
+                });
                 const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
                     revokeResponseJSON.data.id,
