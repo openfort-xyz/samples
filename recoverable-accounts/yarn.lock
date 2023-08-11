@@ -681,10 +681,10 @@
     es6-promise "^4.2.8"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.5.11":
-  version "0.5.12"
-  resolved "https://registry.yarnpkg.com/@openfort/openfort-node/-/openfort-node-0.5.12.tgz#d286f4a9add0c6472cb1bdd512a2692bbe580246"
-  integrity sha512-1B6wSkN/GmEU1FvivPLg3VV/UXWD9HBw+AWl9+dlJH3TTTRjPWZc9GmJISxib0rEKV4VM9Xw104Lp6nrXZxrig==
+"@openfort/openfort-node@^0.5.14":
+  version "0.5.14"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.5.14.tgz#b97dfd7e33194fba9b315db6a2867f9224598085"
+  integrity sha512-rE/+FJWRBCJQ3kr1UHbYO7R6yRdPTm6EQBFFe0c6jfA5959pUyRrTYYtOkw/Dkdt69DBftGRNZSofgruaOI6TQ==
   dependencies:
     "@types/node" "^12"
     bluebird "^3.5.0"
