@@ -30,7 +30,7 @@ const Home: NextPage = () => {
                 padding: 12,
             }}
         >
-            <h2>Openfort + SIWE + Wagmi</h2>
+            <h2>{"Openfort + SIWE + Wagmi"}</h2>
 
             <ConnectButton showBalance={false} accountStatus={"avatar"} />
             <Notice />
@@ -55,12 +55,13 @@ const Home: NextPage = () => {
                         </a>
                     </div>
                     <p>
-                        1. Press the <strong>Mint an NFT</strong> button below. As there's no session key registered yet, a wallet pop-up will appear.
+                        1. Press the <strong>Mint an NFT</strong> button below. As there is no session key registered
+                        yet, a wallet pop-up will appear.
                     </p>
                     <CollectButton />
                     <p>
-                        2. Press on the <strong>Register session</strong> button below (a wallet pop-up will appear again), and then on <strong>Mint an NFT</strong> again (no
-                        pop-up this time).
+                        2. Press on the <strong>Register session</strong> button below (a wallet pop-up will appear
+                        again), and then on <strong>Mint an NFT</strong> again (no pop-up this time).
                     </p>
                     <RegisterButton />
                     <p>
