@@ -60,6 +60,7 @@ const Home: NextPage = () => {
                     <CollectButton />
                     <p>
                         2. Press on <strong>Start recovery</strong> to initiate the recovery process with the default guardian.
+                        This will start a recovery process to set the new owner as the address 0x8a16DBD0970D7829C7375eE86E58AC33Ee8ECE4a.
                     </p>
                     <StartRecoveryButton />
                     <p>
