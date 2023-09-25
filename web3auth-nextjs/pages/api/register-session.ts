@@ -10,7 +10,7 @@ export default async function handler(
     req: {
         query: any;
         headers: {authorization: string; query: any};
-        body: {appPubKey: any; sessionPubKey: any};
+        body: {appPubKey: any; sessionPubKey: any,player:string};
     },
     res: {
         status: (arg0: number) => {
@@ -26,6 +26,7 @@ export default async function handler(
     try {
         const idToken = req.headers.authorization?.split(" ")[1] || "";
         const app_pub_key = req.body.appPubKey;
+        const playerId = req.body.player;
         const sessionKeyAddress = req.body.sessionPubKey;
 
         const jwks = jose.createRemoteJWKSet(new URL("https://api.openlogin.com/jwks"));
@@ -34,7 +35,7 @@ export default async function handler(
         });
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
             const createSessionRequest: CreatePlayerSessionRequest = {
-                playerId: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+                playerId: playerId,
                 address: sessionKeyAddress,
                 chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
                 validUntil: 281474976710655,

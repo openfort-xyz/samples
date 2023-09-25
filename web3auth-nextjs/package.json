@@ -1,5 +1,5 @@
 {
-    "name": "web3auth-wagmi-nextjs",
+    "name": "web3auth-openfort-nextjs",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@openfort/openfort-js": "^0.3.0",
-        "@openfort/openfort-node": "^0.6.4",
+        "@openfort/openfort-node": "^0.6.8",
         "@solana/web3.js": "^1.76.0",
         "@toruslabs/eccrypto": "^1.1.8",
         "@web3auth/base": "^5.2.0",

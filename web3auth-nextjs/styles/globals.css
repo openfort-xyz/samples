@@ -15,11 +15,7 @@ a {
 	box-sizing: border-box;
 }
 
-.container {
-	width: 70%;
-	margin: auto;
-	padding: 0 2rem;
-}
+
 
 .main {
 	min-height: 100vh;
@@ -33,9 +29,9 @@ a {
 
 .title {
 	line-height: 1.15;
-	font-size: 3rem;
+	font-size: 1.5rem;
 	text-align: center;
-	margin: 50px;
+	margin: 25px;
 }
 
 .title a {
@@ -89,12 +85,6 @@ a {
 .logo {
 	height: 1.5rem;
 	margin-left: 0.5rem;
-}
-
-@media (max-width: 1200px) {
-	.container {
-		width: 100%;
-	}
 }
 
 .flex-container {
