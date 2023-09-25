@@ -6,18 +6,17 @@ import {Web3AuthNoModal} from "@web3auth/no-modal";
 import {OpenloginAdapter} from "@web3auth/openlogin-adapter";
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
-import Openfort from "@openfort/openfort-js";
 
-import RPC from "../components/evm.ethers";
-
-const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
+import Notice from "../components/Notice";
+import {CollectButton} from "../components/CollectButton";
+import {RegisterButton} from "../components/RegisterSessionButton";
 
 const clientId = process.env.NEXT_PUBLIC_WEB3_AUTH_ID!; // get from https://dashboard.web3auth.io
 
 function App() {
     const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-
+    const [playerId, setPlayerId] = useState<string | null>(null);
     useEffect(() => {
         const init = async () => {
             try {
@@ -78,103 +77,6 @@ function App() {
         uiConsole(user);
     };
 
-    const registerSessionKey = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
-            return;
-        }
-
-        openfort.createSessionKey();
-        await openfort.saveSessionKey();
-        const address = openfort.sessionKey.address;
-        const {idToken} = await web3auth.authenticateUser();
-        const privKey: any = await web3auth.provider?.request({
-            method: "eth_private_key",
-        });
-        const pubkey = getPublicCompressed(Buffer.from(privKey, "hex")).toString("hex");
-        let toastId = toast.loading("Registering session...");
-
-        const sessionResponse = await fetch("/api/register-session", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({appPubKey: pubkey, sessionPubKey: address}),
-        });
-        const sessionResponseJSON = await sessionResponse.json();
-        if (sessionResponseJSON.data?.nextAction) {
-            toast.dismiss(toastId);
-            toastId = toast.loading("Session Key Waiting for Signature");
-
-            const rpc = new RPC(web3auth.provider!);
-            const ownerSignedSession = await rpc.signMessage(sessionResponseJSON.data.nextAction.payload.userOpHash);
-
-            const openfortSessionResponse = await openfort.sendSignatureSessionRequest(
-                sessionResponseJSON.data.id,
-                ownerSignedSession,
-            );
-
-            if (openfortSessionResponse) {
-                toast.dismiss(toastId);
-                console.log("success:", openfortSessionResponse);
-                toast.success("Session Key Registered Successfully");
-            }
-        } else {
-            toast.dismiss(toastId);
-            toast.error("Session Key Registration Failed");
-        }
-    };
-
-    const mintAsset = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
-            return;
-        }
-        const {idToken} = await web3auth.authenticateUser();
-
-        if (!(await openfort.loadSessionKey())) {
-            toast.error("Session key not found. Please register session key first");
-            return;
-        }
-        const privKey: any = await web3auth.provider?.request({
-            method: "eth_private_key",
-        });
-
-        const pubkey = getPublicCompressed(Buffer.from(privKey, "hex")).toString("hex");
-        let toastId = toast.loading("Collecting item...");
-        // Validate idToken with server
-        const collectResponse = await fetch("/api/collect-asset", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
-            },
-            body: JSON.stringify({appPubKey: pubkey, item: 22, player: 1212}),
-        });
-        const collectResponseJSON = await collectResponse.json();
-        if (collectResponseJSON.data?.nextAction) {
-            const sessionSignedTransaction = openfort.signMessage(
-                collectResponseJSON.data.nextAction.payload.userOpHash,
-            );
-            toast.dismiss(toastId);
-            toastId = toast.loading("Session Key Waiting for Signature");
-            const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
-                collectResponseJSON.data.id,
-                sessionSignedTransaction,
-            );
-            if (openfortTransactionResponse) {
-                toast.dismiss(toastId);
-                toast.success("Item Collected Successfully");
-            }
-        } else {
-            toast.dismiss(toastId);
-            toast.error("JWT Verification Failed");
-            await logout();
-        }
-        return collectResponseJSON;
-    };
-
     const validateIdToken = async () => {
         if (!web3auth) {
             uiConsole("web3auth not initialized yet");
@@ -201,6 +103,8 @@ function App() {
         });
         if (loginRequest.status === 200) {
             toast.dismiss(toastId);
+            const data = await loginRequest.json();
+            setPlayerId(data.player);
             toast.success("JWT Verification Successful");
         } else {
             toast.dismiss(toastId);
@@ -229,30 +133,28 @@ function App() {
 
     const loginView = (
         <>
-            <div className="flex-container">
-                <div>
-                    <button onClick={getUserInfo} className="card">
-                        Get User Info
-                    </button>
-                </div>
-                <div>
-                    <button onClick={registerSessionKey} className="card">
-                        Register session key
-                    </button>
-                </div>
-                <div>
-                    <button onClick={mintAsset} className="card">
-                        Collect item
-                    </button>
-                </div>
-                <div>
-                    <button onClick={logout} className="card">
-                        Log Out
-                    </button>
-                </div>
+            <div>
+                <button onClick={getUserInfo} className="card">
+                    Get User Info
+                </button>
+            </div>
+            <div>
+                {playerId && (
+                    <RegisterButton playerId={playerId} web3auth={web3auth} uiConsole={uiConsole} logout={logout} />
+                )}
+            </div>
+            <div>
+                {playerId && (
+                    <CollectButton playerId={playerId} web3auth={web3auth} uiConsole={uiConsole} logout={logout} />
+                )}
+            </div>
+            <div>
+                <button onClick={logout} className="card">
+                    Log Out
+                </button>
             </div>
 
-            <div id="console" style={{whiteSpace: "pre-line"}}>
+            <div id="console" style={{whiteSpace: "pre-line", width: "500px", overflowX: "auto"}}>
                 <p style={{whiteSpace: "pre-line"}}>Logged in Successfully!</p>
             </div>
         </>
@@ -265,7 +167,15 @@ function App() {
     );
 
     return (
-        <div className="container">
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                padding: 12,
+            }}
+        >
             <h1 className="title">
                 <a target="_blank" href="https://web3auth.io/" rel="noreferrer">
                     Web3Auth
@@ -274,8 +184,10 @@ function App() {
                 <a target="_blank" href="https://openfort.xyz" rel="noreferrer">
                     Openfort
                 </a>{" "}
-                & NextJS Server Side Verification Example
+                <br />& NextJS Server Side Verification Example
             </h1>
+
+            <Notice />
 
             <div className="grid">{provider ? loginView : logoutView}</div>
 

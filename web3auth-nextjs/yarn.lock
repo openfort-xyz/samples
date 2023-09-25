@@ -599,10 +599,10 @@
     es6-promise "^4.2.8"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.6.4":
-  version "0.6.4"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.4.tgz#338d84f13f6722bcbdfd4fe753903c8594f07330"
-  integrity sha512-qll0yLpUa/0S3XXLDdJ6oDuVWlTVviRYTSudhMy2zXUcIyZhPAHoUj/tx7SxCKcFeqS1p2YYk/+FYyhSZxs/Wg==
+"@openfort/openfort-node@^0.6.8":
+  version "0.6.8"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.8.tgz#f4c869d8030f19f3635206e16fcaeeaea97838c8"
+  integrity sha512-eyvpZMGPWBRzjrBWztUQT6M3XBKTM9CIO9iRMSGJJXicWvT9ZTp1dEoy0n0923/hydKfYCQf/ZR9zRFiSBRNuA==
   dependencies:
     "@types/node" "*"
     "@types/node-fetch" "^2.5.7"

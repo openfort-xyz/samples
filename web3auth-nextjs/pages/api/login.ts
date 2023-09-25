@@ -10,7 +10,7 @@ export default async function handler(
         status: (arg0: number) => {
             (): any;
             new (): any;
-            json: {(arg0: {name?: string; error?: any}): void; new (): any};
+            json: {(arg0: {name?: string; error?: any, player?:string}): void; new (): any};
         };
     },
 ) {
@@ -25,14 +25,13 @@ export default async function handler(
             algorithms: ["ES256"],
         });
 
-        const playerId = process.env.NEXTAUTH_OPENFORT_PLAYER!;
-
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
-            const playerAccountAddress = await openfort.players.get({id: playerId});
-
+            const playerAccountAddress = await openfort.players.create({
+                name: (jwtDecoded.payload as any).name,
+            });
             if (playerAccountAddress) {
                 console.log("Player found. ", playerAccountAddress);
-                res.status(200).json({name: "Validation Success. Player created."});
+                res.status(200).json({name: "Validation Success. Player created.", player: playerAccountAddress.id});
             } else {
                 console.log("Failed creating account.");
                 res.status(400).json({name: "Failed creating account"});

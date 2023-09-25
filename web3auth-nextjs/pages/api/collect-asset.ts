@@ -1,6 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import * as jose from "jose";
 import Openfort, {CreateTransactionIntentRequest, Interaction} from "@openfort/openfort-node";
+import { arrayify } from "ethers/lib/utils";
+import { ethers } from "ethers";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -22,7 +24,7 @@ export default async function handler(
 ) {
     try {
         const idToken = req.headers.authorization?.split(" ")[1] || "";
-        const {appPubKey: app_pub_key} = req.body;
+        const {appPubKey: app_pub_key, player:playerId} = req.body;
 
         const jwks = jose.createRemoteJWKSet(new URL("https://api.openlogin.com/jwks"));
         const jwtDecoded = await jose.jwtVerify(idToken, jwks, {
@@ -32,14 +34,15 @@ export default async function handler(
             const interaction: Interaction = {
                 contract: process.env.NEXTAUTH_OPENFORT_CONTRACT!,
                 functionName: "mint",
-                functionArgs: [process.env.NEXTAUTH_OPENFORT_PLAYER!],
+                functionArgs: [playerId],
             };
             const createTransactionIntentRequest: CreateTransactionIntentRequest = {
-                player: process.env.NEXTAUTH_OPENFORT_PLAYER!,
+                player: playerId,
                 chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
                 optimistic: true,
                 interactions: [interaction],
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
+                externalOwnerAddress: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
             };
             const transactionIntent = await openfort.transactionIntents.create(createTransactionIntentRequest);
             if (transactionIntent) {
@@ -55,6 +58,7 @@ export default async function handler(
             res.status(400).json({name: "Failed"});
         }
     } catch (error) {
+        console.log("Error: ", error);
         res.status(500).json({error: error});
     }
 }
