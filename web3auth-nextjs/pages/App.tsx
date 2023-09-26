@@ -193,7 +193,7 @@ function App() {
 
             <footer className="footer">
                 <a
-                    href="https://github.com/openfort-xyz/samples/tree/main/web3auth-wagmi-nextjs"
+                    href="https://github.com/openfort-xyz/samples/tree/main/web3auth-nextjs"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
