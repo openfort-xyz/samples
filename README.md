@@ -36,7 +36,7 @@ To test a sample, follow the instructions inside its folder.
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Complete open-source authentication solution](ssv-social-nextjs)
-- [Use Web3Auth as the key management and authentication solution](web3auth-wagmi-nextjs)
+- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
 - [Openfort Auth in Unity](https://github.com/openfort-xyz/authentication-unity-sample)
