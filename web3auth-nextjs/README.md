@@ -11,7 +11,7 @@ It is lightly based off of [a sample from Web3Auth](https://github.com/Web3Auth/
 
 - [Live demo](https://sample-web3auth-nextjs.vercel.app)
 
-This demo authenticates a player using NextAuth. It will create a custodial account for the player and collect an asset with it. Then, it transfers the account ownership from a Openfort custodial to a self-custodial account.
+This demo authenticates a player using NextAuth. It will create smart contract account where the private key is managed through Web3Auth through their authentication. The smart account is deployed as soon as an on  chain action is performed (either registering a session key or minting an NFT).
 
 
 ## Features
