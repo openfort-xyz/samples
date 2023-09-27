@@ -1,8 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import * as jose from "jose";
+import axios from "axios";
 import Openfort, {CreatePlayerSessionRequest} from "@openfort/openfort-node";
-import {ethers} from "ethers";
-import {arrayify} from "ethers/lib/utils";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -10,7 +8,7 @@ export default async function handler(
     req: {
         query: any;
         headers: {authorization: string; query: any};
-        body: {appPubKey: any; sessionPubKey: any,player:string};
+        body: {user_uuid: any; sessionPubKey: any,player:string};
     },
     res: {
         status: (arg0: number) => {
@@ -25,15 +23,31 @@ export default async function handler(
 ) {
     try {
         const idToken = req.headers.authorization?.split(" ")[1] || "";
-        const app_pub_key = req.body.appPubKey;
+        const user_uuid = req.body.user_uuid;
         const playerId = req.body.player;
         const sessionKeyAddress = req.body.sessionPubKey;
 
-        const jwks = jose.createRemoteJWKSet(new URL("https://api.openlogin.com/jwks"));
-        const jwtDecoded = await jose.jwtVerify(idToken, jwks, {
-            algorithms: ["ES256"],
-        });
-        if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
+        const response = await axios.post(
+            "https://api.particle.network/server/rpc",
+            {
+              jsonrpc: "2.0",
+              id: 0,
+              method: "getUserInfo",
+              params: [user_uuid, idToken],
+            },
+            {
+              auth: {
+                username: process.env.NEXT_PUBLIC_PROJECT_ID!,
+                password: process.env.PARTICLE_SECRET_PROJECT_ID!,
+              },
+            }
+          );
+
+        const uuid = response.data.result.uuid;
+        const wallets = response.data.result.wallets;
+        const evm_wallet = wallets.find((wallet: any) => wallet.chain == "evm_chain");
+
+        if (uuid == user_uuid) {
             const createSessionRequest: CreatePlayerSessionRequest = {
                 playerId: playerId,
                 address: sessionKeyAddress,
@@ -41,7 +55,7 @@ export default async function handler(
                 validUntil: 281474976710655,
                 validAfter: 0,
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-                externalOwnerAddress: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
+                externalOwnerAddress: evm_wallet.publicAddress,
             };
             const playerSession = await openfort.players.createSession(createSessionRequest);
 

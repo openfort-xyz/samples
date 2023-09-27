@@ -2,33 +2,24 @@ import "react-toastify/dist/ReactToastify.css";
 
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
-import RPC from "../components/evm.ethers";
-
 import Notice from "../components/Notice";
 import {CollectButton} from "../components/CollectButton";
 import {RegisterButton} from "../components/RegisterSessionButton";
-import {useParticleProvider} from "@particle-network/connect-react-ui";
-import {ParticleConnect, evmWallets} from "@particle-network/connect";
-import {PolygonMumbai} from "@particle-network/chains";
+import {ParticleNetwork} from "@particle-network/auth";
+import {ParticleProvider} from "@particle-network/provider";
 
 function App() {
-    const [connectKit, setConnectKit] = useState<ParticleConnect | null>(null);
+    const [particle, setParticle] = useState<ParticleNetwork | null>(null);
+    const [provider, setProvider] = useState<ParticleProvider | null>(null);
     useEffect(() => {
         const init = async () => {
             try {
-                const connectKitTemp = new ParticleConnect({
+                const particle = new ParticleNetwork({
                     projectId: process.env.NEXT_PUBLIC_PROJECT_ID as string,
                     clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY as string,
                     appId: process.env.NEXT_PUBLIC_APP_ID as string,
-                    chains: [PolygonMumbai],
-                    wallets: [
-                        ...evmWallets({
-                            projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID as string,
-                            showQrModal: false,
-                        }),
-                    ],
                 });
-                setConnectKit(connectKitTemp);
+                setParticle(particle);
             } catch (error) {
                 console.error(error);
             }
@@ -37,36 +28,41 @@ function App() {
         init();
     }, []);
 
-    const provider = useParticleProvider();
-
     const [playerId, setPlayerId] = useState<string | null>(null);
 
-    const personalSign = async () => {
-        const rpc = new RPC(provider!);
-
-        const accounts = await rpc.getAccounts();
-        const result = await rpc.signMessage("Hello Particle!");
-        toast.success("Personal Sign Successful");
-    };
-
     const login = async () => {
-        if (!connectKit) {
-            uiConsole("connectKit not initialized yet");
+        if (!particle) {
+            uiConsole("particle not initialized yet");
             return;
         }
-        const particleProvider = await connectKit.connect("particle", {preferredAuthType: "google"});
-        console.log(particleProvider);
+        await particle.auth.login({preferredAuthType: "google"});
+        const particleProvider = new ParticleProvider(particle.auth);
+        setProvider(particleProvider);
         await validateIdToken();
     };
 
-    const validateIdToken = async () => {
-        if (!connectKit) {
-            uiConsole("connectKit not initialized yet");
+    const getUserInfo = async () => {
+        if (!particle) {
+            uiConsole("Particle not initialized yet");
             return;
         }
-        const idToken = "ed";
+        const user = particle.auth.getUserInfo();
+        uiConsole(user);
+    };
 
-        const pubkey = "0x";
+    const validateIdToken = async () => {
+        if (!particle) {
+            uiConsole("particle not initialized yet");
+            return;
+        }
+        const authInfo = particle.auth.getUserInfo();
+
+        if (!authInfo) {
+            toast.error("JWT Verification Failed");
+            console.log("JWT Verification Failed");
+            await logout();
+            return;
+        }
 
         const toastId = toast.loading("Validating server-side...");
 
@@ -75,9 +71,9 @@ function App() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
+                Authorization: `Bearer ${authInfo.token}`,
             },
-            body: JSON.stringify({appPubKey: pubkey}),
+            body: JSON.stringify({user_uuid: authInfo.uuid}),
         });
         if (loginRequest.status === 200) {
             toast.dismiss(toastId);
@@ -85,6 +81,7 @@ function App() {
             setPlayerId(data.player);
             toast.success("JWT Verification Successful");
         } else {
+            console.log(loginRequest);
             toast.dismiss(toastId);
             toast.error("JWT Verification Failed");
             console.log("JWT Verification Failed");
@@ -94,11 +91,11 @@ function App() {
     };
 
     const logout = async () => {
-        if (!connectKit) {
-            uiConsole("connectKit not initialized yet");
+        if (!particle) {
+            uiConsole("particle not initialized yet");
             return;
         }
-        connectKit.disconnect({hideLoading: true});
+        setProvider(null);
     };
 
     function uiConsole(...args: any[]): void {
@@ -111,13 +108,30 @@ function App() {
     const loginView = (
         <>
             <div>
+                <button onClick={getUserInfo} className="card">
+                    Get User Info
+                </button>
+            </div>
+            <div>
                 {playerId && (
-                    <RegisterButton playerId={playerId} provider={provider} uiConsole={uiConsole} logout={logout} />
+                    <RegisterButton
+                        playerId={playerId}
+                        particle={particle}
+                        provider={provider}
+                        uiConsole={uiConsole}
+                        logout={logout}
+                    />
                 )}
             </div>
             <div>
                 {playerId && (
-                    <CollectButton playerId={playerId} provider={provider} uiConsole={uiConsole} logout={logout} />
+                    <CollectButton
+                        playerId={playerId}
+                        particle={particle}
+                        provider={provider}
+                        uiConsole={uiConsole}
+                        logout={logout}
+                    />
                 )}
             </div>
             <div>

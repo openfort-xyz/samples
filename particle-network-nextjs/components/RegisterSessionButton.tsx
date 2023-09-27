@@ -7,11 +7,13 @@ const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 export function RegisterButton({
     provider,
+    particle,
     uiConsole,
     logout,
     playerId,
 }: {
     provider: any;
+    particle: any;
     uiConsole: any;
     logout: any;
     playerId: string;
@@ -26,30 +28,28 @@ export function RegisterButton({
                 return;
             }
 
+            const authInfo = particle.auth.getUserInfo();
+
             openfort.createSessionKey();
             await openfort.saveSessionKey();
             const address = openfort.sessionKey.address;
-            const {idToken} = await provider.authenticateUser();
-            const privKey: any = await provider.provider?.request({
-                method: "eth_private_key",
-            });
-            const pubkey = "0x";
+
             let toastId = toast.loading("Registering session...");
 
             const sessionResponse = await fetch("/api/register-session", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${idToken}`,
+                    Authorization: `Bearer ${authInfo.token}`,
                 },
-                body: JSON.stringify({appPubKey: pubkey, sessionPubKey: address, player: playerId}),
+                body: JSON.stringify({user_uuid: authInfo.uuid, sessionPubKey: address, player: playerId}),
             });
             const sessionResponseJSON = await sessionResponse.json();
             if (sessionResponseJSON.data?.nextAction) {
                 toast.dismiss(toastId);
                 toastId = toast.loading("Session Key Waiting for Signature");
 
-                const rpc = new RPC(provider.provider!);
+                const rpc = new RPC(provider!);
                 const ownerSignedSession = await rpc.signMessage(
                     sessionResponseJSON.data.nextAction.payload.userOpHash,
                 );
@@ -61,12 +61,13 @@ export function RegisterButton({
 
                 if (openfortSessionResponse) {
                     toast.dismiss(toastId);
-                    console.log("success:", openfortSessionResponse);
+
                     toast.success("Session Key Registered Successfully");
                 }
             } else {
                 toast.dismiss(toastId);
                 toast.error("Session Key Registration Failed");
+                logout();
             }
         } catch (error) {
             console.error("Error:", error);

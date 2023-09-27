@@ -1,15 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import * as jose from "jose";
+import axios from "axios";
 import Openfort, {CreateTransactionIntentRequest, Interaction} from "@openfort/openfort-node";
-import { arrayify } from "ethers/lib/utils";
-import { ethers } from "ethers";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export default async function handler(
     req: {
         headers: {authorization: string};
-        body: {appPubKey: any; player: any; item: any};
+        body: {user_uuid: any; player: any; item: any};
     },
     res: {
         status: (arg0: number) => {
@@ -24,13 +22,30 @@ export default async function handler(
 ) {
     try {
         const idToken = req.headers.authorization?.split(" ")[1] || "";
-        const {appPubKey: app_pub_key, player:playerId} = req.body;
+        const {user_uuid, player:playerId} = req.body;
 
-        const jwks = jose.createRemoteJWKSet(new URL("https://api.openlogin.com/jwks"));
-        const jwtDecoded = await jose.jwtVerify(idToken, jwks, {
-            algorithms: ["ES256"],
-        });
-        if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
+        const response = await axios.post(
+            "https://api.particle.network/server/rpc",
+            {
+              jsonrpc: "2.0",
+              id: 0,
+              method: "getUserInfo",
+              params: [user_uuid, idToken],
+            },
+            {
+              auth: {
+                username: process.env.NEXT_PUBLIC_PROJECT_ID!,
+                password: process.env.PARTICLE_SECRET_PROJECT_ID!,
+              },
+            }
+          );
+
+        const uuid = response.data.result.uuid;
+        const wallets = response.data.result.wallets;
+
+        const evm_wallet = wallets.find((wallet: any) => wallet.chain == "evm_chain");
+
+        if (uuid == user_uuid) {
             const interaction: Interaction = {
                 contract: process.env.NEXTAUTH_OPENFORT_CONTRACT!,
                 functionName: "mint",
@@ -42,7 +57,7 @@ export default async function handler(
                 optimistic: true,
                 interactions: [interaction],
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-                externalOwnerAddress: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
+                externalOwnerAddress: evm_wallet.publicAddress,
             };
             const transactionIntent = await openfort.transactionIntents.create(createTransactionIntentRequest);
             if (transactionIntent) {

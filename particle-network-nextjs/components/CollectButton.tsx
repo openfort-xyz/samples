@@ -7,11 +7,13 @@ const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 export function CollectButton({
     provider,
+    particle,
     uiConsole,
     logout,
     playerId,
 }: {
     provider: any;
+    particle: any;
     uiConsole: any;
     logout: any;
     playerId: string;
@@ -25,28 +27,23 @@ export function CollectButton({
                 uiConsole("provider not initialized yet");
                 return;
             }
-            const {idToken} = await provider.authenticateUser();
+            const authInfo = particle.auth.getUserInfo();
 
-            const privKey: any = await provider.provider?.request({
-                method: "eth_private_key",
-            });
-
-            const pubkey = "0x";
             let toastId = toast.loading("Collecting item...");
             // Validate idToken with server
             const collectResponse = await fetch("/api/collect-asset", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${idToken}`,
+                    Authorization: `Bearer ${authInfo.token}`,
                 },
-                body: JSON.stringify({appPubKey: pubkey, item: 22, player: playerId}),
+                body: JSON.stringify({user_uuid: authInfo.uuid, player: playerId}),
             });
             const collectResponseJSON = await collectResponse.json();
 
             if (collectResponseJSON.data?.nextAction) {
                 if (!(await openfort.loadSessionKey())) {
-                    const rpc = new RPC(provider.provider!);
+                    const rpc = new RPC(provider!);
                     const ownerSignedTransaction = await rpc.signMessage(
                         collectResponseJSON.data.nextAction.payload.userOpHash,
                     );
