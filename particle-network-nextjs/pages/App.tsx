@@ -1,52 +1,25 @@
 import "react-toastify/dist/ReactToastify.css";
 
-import {getPublicCompressed} from "@toruslabs/eccrypto";
-import {CHAIN_NAMESPACES, SafeEventEmitterProvider, WALLET_ADAPTERS} from "@web3auth/base";
-import {Web3AuthNoModal} from "@web3auth/no-modal";
-import {OpenloginAdapter} from "@web3auth/openlogin-adapter";
 import {useEffect, useState} from "react";
 import {toast} from "react-toastify";
-
 import Notice from "../components/Notice";
 import {CollectButton} from "../components/CollectButton";
 import {RegisterButton} from "../components/RegisterSessionButton";
-
-const clientId = process.env.NEXT_PUBLIC_WEB3_AUTH_ID!; // get from https://dashboard.web3auth.io
+import {ParticleNetwork} from "@particle-network/auth";
+import {ParticleProvider} from "@particle-network/provider";
 
 function App() {
-    const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
-    const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
-    const [playerId, setPlayerId] = useState<string | null>(null);
+    const [particle, setParticle] = useState<ParticleNetwork | null>(null);
+    const [provider, setProvider] = useState<ParticleProvider | null>(null);
     useEffect(() => {
         const init = async () => {
             try {
-                const web3auth = new Web3AuthNoModal({
-                    clientId,
-                    chainConfig: {
-                        chainNamespace: CHAIN_NAMESPACES.EIP155,
-                        chainId: "0x13881",
-                        rpcTarget: "https://rpc.ankr.com/polygon_mumbai",
-                    },
-                    web3AuthNetwork: "mainnet",
+                const particle = new ParticleNetwork({
+                    projectId: process.env.NEXT_PUBLIC_PROJECT_ID as string,
+                    clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY as string,
+                    appId: process.env.NEXT_PUBLIC_APP_ID as string,
                 });
-
-                const openloginAdapter = new OpenloginAdapter({
-                    adapterSettings: {
-                        loginConfig: {
-                            google: {
-                                verifier: "openfort-sample",
-                                typeOfLogin: "google",
-                                clientId: process.env.NEXT_PUBLIC_GOOGLE_ID, // use your app client id you got from google
-                            },
-                        },
-                    },
-                });
-                web3auth.configureAdapter(openloginAdapter);
-                setWeb3auth(web3auth);
-                await web3auth.init();
-                if (web3auth.provider) {
-                    setProvider(web3auth.provider);
-                }
+                setParticle(particle);
             } catch (error) {
                 console.error(error);
             }
@@ -55,40 +28,41 @@ function App() {
         init();
     }, []);
 
+    const [playerId, setPlayerId] = useState<string | null>(null);
+
     const login = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
+        if (!particle) {
+            uiConsole("particle not initialized yet");
             return;
         }
-        const web3authProvider = await web3auth.connectTo(WALLET_ADAPTERS.OPENLOGIN, {
-            mfaLevel: "default",
-            loginProvider: "google",
-        });
-        setProvider(web3authProvider);
+        await particle.auth.login({preferredAuthType: "google"});
+        const particleProvider = new ParticleProvider(particle.auth);
+        setProvider(particleProvider);
         await validateIdToken();
     };
 
     const getUserInfo = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
+        if (!particle) {
+            uiConsole("Particle not initialized yet");
             return;
         }
-        const user = await web3auth.getUserInfo();
+        const user = particle.auth.getUserInfo();
         uiConsole(user);
     };
 
     const validateIdToken = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
+        if (!particle) {
+            uiConsole("particle not initialized yet");
             return;
         }
-        const {idToken} = await web3auth.authenticateUser();
+        const authInfo = particle.auth.getUserInfo();
 
-        const privKey: any = await web3auth.provider?.request({
-            method: "eth_private_key",
-        });
-
-        const pubkey = getPublicCompressed(Buffer.from(privKey, "hex")).toString("hex");
+        if (!authInfo) {
+            toast.error("JWT Verification Failed");
+            console.log("JWT Verification Failed");
+            await logout();
+            return;
+        }
 
         const toastId = toast.loading("Validating server-side...");
 
@@ -97,9 +71,9 @@ function App() {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${idToken}`,
+                Authorization: `Bearer ${authInfo.token}`,
             },
-            body: JSON.stringify({appPubKey: pubkey}),
+            body: JSON.stringify({user_uuid: authInfo.uuid}),
         });
         if (loginRequest.status === 200) {
             toast.dismiss(toastId);
@@ -107,6 +81,7 @@ function App() {
             setPlayerId(data.player);
             toast.success("JWT Verification Successful");
         } else {
+            console.log(loginRequest);
             toast.dismiss(toastId);
             toast.error("JWT Verification Failed");
             console.log("JWT Verification Failed");
@@ -116,11 +91,10 @@ function App() {
     };
 
     const logout = async () => {
-        if (!web3auth) {
-            uiConsole("web3auth not initialized yet");
+        if (!particle) {
+            uiConsole("particle not initialized yet");
             return;
         }
-        await web3auth.logout();
         setProvider(null);
     };
 
@@ -140,12 +114,24 @@ function App() {
             </div>
             <div>
                 {playerId && (
-                    <RegisterButton playerId={playerId} web3auth={web3auth} uiConsole={uiConsole} logout={logout} />
+                    <RegisterButton
+                        playerId={playerId}
+                        particle={particle}
+                        provider={provider}
+                        uiConsole={uiConsole}
+                        logout={logout}
+                    />
                 )}
             </div>
             <div>
                 {playerId && (
-                    <CollectButton playerId={playerId} web3auth={web3auth} uiConsole={uiConsole} logout={logout} />
+                    <CollectButton
+                        playerId={playerId}
+                        particle={particle}
+                        provider={provider}
+                        uiConsole={uiConsole}
+                        logout={logout}
+                    />
                 )}
             </div>
             <div>
@@ -161,9 +147,11 @@ function App() {
     );
 
     const logoutView = (
-        <button onClick={login} className="card">
-            Login
-        </button>
+        <>
+            <button onClick={login} className="card">
+                Login
+            </button>
+        </>
     );
 
     return (
@@ -177,8 +165,8 @@ function App() {
             }}
         >
             <h1 className="title">
-                <a target="_blank" href="https://web3auth.io/" rel="noreferrer">
-                    Web3Auth
+                <a target="_blank" href="https://particle.network" rel="noreferrer">
+                    Particle Network
                 </a>
                 {" & "}
                 <a target="_blank" href="https://openfort.xyz" rel="noreferrer">
@@ -193,7 +181,7 @@ function App() {
 
             <footer className="footer">
                 <a
-                    href="https://github.com/openfort-xyz/samples/tree/main/web3auth-nextjs"
+                    href="https://github.com/openfort-xyz/samples/tree/main/particle-network-nextjs"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
