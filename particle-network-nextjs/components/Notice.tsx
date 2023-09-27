@@ -17,7 +17,7 @@ const Notice: React.FC = () => {
         <div style={style}>
             <strong>Note!</strong>
             <br />
-            For demo purposes, a new player (& account) is created every time you authenticate.
+            For demo purposes, a new smart account is created every time you authenticate.
         </div>
     );
 };
