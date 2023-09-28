@@ -31,15 +31,23 @@ To test a sample, follow the instructions inside its folder.
 
 ## Available Samples
 
-- [Use an external KMS to sign transaction intents](external-kms-game)
+### Authentication
 - [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
-- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
-- [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
-- [Complete open-source authentication solution](ssv-social-nextjs)
-- [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
-- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
-- [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
-- [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
 - [Openfort Auth in Unity](https://github.com/openfort-xyz/authentication-unity-sample)
+- [Complete open-source authentication solution](ssv-social-nextjs)
+- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
+### Smart Wallets
 - [Use Recoverable Accounts](recoverable-accounts)
 - [Build with Token Bound Accounts (ERC6551)](ERC6551-token-bound-accounts)
+- [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
+### Key Management
+- [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
+- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
+- [Use an external KMS to sign transaction intents](external-kms-game)
+
+
+- [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
+- [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
+
+
+
