@@ -2,7 +2,8 @@
 
 This samples shows your how to use [ERC-6551](https://eips.ethereum.org/EIPS/eip-6551) Token Bound Accounts with Openfort.
 
-- Blog article [here](https://www.openfort.xyz/blog/technical-dive-combining-token-bound-account-tba-with-account-abstraction-aa).
+- [Blog article](https://www.openfort.xyz/blog/technical-dive-combining-token-bound-account-tba-with-account-abstraction-aa).
+- [Implementation guide](https://www.openfort.xyz/docs/guides/resources/token-bound-accounts).
 
 It includes two options:
 
