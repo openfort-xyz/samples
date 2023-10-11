@@ -35,19 +35,18 @@ To test a sample, follow the instructions inside its folder.
 - [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
 - [Openfort Auth in Unity](https://github.com/openfort-xyz/authentication-unity-sample)
 - [Complete open-source authentication solution](ssv-social-nextjs)
-- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 ### Smart Wallets
 - [Use Recoverable Accounts](recoverable-accounts)
 - [Build with Token Bound Accounts (ERC6551)](ERC6551-token-bound-accounts)
 - [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
-### Key Management
+### Auth + Key Management
 - [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
+### Key Management
 - [Use an external KMS to sign transaction intents](external-kms-game)
-
-
+### Openfort Implementations
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
-
+- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 
 
