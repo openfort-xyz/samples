@@ -42,6 +42,7 @@ To test a sample, follow the instructions inside its folder.
 ### Auth + Key Management
 - [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
+- [Use Lit Protocol as the key management and authentication solution](lit-protocol)
 ### Key Management
 - [Use an external KMS to sign transaction intents](external-kms-game)
 ### Openfort Implementations
