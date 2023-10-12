@@ -9,7 +9,7 @@ It uses Server-Side Verification (SSV) via Social login to authenticate a player
 
 - [Live demo](https://sample-particle-network-nextjs.vercel.app/)
 
-This demo authenticates a player using NextAuth. It will create a custodial account for the player and collect an asset with it. Then, it transfers the account ownership from a Openfort custodial to a self-custodial account.
+This demo authenticates a player using NextAuth. It will create a smart contract wallet where the private key and the user authentication is managed by Particle Network.
 
 
 ## Features
