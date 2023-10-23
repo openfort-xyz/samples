@@ -1,4 +1,4 @@
-# Checkout single subscription
+# Node Express API Sample
 An [Express server](http://expressjs.com) implementation
 
 ## Requirements
@@ -12,14 +12,14 @@ An [Express server](http://expressjs.com) implementation
 Copy the .env.example file into a file named .env in the folder of the server you want to use. For example:
 
 ```
-cp .env.example .env
+cp ../.env.example .env
 ```
 
 You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
 
 ```
-NEXT_PUBLIC_OPENFORT_PUBLIC_KEY=<replace-with-your-publishable-key>
-NEXTAUTH_OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
+OPENFORT_PUBLISHABLE_KEY=<replace-with-your-publishable-key>
+OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
 ```
 
 **2. Create a Policy and add a Contract**
