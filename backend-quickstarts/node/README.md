@@ -41,6 +41,10 @@ npm start
 
 Go to `localhost:4242` to see the demo
 
+## Instant deploy
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/vi0lxN?referralCode=WNCfSH)
+
 ## Get support
 
 If you have questions, comments, or need help with code, we're here to help:
