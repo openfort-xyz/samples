@@ -64,7 +64,7 @@ dotnet run Program.cs
 
 ## Instant deploy
 
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/d2bkjE?referralCode=WNCfSH)
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/L-kdsI?referralCode=WNCfSH)
 
 ## Get support
 

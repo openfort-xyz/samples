@@ -11,11 +11,11 @@ const app = express();
 
 // Load environment variables
 const envFilePath = path.resolve(__dirname, "./.env");
-const { error: envError } = dotenv.config({ path: envFilePath });
+dotenv.config({ path: envFilePath });
 
-if (envError) {
+if (!process.env.OPENFORT_SECRET_KEY) {
   throw new Error(
-    `Unable to load the .env file from ${envFilePath}. Please copy .env.example to ${envFilePath}`
+    `Unable to load the .env file. Please copy .env.example to ${envFilePath}`
   );
 }
 
