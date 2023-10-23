@@ -22,7 +22,7 @@ namespace server
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
+                    webBuilder.UseStartup<Startup>().UseUrls("http://0.0.0.0:" + Environment.GetEnvironmentVariable("PORT") ?? "3000");
                 });
         }
     }
