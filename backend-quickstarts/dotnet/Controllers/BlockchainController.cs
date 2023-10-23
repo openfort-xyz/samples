@@ -76,7 +76,7 @@ namespace server.Controllers
         {
             PlayerGetRequest playerGetRequest = new PlayerGetRequest
             (
-                id: Request.Form["playerId"],
+                id: Request.Query["playerId"],
                 expand: new List<PlayerResponseExpandable> { PlayerResponseExpandable.TransactionIntents }
             );
             PlayerResponse player = await client.Players.Get(playerGetRequest);
