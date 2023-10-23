@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 
 const CHAIN_ID = 80001;
 const POLICY_ID = "pol_921245a6-9151-452a-aa72-2909d13ac404";
-const PORT = 3000;
+const PORT = process.env.PORT ?? 3000;
 
 const app = express();
 
