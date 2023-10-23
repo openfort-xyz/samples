@@ -49,5 +49,6 @@ To test a sample, follow the instructions inside its folder.
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
+- [Backend quickstarts](backend-quickstarts)
 
 
