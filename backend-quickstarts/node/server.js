@@ -93,6 +93,10 @@ app.post("/request-transfer-ownership", async (req, res) => {
   }
 });
 
+app.get("/", (req, res) => {
+  res.send("Service is running");
+});
+
 app.get("/player-transactions", async (req, res) => {
   try {
     const player = await openfort.players.get({
