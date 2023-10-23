@@ -62,6 +62,10 @@ If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63
 dotnet run Program.cs
 ```
 
+## Instant deploy
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/d2bkjE?referralCode=WNCfSH)
+
 ## Get support
 
 If you have questions, comments, or need help with code, we're here to help:
