@@ -23,6 +23,12 @@ namespace server.Controllers
             client = new OpenfortClient(this.options.Value.SecretKey);
         }
 
+        [HttpGet("/")]
+        public IActionResult GetRoot()
+        {
+            return Ok("Service is running");
+        }
+
         [HttpPost("create-transaction")]
         public async Task<IActionResult> CreateTransaction()
         {
