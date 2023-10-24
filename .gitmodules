@@ -7,3 +7,6 @@
 [submodule "authentication-unity-sample"]
 	path = authentication-unity-sample
 	url = https://github.com/openfort-xyz/authentication-unity-sample
+[submodule "playfab-unity-sample"]
+	path = playfab-unity-sample
+	url = https://github.com/openfort-xyz/playfab-unity-sample

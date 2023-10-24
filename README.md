@@ -50,5 +50,5 @@ To test a sample, follow the instructions inside its folder.
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Backend quickstarts](backend-quickstarts)
-
-
+### Backend as a Service
+- [Use an Playfab as the authentication and backend logic solution](playfab-unity-sample)
