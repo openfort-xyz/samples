@@ -14,7 +14,7 @@ The Demo Passkey Smart Wallet is currently hosted at [sample-passkey-turnkey.ver
 
 This application has two components:
 * the frontend (in [`frontend`](./frontend/)) is a NextJS app running in browsers. Responsibilities are: serve the UI, make calls to the backend component, and execute passkey interactions (assertions or attestations). Passkey interactions are abstracted through [Turnkey JS SDK](https://github.com/tkhq/sdk). This is deployed through [Vercel](https://vercel.com/).
-* the backend (main file: [`index.ts`](./backend/index.ts)) is a Express application handling requests made by the frontend. It uses the [Turnkey JS SDK](https://github.com/tkhq/sdk) to interact with the Turnkey API and [Openfort Node SDK](https://github.com/openfort-xyz/openfort-node) to interact with the smart wallet. For deployment we use [Railway](https://www.railway.app/).
+* the backend (main file: [`index.ts`](./backend/src/index.ts)) is a Express application handling requests made by the frontend. It uses the [Turnkey JS SDK](https://github.com/tkhq/sdk) to interact with the Turnkey API and [Openfort Node SDK](https://github.com/openfort-xyz/openfort-node) to interact with the smart wallet. For deployment we use [Railway](https://www.railway.app/).
 
 Requests and responses use JSON-over-HTTP. Now let's talk about the different flows implemented, one-by-one.
 
