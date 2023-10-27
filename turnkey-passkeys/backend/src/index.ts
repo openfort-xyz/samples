@@ -39,7 +39,7 @@ const corsOptions = {
   credentials: true,
   maxAge: 600,
 };
-
+app.set('trust proxy', 1)
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.raw({ type: "application/vnd.custom-type" }));
@@ -69,7 +69,6 @@ app.use(
     saveUninitialized: true,
     store: prismaSessionStore,
     cookie: {
-      domain: process.env.NODE_ENV === "production" ? "sample-passkey-turnkey.vercel.app" : undefined,
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: process.env.NODE_ENV === "production" ? "none" : false,
       maxAge: 60 * 60 * 24 * 1000,
