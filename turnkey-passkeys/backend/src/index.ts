@@ -30,7 +30,10 @@ const app = express();
 const port = process.env.PORT || 3000;
 const prismaSessionStore = new PrismaSessionStore(prisma);
 const corsOptions = {
-  origin: ["http://localhost:3456", "https://sample-passkey-turnkey.vercel.app"],
+  origin: [
+    "http://localhost:3456",
+    "https://sample-passkey-turnkey.vercel.app",
+  ],
   methods: ["GET", "POST"],
   allowedHeaders: ["content-type"],
   credentials: true,
@@ -65,7 +68,12 @@ app.use(
     resave: false,
     saveUninitialized: true,
     store: prismaSessionStore,
-    cookie: { secure: process.env.NODE_ENV === 'production'? true:false,  sameSite: 'none',maxAge: 60 * 60 * 24 * 1000 }, // 1 day
+    cookie: {
+      domain: process.env.NODE_ENV === "production"?".vercel.app":undefined,
+      secure: process.env.NODE_ENV === "production" ? true : false,
+      sameSite: process.env.NODE_ENV === "production" ? "none" : false,
+      maxAge: 60 * 60 * 24 * 1000,
+    }, // 1 day
   })
 );
 
@@ -267,8 +275,10 @@ app.post("/api/wallet/construct-tx", async (req, res) => {
     const transactionIntent = await openfort.transactionIntents.create(
       createTransactionIntentRequest
     );
-    const aBytes = ethers.utils.arrayify(transactionIntent.nextAction?.payload.userOpHash!)
-    const msg = ethers.utils.hashMessage(aBytes)
+    const aBytes = ethers.utils.arrayify(
+      transactionIntent.nextAction?.payload.userOpHash!
+    );
+    const msg = ethers.utils.hashMessage(aBytes);
     res.status(200).json({
       unsignedTransaction: msg,
       transactionIntentId: transactionIntent.id,
@@ -330,11 +340,11 @@ app.post("/api/wallet/send-tx", async (req, res) => {
       r: `0x${result.r}`,
       s: `0x${result.s}`,
       v: parseInt(result.v) + 27,
-    })
+    });
 
     const openfortTxn = await openfort.transactionIntents.signature({
       id: signedRequest.transactionIntentId,
-      signature:signature,
+      signature: signature,
     });
 
     res.status(200).json({ hash: openfortTxn.response?.transactionHash });
@@ -346,7 +356,6 @@ app.post("/api/wallet/send-tx", async (req, res) => {
 // /api/wallet/history
 app.get("/api/wallet/history", async (req, res) => {
   try {
-
     const user = await getCurrentUser(req);
     if (!user) {
       res.status(403).send("no current user");
