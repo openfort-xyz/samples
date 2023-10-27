@@ -85,6 +85,10 @@ app.get("/api/whoami", async (req, res) => {
   }
 });
 
+app.get("/api/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
 // /api/registration/:email
 app.get("/api/registration/:email", async (req, res) => {
   try {
