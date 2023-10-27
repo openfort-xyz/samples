@@ -13,9 +13,15 @@ namespace server.Controllers
     {
         public readonly IOptions<OpenfortOptions> options;
         private readonly OpenfortClient client;
-        private readonly string policyId = "pol_921245a6-9151-452a-aa72-2909d13ac404";
-        private readonly int chainId = 80001;
+        private readonly int chainId = 43113;
 
+        private readonly Dictionary<string, (string contractId, string policyId)> contractPolicyMap = new Dictionary<string, (string contractId, string policyId)>
+        {
+            { "1", ("con_6b46eb3d-70c4-4b00-b94c-6628a6f6920c", "pol_9caa6b7a-1cc1-4ee0-b5f6-7d465c97f767") },
+            { "2", ("con_6b46eb3d-70c4-4b00-b94c-6628a6f6920c", "pol_9f71a00d-e13c-418a-a9a0-79288833a0a0") },
+            { "3", ("con_6b46eb3d-70c4-4b00-b94c-6628a6f6920c", "pol_20cc4d56-ef4f-4b6d-a4f8-649b4149e5cd") }
+
+        };
 
         public BlockchainController(IOptions<OpenfortOptions> options)
         {
@@ -29,30 +35,43 @@ namespace server.Controllers
             return Ok("Service is running");
         }
 
-        [HttpPost("create-transaction")]
-        public async Task<IActionResult> CreateTransaction()
+        [HttpPost("wallet")]
+        public async Task<IActionResult> CreateWallet()
         {
             CreatePlayerRequest playerRequest = new CreatePlayerRequest
             (
                 name: "John Doe"
             );
             PlayerResponse player = await client.Players.Create(playerRequest);
+            return Ok(player);
+        }
+
+        [HttpPost("purchase")]
+        public async Task<IActionResult> CreateTransaction()
+        {
+            string itemKey = Request.Form["item"];
+            string playerId = Request.Form["playerId"];
+
+            if (!contractPolicyMap.TryGetValue(itemKey, out var mapping))
+            {
+                return BadRequest($"No mapping found for {itemKey}");
+            }
 
             Interaction interactionMint = new Interaction
                 (
-                    contract: Request.Form["contractId"],
+                    contract: mapping.contractId.ToString(),
                     functionName: "mint",
-                    functionArgs: new List<object> { player.Id }
+                    functionArgs: new List<object> { playerId }
                 );
 
             CreateTransactionIntentRequest transactionIntentRequest = new CreateTransactionIntentRequest
             (
-                player: player.Id,
+                player: playerId,
                 chainId: chainId,
-                policy: policyId,
+                policy: mapping.policyId.ToString(),
                 externalOwnerAddress: null!,
                 optimistic: true,
-                confirmationBlocks: 0,
+                confirmationBlocks: 3,
                 interactions: new List<Interaction> { interactionMint }
             );
 
@@ -68,7 +87,7 @@ namespace server.Controllers
             (
                 playerId: Request.Form["playerId"],
                 chainId: chainId,
-                policy: policyId,
+                policy: "policyId",
                 newOwnerAddress: Request.Form["newOwnerAddress"]
             );
 
@@ -99,7 +118,7 @@ namespace server.Controllers
             {
                 openfortEvent = client.ConstructWebhookEvent(
                     json,
-                    Request.Headers["openfort-Signature"]
+                    Request.Headers["openfort-signature"]
                 );
                 Console.WriteLine($"Webhook notification: {openfortEvent} found");
             }

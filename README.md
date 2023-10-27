@@ -45,6 +45,7 @@ To test a sample, follow the instructions inside its folder.
 - [Use Lit Protocol as the key management and authentication solution](lit-protocol)
 ### Key Management
 - [Use an external KMS to sign transaction intents](external-kms-game)
+- [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
 ### Openfort Implementations
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
