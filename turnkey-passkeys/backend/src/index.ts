@@ -32,7 +32,7 @@ const prismaSessionStore = new PrismaSessionStore(prisma);
 const corsOptions = {
   origin: [
     "http://localhost:3456",
-    "https://sample-passkey-turnkey.vercel.app",
+    "https://sample-passkey-turnkey.up.railway.app",
   ],
   methods: ["GET", "POST"],
   allowedHeaders: ["content-type"],
@@ -69,7 +69,7 @@ app.use(
     saveUninitialized: true,
     store: prismaSessionStore,
     cookie: {
-      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
+      domain: process.env.NODE_ENV === "production" ? "sample-passkey-turnkey.up.railway.app" : undefined,
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: process.env.NODE_ENV === "production" ? "none" : false,
       maxAge: 60 * 60 * 24 * 1000,
