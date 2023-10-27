@@ -6,7 +6,7 @@ Turnkey's infra is based on secure enclaves. Critically, Turnkey's infra ensures
 
 In other words, we are not actually using the passkeys themselves to sign transactions. Rather, we are using the passkeys to unlock ECDSA private keys, and then use the ECDSA private keys to sign transactions. By doing so, we achieve maximal compatibility with existing wallet infra as well gas efficiency, with the caveat that we are relying on a centralized signing service (Turnkey).
 
-The Demo Passkey Smart Wallet is currently hosted at [sample-passkey-wallet.vercel.app](https://sample-passkey-wallet.vercel.app). See [legal disclaimer](#legal-disclaimer).
+The Demo Passkey Smart Wallet is currently hosted at [sample-passkey-turnkey.vercel.app](https://sample-passkey-turnkey.vercel.app). See [legal disclaimer](#legal-disclaimer).
 
 <img src="https://blog-cms.openfort.xyz/uploads/passkey_smart_wallet_1b79a44fdc.png?updated_at=2023-10-27T13:59:12.921Z" alt="homepage screenshot" width="800px">
 
