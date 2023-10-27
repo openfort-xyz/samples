@@ -30,7 +30,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 const prismaSessionStore = new PrismaSessionStore(prisma);
 const corsOptions = {
-  origin: ["http://localhost:3456", "https://sample-passkey-turnkey.vercel.app/"],
+  origin: ["http://localhost:3456", "https://sample-passkey-turnkey.vercel.app"],
   methods: ["GET", "POST"],
   allowedHeaders: ["content-type"],
   credentials: true,
