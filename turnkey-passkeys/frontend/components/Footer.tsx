@@ -8,7 +8,7 @@ export function Footer() {
         <Link
           className="underline"
           target="_blank"
-          href="https://https://github.com/openfort-xyz/samples/turnkey-passkeys#legal-disclaimer"
+          href="https://github.com/openfort-xyz/samples/tree/main/turnkey-passkeys#legal-disclaimer"
         >
           Legal disclaimer
         </Link>
