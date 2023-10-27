@@ -69,7 +69,7 @@ app.use(
     saveUninitialized: true,
     store: prismaSessionStore,
     cookie: {
-      domain: process.env.NODE_ENV === "production"?".vercel.app":undefined,
+      domain: process.env.NODE_ENV === "production" ? ".vercel.app" : undefined,
       secure: process.env.NODE_ENV === "production" ? true : false,
       sameSite: process.env.NODE_ENV === "production" ? "none" : false,
       maxAge: 60 * 60 * 24 * 1000,
