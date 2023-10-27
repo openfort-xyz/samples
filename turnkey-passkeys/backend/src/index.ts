@@ -65,7 +65,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     store: prismaSessionStore,
-    cookie: { secure: false, maxAge: 60 * 60 * 24 * 1000 }, // 1 day
+    cookie: { secure: process.env.NODE_ENV === 'production'?true:false,  sameSite: 'none',maxAge: 60 * 60 * 24 * 1000 }, // 1 day
   })
 );
 
@@ -346,6 +346,7 @@ app.post("/api/wallet/send-tx", async (req, res) => {
 // /api/wallet/history
 app.get("/api/wallet/history", async (req, res) => {
   try {
+
     const user = await getCurrentUser(req);
     if (!user) {
       res.status(403).send("no current user");
