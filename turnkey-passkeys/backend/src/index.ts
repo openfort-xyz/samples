@@ -65,7 +65,7 @@ app.use(
     resave: false,
     saveUninitialized: true,
     store: prismaSessionStore,
-    cookie: { secure: process.env.NODE_ENV === 'production'?true:false,  sameSite: 'none',maxAge: 60 * 60 * 24 * 1000 }, // 1 day
+    cookie: { secure: process.env.NODE_ENV === 'production'? true:false,  sameSite: 'none',maxAge: 60 * 60 * 24 * 1000 }, // 1 day
   })
 );
 
