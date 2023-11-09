@@ -52,4 +52,6 @@ To test a sample, follow the instructions inside its folder.
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Backend quickstarts](backend-quickstarts)
 ### Backend as a Service
-- [Use an Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
+- [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
+- [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)
+

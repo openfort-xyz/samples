@@ -10,3 +10,6 @@
 [submodule "playfab-unity-sample"]
 	path = playfab-unity-sample
 	url = https://github.com/openfort-xyz/playfab-unity-sample
+[submodule "firebase-extension-unity-sample"]
+	path = firebase-extension-unity-sample
+	url = https://github.com/openfort-xyz/firebase-extension-unity-sample
