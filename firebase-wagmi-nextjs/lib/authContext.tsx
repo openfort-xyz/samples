@@ -69,6 +69,10 @@ export const useAuth = () => useContext(authContext);
 export const signOut = async () => {
   const auth = getAuth();
   destroyCookie(null, "idToken");
-  openfort.removeSessionKey();
+  try {
+    await openfort.removeSessionKey();
+  } catch (error) {
+    console.error("Failed to remove session key:", error);
+  }
   await signout(auth);
 };
