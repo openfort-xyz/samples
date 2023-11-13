@@ -10,6 +10,7 @@ import {toast} from "react-toastify";
 import Notice from "../components/Notice";
 import {CollectButton} from "../components/CollectButton";
 import {RegisterButton} from "../components/RegisterSessionButton";
+import { EthereumPrivateKeyProvider } from "@web3auth/ethereum-provider";
 
 const clientId = process.env.NEXT_PUBLIC_WEB3_AUTH_ID!; // get from https://dashboard.web3auth.io
 
@@ -17,36 +18,47 @@ function App() {
     const [web3auth, setWeb3auth] = useState<Web3AuthNoModal | null>(null);
     const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(null);
     const [playerId, setPlayerId] = useState<string | null>(null);
+    const [loggedIn, setLoggedIn] = useState<boolean | null>(false);
+
     useEffect(() => {
         const init = async () => {
             try {
+                const chainConfig = {
+                    chainNamespace: CHAIN_NAMESPACES.EIP155,
+                    chainId: "0x1",
+                    rpcTarget: "https://rpc.ankr.com/eth",
+                    displayName: "Ethereum Mainnet",
+                    blockExplorer: "https://goerli.etherscan.io",
+                    ticker: "ETH",
+                    tickerName: "Ethereum",
+                  };
                 const web3auth = new Web3AuthNoModal({
                     clientId,
-                    chainConfig: {
-                        chainNamespace: CHAIN_NAMESPACES.EIP155,
-                        chainId: "0x13881",
-                        rpcTarget: "https://rpc.ankr.com/polygon_mumbai",
-                    },
-                    web3AuthNetwork: "mainnet",
+                    chainConfig: chainConfig,
+                    web3AuthNetwork: "sapphire_devnet",
                 });
+
+                const privateKeyProvider = new EthereumPrivateKeyProvider({ config: { chainConfig } });
 
                 const openloginAdapter = new OpenloginAdapter({
                     adapterSettings: {
                         loginConfig: {
                             google: {
-                                verifier: "openfort-sample",
+                                verifier: "openfort-web3auth-sample-google",
                                 typeOfLogin: "google",
                                 clientId: process.env.NEXT_PUBLIC_GOOGLE_ID, // use your app client id you got from google
                             },
                         },
                     },
+                    privateKeyProvider
                 });
                 web3auth.configureAdapter(openloginAdapter);
                 setWeb3auth(web3auth);
                 await web3auth.init();
-                if (web3auth.provider) {
-                    setProvider(web3auth.provider);
-                }
+                setProvider(web3auth.provider);
+                if (web3auth.connectedAdapterName) {
+                    setLoggedIn(true);
+                  }
             } catch (error) {
                 console.error(error);
             }
@@ -66,6 +78,7 @@ function App() {
         });
         setProvider(web3authProvider);
         await validateIdToken();
+        setLoggedIn(true);
     };
 
     const getUserInfo = async () => {
@@ -122,6 +135,7 @@ function App() {
         }
         await web3auth.logout();
         setProvider(null);
+        setLoggedIn(false);
     };
 
     function uiConsole(...args: any[]): void {
@@ -189,7 +203,7 @@ function App() {
 
             <Notice />
 
-            <div className="grid">{provider ? loginView : logoutView}</div>
+            <div className="grid">{loggedIn ? loginView : logoutView}</div>
 
             <footer className="footer">
                 <a
