@@ -4,7 +4,7 @@ This sample uses Web3Auth as the key management and authentication solution.
 
 It uses Server-Side Verification (SSV) via Social login to authenticate a player. It will create a self-custodial account for the player and collect an asset with it.
 
-It is lightly based off of [a sample from Web3Auth](https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-no-modal-sdk/server-side-verification/ssv-via-social-nextjs-no-modal-example).
+It is lightly based off of [a sample from Web3Auth](https://github.com/Web3Auth/web3auth-pnp-examples/tree/main/web-no-modal-sdk/server-side-verification-no-modal-example).
 
 
 ## Demo
