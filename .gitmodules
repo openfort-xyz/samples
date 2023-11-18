@@ -13,3 +13,6 @@
 [submodule "firebase-extension-unity-sample"]
 	path = firebase-extension-unity-sample
 	url = https://github.com/openfort-xyz/firebase-extension-unity-sample
+[submodule "opensea-walletconnect-unity-sample"]
+	path = opensea-walletconnect-unity-sample
+	url = https://github.com/openfort-xyz/opensea-walletconnect-unity-sample

@@ -9,7 +9,7 @@ This is an example web app that shows how you can use Lit's programmable MPC sig
 **1. Clone and configure the sample**
 
 ```bash
-git clone https://github.com/openfort-xyz/samples/tree/main/lit-protocol
+git clone https://github.com/openfort-xyz/samples/
 
 cd lit-protocol
 
