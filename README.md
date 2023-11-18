@@ -47,6 +47,7 @@ To test a sample, follow the instructions inside its folder.
 - [Use an external KMS to sign transaction intents](external-kms-game)
 - [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
 ### Openfort Implementations
+- [Connect to Opensea from Unity with WalletConnect](https://github.com/openfort-xyz/opensea-walletconnect-unity-sample)
 - [Integrate with Openfort's session keys](rainbow-ssv-nextjs)
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
