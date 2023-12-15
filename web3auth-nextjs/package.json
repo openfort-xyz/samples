@@ -11,7 +11,7 @@
     },
     "dependencies": {
         "@openfort/openfort-js": "^0.3.0",
-        "@openfort/openfort-node": "^0.6.8",
+        "@openfort/openfort-node": "^0.6.28",
         "@web3auth/ethereum-provider": "^7.0.4",
         "@toruslabs/eccrypto": "^1.1.8",
         "@web3auth/base": "^7.0.4",

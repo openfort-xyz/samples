@@ -16,3 +16,6 @@
 [submodule "opensea-walletconnect-unity-sample"]
 	path = opensea-walletconnect-unity-sample
 	url = https://github.com/openfort-xyz/opensea-walletconnect-unity-sample
+[submodule "ugs-unity-game-services-sample"]
+	path = ugs-unity-game-services-sample
+	url = https://github.com/openfort-xyz/ugs-unity-game-services-sample
