@@ -20,7 +20,6 @@ if (!process.env.OPENFORT_SECRET_KEY) {
 }
 
 const openfort = new Openfort(process.env.OPENFORT_SECRET_KEY);
-
 // Middleware to handle application/json with rawBody for webhooks
 app.use(express.urlencoded({ extended: true }));
 app.use(
