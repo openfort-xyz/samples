@@ -33,6 +33,7 @@ To test a sample, follow the instructions inside its folder.
 
 ### Authentication
 - [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
+- [Openfort Auth with Firebase in NextJS](https://github.com/openfort-xyz/firebase-auth-sample)
 - [Openfort Auth in Unity](https://github.com/openfort-xyz/authentication-unity-sample)
 - [Complete open-source authentication solution](ssv-social-nextjs)
 ### Smart Wallets

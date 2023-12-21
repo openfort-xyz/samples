@@ -19,3 +19,6 @@
 [submodule "ugs-unity-game-services-sample"]
 	path = ugs-unity-game-services-sample
 	url = https://github.com/openfort-xyz/ugs-unity-game-services-sample
+[submodule "firebase-auth-sample"]
+	path = firebase-auth-sample
+	url = https://github.com/openfort-xyz/firebase-auth-sample
