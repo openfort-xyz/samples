@@ -13,7 +13,7 @@ namespace server.Controllers
     {
         public readonly IOptions<OpenfortOptions> options;
         private readonly OpenfortClient client;
-        private readonly int chainId = 43113;
+        private readonly int chainId = 43113; // Avalanche Fuji Testnet
 
         private readonly Dictionary<string, (string contractId, string policyId)> contractPolicyMap = new Dictionary<string, (string contractId, string policyId)>
         {
@@ -38,7 +38,7 @@ namespace server.Controllers
         [HttpPost("wallet")]
         public async Task<IActionResult> CreateWallet()
         {
-            CreatePlayerRequest playerRequest = new CreatePlayerRequest
+            PlayerCreateRequest playerRequest = new PlayerCreateRequest
             (
                 name: "John Doe"
             );
