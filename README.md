@@ -57,3 +57,4 @@ To test a sample, follow the instructions inside its folder.
 - [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
 - [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)
 - [Use Unity Game Servies (UGS) with embedded wallets to mint NFTs](https://github.com/openfort-xyz/ugs-unity-game-services-sample)
+- [In-App Purchases with (UGS) to buy NFTs and ERC-20s with your Credit Card](https://github.com/openfort-xyz/iap-unity-sample)

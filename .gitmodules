@@ -22,3 +22,6 @@
 [submodule "firebase-auth-sample"]
 	path = firebase-auth-sample
 	url = https://github.com/openfort-xyz/firebase-auth-sample
+[submodule "iap-unity-sample"]
+	path = iap-unity-sample
+	url = https://github.com/openfort-xyz/iap-unity-sample
