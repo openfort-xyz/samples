@@ -44,7 +44,7 @@ NEXTAUTH_OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
 
 You can create Policies and add Contracts in the Dashboard or with the API. This sample requires a Policy and a Contract to run. Once you've created them, and add its ID tor `.env`.
 
-`NEXTAUTH_OPENFORT_PLAYER` is the ID of a [Player](https://www.openfort.xyz/docs/api/players#create-a-player) for your player. 
+`NEXTAUTH_OPENFORT_PLAYER` is the ID of a [Player](https://www.openfort.xyz/docs/reference/api/create-a-player-object) for your player. 
 
 `NEXTAUTH_OPENFORT_CONTRACT` is the ID of a [Contract](https://www.openfort.xyz/docs/reference/api/create-contract-object) for your contract. A contract has a chainId. 
 If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63AC0 (NFT contract deployed in 80001 Mumbai).
