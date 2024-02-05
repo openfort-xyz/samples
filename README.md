@@ -53,6 +53,7 @@ To test a sample, follow the instructions inside its folder.
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Backend quickstarts](backend-quickstarts)
+- [Block bot behavior from your game - ReCAPTCHA Unity](unity-recaptcha-sample)
 ### Backend as a Service
 - [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
 - [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)

@@ -25,3 +25,6 @@
 [submodule "iap-unity-sample"]
 	path = iap-unity-sample
 	url = https://github.com/openfort-xyz/iap-unity-sample
+[submodule "unity-recaptcha-sample"]
+	path = unity-recaptcha-sample
+	url = https://github.com/openfort-xyz/unity-recaptcha-sample
