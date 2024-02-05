@@ -40,7 +40,7 @@ The backend then forwards this signed request to Turnkey. If the request is succ
 
 ### Mint NFT
 
-For a signed-in user, the dashboard shows functionality to mint an NFT.  The amount and destination parameters are POSTed to the backend, the backend requests Openfort to construct an unsigned sponsored payload using [policies](https://www.openfort.xyz/docs/guides/smart-accounts/policies), and the frontend uses this to construct a Turnkey Sign Transaction request. This request is signed via a webauthn assertion (remember, end-users are the only ones able to perform any action in their respective sub-organization!), and forwarded to backend. The backend then grabs the signature and forwards it back to Openfort who puts it on-chain.
+For a signed-in user, the dashboard shows functionality to mint an NFT.  The amount and destination parameters are POSTed to the backend, the backend requests Openfort to construct an unsigned sponsored payload using [policies](https://www.openfort.xyz/docs/guides/transaction-cloud/policies), and the frontend uses this to construct a Turnkey Sign Transaction request. This request is signed via a webauthn assertion (remember, end-users are the only ones able to perform any action in their respective sub-organization!), and forwarded to backend. The backend then grabs the signature and forwards it back to Openfort who puts it on-chain.
 
 <img src="https://blog-cms.openfort.xyz/uploads/turnkey_passkey_bc074f873e.svg?updated_at=2023-10-27T14:15:51.683Z" alt="authentication dialog" width="400px">
 
