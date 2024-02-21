@@ -1,4 +1,4 @@
-# Social login with Openfort
+# Social Login + Session Keys + Transfer Ownership Sample
 
 NextAuth.js is a complete open-source authentication solution.
 
