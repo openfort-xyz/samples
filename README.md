@@ -41,6 +41,9 @@ To test a sample, follow the instructions inside its folder.
 - [Build with Token Bound Accounts (ERC6551)](ERC6551-token-bound-accounts)
 - [Example Wallet interacting with Openfort accounts](https://github.com/openfort-xyz/walletconnect-wallet-sample)
 ### Auth + Key Management
+- [Create non-custodial smart accounts in Unity WebGL](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)
+- [Create non-custodial smart accounts in Unity Android + Google Play Login](https://github.com/openfort-xyz/sample-unity-android-embedded-signer)
+- [Create non-custodial smart accounts in browser NextJS](https://github.com/openfort-xyz/sample-browser-nextjs-embedded-signer)
 - [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
 - [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
 - [Use Lit Protocol as the key management and authentication solution](lit-protocol)
