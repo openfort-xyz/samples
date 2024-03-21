@@ -83,15 +83,14 @@ namespace server.Controllers
         public async Task<IActionResult> RequestTransferOwnership()
         {
 
-            PlayerTransferAccountOwnershipRequest requestTransferOwnership = new PlayerTransferAccountOwnershipRequest
+            AccountTransferOwnershipRequest requestTransferOwnership = new AccountTransferOwnershipRequest
             (
-                playerId: Request.Form["playerId"],
-                chainId: chainId,
+                id: Request.Form["accountId"],
                 policy: "policyId",
                 newOwnerAddress: Request.Form["newOwnerAddress"]
             );
 
-            TransactionIntentResponse transferRequest = await client.Players.RequestTransferAccountOwnership(requestTransferOwnership);
+            TransactionIntentResponse transferRequest = await client.Accounts.RequestTransferOwnership(requestTransferOwnership);
 
             return Ok(transferRequest);
         }
@@ -99,7 +98,7 @@ namespace server.Controllers
         [HttpGet("player-transactions")]
         public async Task<IActionResult> PlayerTransactions()
         {
-            PlayerGetRequest playerGetRequest = new PlayerGetRequest
+            PlayerRequest playerGetRequest = new PlayerRequest
             (
                 id: Request.Query["playerId"],
                 expand: new List<PlayerResponseExpandable> { PlayerResponseExpandable.TransactionIntents }

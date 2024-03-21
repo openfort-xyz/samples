@@ -1,195 +1,150 @@
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { CollectButton } from "../components/CollectButton";
+import { RegisterButton } from "../components/RegisterSessionButton";
+import { ParticleNetwork, UserInfo } from "@particle-network/auth";
+import { ParticleProvider } from "@particle-network/provider";
+
 import "react-toastify/dist/ReactToastify.css";
 
-import {useEffect, useState} from "react";
-import {toast} from "react-toastify";
-import Notice from "../components/Notice";
-import {CollectButton} from "../components/CollectButton";
-import {RegisterButton} from "../components/RegisterSessionButton";
-import {ParticleNetwork} from "@particle-network/auth";
-import {ParticleProvider} from "@particle-network/provider";
+// You might need to adjust these types based on the actual API and structures you're working with
+interface PlayerInfo {
+  id: string;
+}
 
 function App() {
-    const [particle, setParticle] = useState<ParticleNetwork | null>(null);
-    const [provider, setProvider] = useState<ParticleProvider | null>(null);
-    useEffect(() => {
-        const init = async () => {
-            try {
-                const particle = new ParticleNetwork({
-                    projectId: process.env.NEXT_PUBLIC_PROJECT_ID as string,
-                    clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY as string,
-                    appId: process.env.NEXT_PUBLIC_APP_ID as string,
-                });
-                setParticle(particle);
-            } catch (error) {
-                console.error(error);
-            }
-        };
+  const [particle, setParticle] = useState<ParticleNetwork | null>(null);
+  const [provider, setProvider] = useState<ParticleProvider | null>(null);
+  const [playerId, setPlayerId] = useState<string | null>(null);
+  const [showPopup, setShowPopup] = useState<string | false>(false);
 
-        init();
-    }, []);
-
-    const [playerId, setPlayerId] = useState<string | null>(null);
-
-    const login = async () => {
-        if (!particle) {
-            uiConsole("particle not initialized yet");
-            return;
-        }
-        await particle.auth.login({preferredAuthType: "google"});
-        const particleProvider = new ParticleProvider(particle.auth);
-        setProvider(particleProvider);
-        await validateIdToken();
+  useEffect(() => {
+    const init = async () => {
+      const p = new ParticleNetwork({
+        projectId: process.env.NEXT_PUBLIC_PROJECT_ID!,
+        clientKey: process.env.NEXT_PUBLIC_CLIENT_KEY!,
+        appId: process.env.NEXT_PUBLIC_APP_ID!,
+      });
+      setParticle(p);
     };
+    init();
+  }, []);
 
-    const getUserInfo = async () => {
-        if (!particle) {
-            uiConsole("Particle not initialized yet");
-            return;
-        }
-        const user = particle.auth.getUserInfo();
-        uiConsole(user);
-    };
+  const login = async () => {
+    if (!particle) return toast.error("Not initialized");
+    await particle.auth.login({ preferredAuthType: "google" });
+    setProvider(new ParticleProvider(particle.auth));
+    validateToken();
+  };
 
-    const validateIdToken = async () => {
-        if (!particle) {
-            uiConsole("particle not initialized yet");
-            return;
-        }
-        const authInfo = particle.auth.getUserInfo();
+  const validateToken = async () => {
+    if (!particle) return;
+    const userInfo: UserInfo | null = particle.auth.getUserInfo();
+    if (!userInfo) return toast.error("User info not found");
+    const toastId = toast.loading("Validating...");
 
-        if (!authInfo) {
-            toast.error("JWT Verification Failed");
-            console.log("JWT Verification Failed");
-            await logout();
-            return;
-        }
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+      body: JSON.stringify({ user_uuid: userInfo.uuid }),
+    });
 
-        const toastId = toast.loading("Validating server-side...");
+    toast.dismiss(toastId);
 
-        // Validate idToken with server
-        const loginRequest = await fetch("/api/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${authInfo.token}`,
-            },
-            body: JSON.stringify({user_uuid: authInfo.uuid}),
-        });
-        if (loginRequest.status === 200) {
-            toast.dismiss(toastId);
-            const data = await loginRequest.json();
-            setPlayerId(data.player);
-            toast.success("JWT Verification Successful");
-        } else {
-            console.log(loginRequest);
-            toast.dismiss(toastId);
-            toast.error("JWT Verification Failed");
-            console.log("JWT Verification Failed");
-            await logout();
-        }
-        return loginRequest.status;
-    };
-
-    const logout = async () => {
-        if (!particle) {
-            uiConsole("particle not initialized yet");
-            return;
-        }
-        setProvider(null);
-    };
-
-    function uiConsole(...args: any[]): void {
-        const el = document.querySelector("#console>p");
-        if (el) {
-            el.innerHTML = JSON.stringify(args || {}, null, 2);
-        }
+    if (res.status === 200) {
+      const data: { player: PlayerInfo } = await res.json();
+      setPlayerId(data.player.id);
+      toast.success("JWT Verified");
+    } else {
+      setProvider(null);
+      toast.error("JWT Validation Failed");
     }
+  };
 
-    const loginView = (
-        <>
-            <div>
-                <button onClick={getUserInfo} className="card">
-                    Get User Info
-                </button>
-            </div>
-            <div>
-                {playerId && (
-                    <RegisterButton
-                        playerId={playerId}
-                        particle={particle}
-                        provider={provider}
-                        uiConsole={uiConsole}
-                        logout={logout}
-                    />
-                )}
-            </div>
-            <div>
-                {playerId && (
-                    <CollectButton
-                        playerId={playerId}
-                        particle={particle}
-                        provider={provider}
-                        uiConsole={uiConsole}
-                        logout={logout}
-                    />
-                )}
-            </div>
-            <div>
-                <button onClick={logout} className="card">
-                    Log Out
-                </button>
-            </div>
+  const uiConsole = (...args: any[]): void => {
+    const content = JSON.stringify(args.length > 1 ? args : args[0], null, 2);
+    setShowPopup(content);
+  };
 
-            <div id="console" style={{whiteSpace: "pre-line", width: "500px", overflowX: "auto"}}>
-                <p style={{whiteSpace: "pre-line"}}>Logged in Successfully!</p>
-            </div>
-        </>
-    );
+  const logout = async () => {
+    if (!particle) return;
+    setProvider(null);
+  };
+  return (
+    <div className="App">
+      <div className="logos-section">
+        <a target="_blank" href="https://particle.network" rel="noreferrer">
+          <img
+            src="https://i.imgur.com/2btL79J.png"
+            alt="Particle Network"
+            className="particle-logo"
+          />
+        </a>
+        <a target="_blank" href="https://openfort.xyz" rel="noreferrer">
+          <img
+            src="https://i.imgur.com/b9dAZXs.png"
+            alt="Openfort"
+            className="openfort-logo"
+          />
+        </a>
+      </div>
 
-    const logoutView = (
-        <>
-            <button onClick={login} className="card">
-                Login
-            </button>
-        </>
-    );
-
-    return (
-        <div
-            style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                padding: 12,
-            }}
-        >
-            <h1 className="title">
-                <a target="_blank" href="https://particle.network" rel="noreferrer">
-                    Particle Network
-                </a>
-                {" & "}
-                <a target="_blank" href="https://openfort.xyz" rel="noreferrer">
-                    Openfort
-                </a>{" "}
-                <br />& NextJS Server Side Verification Example
-            </h1>
-
-            <Notice />
-
-            <div className="grid">{provider ? loginView : logoutView}</div>
-
-            <footer className="footer">
-                <a
-                    href="https://github.com/openfort-xyz/samples/tree/main/particle-network-nextjs"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    Source code
-                </a>
-            </footer>
+      {!provider ? (
+        <div className="login-section">
+          <button className="sign-button" onClick={login}>
+            Sign in with Google
+          </button>
         </div>
-    );
+      ) : (
+        <div className="profile-card">
+          <h2>{particle?.auth?.getUserInfo()?.name ?? "Default Name"}</h2>
+          <div className="action-buttons">
+            {playerId && particle && (
+              <RegisterButton
+                playerId={playerId}
+                particle={particle}
+                provider={provider}
+                logout={logout}
+                uiConsole={uiConsole}
+              />
+            )}
+            <button onClick={() => uiConsole(particle?.auth.getUserInfo())}>
+              Get User Info
+            </button>
+            {playerId && particle && (
+              <CollectButton
+                playerId={playerId}
+                particle={particle}
+                provider={provider}
+                logout={logout}
+                uiConsole={uiConsole}
+              />
+            )}
+          </div>
+        </div>
+      )}
+      <div id="console">
+        <p></p>
+      </div>
+
+      {showPopup && (
+        <div className="popup-overlay">
+          <div className="popup-content">
+            <pre>{showPopup}</pre>
+            <button
+              className="popup-close-btn"
+              onClick={() => setShowPopup(false)}
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default App;

@@ -13,27 +13,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     if (session) {
         // Get the address of the session key.
         const {address} = req.body;
-        const playerId = process.env.NEXTAUTH_OPENFORT_PLAYER!;
-        const chainId = Number(process.env.NEXTAUTH_OPENFORT_CHAINID!);
+        const acccountId = process.env.NEXTAUTH_OPENFORT_PLAYER!;
 
         try {
-            const playerTransferOwnership = await openfort.players.requestTransferAccountOwnership({
-                playerId: playerId,
+            const playerTransferOwnership = await openfort.accounts.requestTransferOwnership({
+                id: acccountId,
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
-                chainId: chainId,
                 newOwnerAddress: address!,
             });
 
-            const playerAccountAddress = await openfort.players.listAccounts({
-                player: playerId,
-            });
+            const playerAccountAddress = (await openfort.accounts.get({
+                id: acccountId,
+            })).address
 
-            const accountAddress = playerAccountAddress.data.find((account) => account.chainId === chainId)?.address;
 
             return res.send({
                 data: {
                     tranferRequest: playerTransferOwnership,
-                    accountAddress,
+                    playerAccountAddress,
                 },
             });
         } catch (e: any) {

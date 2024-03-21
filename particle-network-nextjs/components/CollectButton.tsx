@@ -2,36 +2,39 @@ import * as React from "react";
 import Openfort from "@openfort/openfort-js";
 import {toast} from "react-toastify";
 import RPC from "./evm.ethers";
+import {ParticleProvider} from "@particle-network/provider";
+import {ParticleNetwork} from "@particle-network/auth";
+
+interface CollectButtonProps {
+    provider: ParticleProvider;
+    particle: ParticleNetwork;
+    uiConsole: (message: any) => void;
+    logout: () => void;
+    playerId: string;
+}
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
-export function CollectButton({
-    provider,
-    particle,
-    uiConsole,
-    logout,
-    playerId,
-}: {
-    provider: any;
-    particle: any;
-    uiConsole: any;
-    logout: any;
-    playerId: string;
-}) {
-    const [collectLoading, setCollectLoading] = React.useState(false);
+export const CollectButton: React.FC<CollectButtonProps> = ({provider, particle, uiConsole, logout, playerId}) => {
+    const [collectLoading, setCollectLoading] = React.useState<boolean>(false);
 
     const handleCollectButtonClick = async () => {
-        var openfortTransactionResponse;
+        let openfortTransactionResponse;
         try {
             if (!provider) {
-                uiConsole("provider not initialized yet");
+                uiConsole("Provider not initialized yet");
                 return;
             }
+
             const authInfo = particle.auth.getUserInfo();
+            if (!authInfo) {
+                uiConsole("Auth info not available");
+                return;
+            }
 
             let toastId = toast.loading("Collecting item...");
-            // Validate idToken with server
-            const collectResponse = await fetch("/api/collect-asset", {
+
+            const res = await fetch("/api/collect-asset", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -39,48 +42,44 @@ export function CollectButton({
                 },
                 body: JSON.stringify({user_uuid: authInfo.uuid, player: playerId}),
             });
-            const collectResponseJSON = await collectResponse.json();
 
-            if (collectResponseJSON.data?.nextAction) {
-                if (!(await openfort.loadSessionKey())) {
-                    const rpc = new RPC(provider!);
-                    const ownerSignedTransaction = await rpc.signMessage(
-                        collectResponseJSON.data.nextAction.payload.userOpHash,
-                    );
+            const {data} = await res.json();
+            toast.dismiss(toastId);
 
-                    toast.dismiss(toastId);
-                    toastId = toast.loading("Owner Key Waiting for Signature");
-                    openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
-                        collectResponseJSON.data.id,
-                        ownerSignedTransaction,
-                    );
-                    if (openfortTransactionResponse) {
-                        toast.dismiss(toastId);
-                        toast.success("Item Collected Successfully");
-                    }
-                } else {
-                    const sessionSignedTransaction = openfort.signMessage(
-                        collectResponseJSON.data.nextAction.payload.userOpHash,
-                    );
-                    toast.dismiss(toastId);
-                    toastId = toast.loading("Session Key Waiting for Signature");
-                    openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
-                        collectResponseJSON.data.id,
-                        sessionSignedTransaction,
-                    );
-                    if (openfortTransactionResponse) {
-                        toast.dismiss(toastId);
-                        toast.success("Item Collected Successfully");
-                    }
-                }
-            } else {
-                toast.dismiss(toastId);
+            if (!data?.nextAction) {
                 toast.error("JWT Verification Failed");
-                await logout();
+                logout();
+                return;
             }
-            return collectResponseJSON;
+
+            const payload = data.nextAction.payload.userOperationHash;
+            const sessionKey = openfort.configureSessionKey();
+            let signedTransaction;
+            toastId = toast.loading(
+                sessionKey.isRegistered ? "Session Key Waiting for Signature" : "Owner Key Waiting for Signature",
+            );
+            if (!sessionKey.isRegistered) {
+                signedTransaction = await new RPC(provider).signMessage(payload);
+                openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
+                    data.id,
+                    signedTransaction,
+                    signedTransaction,
+                );
+            } else {
+                openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
+                    data.id,
+                    signedTransaction,
+                );
+            }
+
+            toast.dismiss(toastId);
+
+            if (openfortTransactionResponse) {
+                toast.success("Item Collected Successfully");
+            }
         } catch (error) {
             console.error("Error:", error);
+            if (error instanceof Error) uiConsole(error.message);
         } finally {
             uiConsole(openfortTransactionResponse);
             setCollectLoading(false);
@@ -94,4 +93,4 @@ export function CollectButton({
             </button>
         </div>
     );
-}
+};

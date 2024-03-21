@@ -38,7 +38,7 @@ export default async function handler(
                 res.status(200).json({
                     name: "Item collection success.",
                     transactionIntentId:transactionIntentResponse.id,
-                    nextAction: transactionIntentResponse.nextAction.payload.userOpHash,
+                    nextAction: transactionIntentResponse.nextAction.payload.userOperationHash,
                 });
             } else {
                 res.status(400).json({error:"error"});

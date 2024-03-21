@@ -8,9 +8,9 @@ import NextAuth, {NextAuthOptions} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {getCsrfToken} from "next-auth/react";
 import {SiweMessage} from "siwe";
-import Openfort, { DataAccountTypes } from "@openfort/openfort-node";
+import Openfort from "@openfort/openfort-node";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http://localhost:3000");
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
     const providers = [
@@ -44,7 +44,6 @@ export function getAuthOptions(req: IncomingMessage): NextAuthOptions {
                         account = await openfort.accounts.create({
                             player: process.env.NEXTAUTH_OPENFORT_PLAYER!,
                             chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
-                            accountType: DataAccountTypes.Recoverable,
                             externalOwnerAddress: siwe.address,
                         });
                     } catch (e: any) {

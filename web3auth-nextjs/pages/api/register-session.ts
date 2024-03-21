@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import * as jose from "jose";
-import Openfort, {CreatePlayerSessionRequest} from "@openfort/openfort-node";
+import Openfort, { CreateSessionRequest } from "@openfort/openfort-node";
 import {ethers} from "ethers";
 import {arrayify} from "ethers/lib/utils";
 
@@ -34,8 +34,8 @@ export default async function handler(
             algorithms: ["ES256"],
         });
         if ((jwtDecoded.payload as any).wallets[0].public_key == app_pub_key) {
-            const createSessionRequest: CreatePlayerSessionRequest = {
-                playerId: playerId,
+            const createSessionRequest: CreateSessionRequest = {
+                player: playerId,
                 address: sessionKeyAddress,
                 chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
                 validUntil: 281474976710655,
@@ -43,7 +43,7 @@ export default async function handler(
                 policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
                 externalOwnerAddress: ethers.utils.computeAddress(arrayify("0x" + app_pub_key)),
             };
-            const playerSession = await openfort.players.createSession(createSessionRequest);
+            const playerSession = await openfort.sessions.create(createSessionRequest);
 
             if (playerSession) {
                 console.log("Session created successfully. ", playerSession);

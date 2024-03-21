@@ -4,14 +4,12 @@ import {
   EthWalletProvider,
   WebAuthnProvider,
   LitAuthClient,
-  OtpProvider,
 } from '@lit-protocol/lit-auth-client';
 import { AuthMethodType, ProviderType } from '@lit-protocol/constants';
 import {
   AuthMethod,
   GetSessionSigsProps,
   IRelayPKP,
-  ProviderOptions,
   SessionSigs,
 } from '@lit-protocol/types';
 
@@ -154,31 +152,6 @@ export async function authenticateWithWebAuthn(): Promise<
 }
 
 /**
- * Send OTP code to user
- */
-export async function sendOTPCode(emailOrPhone: string) {
-  const otpProvider = litAuthClient.initProvider<OtpProvider>(
-    ProviderType.Otp,
-    {
-      userId: emailOrPhone,
-    } as unknown as ProviderOptions
-  );
-  const status = await otpProvider.sendOtpCode();
-  return status;
-}
-
-/**
- * Get auth method object by validating the OTP code
- */
-export async function authenticateWithOTP(
-  code: string
-): Promise<AuthMethod | undefined> {
-  const otpProvider = litAuthClient.getProvider(ProviderType.Otp);
-  const authMethod = await otpProvider?.authenticate({ code });
-  return authMethod;
-}
-
-/**
  * Get auth method object by validating Stytch JWT
  */
 export async function authenticateWithStytch(
@@ -282,8 +255,6 @@ function getProviderByAuthMethod(authMethod: AuthMethod) {
       return litAuthClient.getProvider(ProviderType.EthWallet);
     case AuthMethodType.WebAuthn:
       return litAuthClient.getProvider(ProviderType.WebAuthn);
-    case AuthMethodType.OTP:
-      return litAuthClient.getProvider(ProviderType.Otp);
     case AuthMethodType.StytchOtp:
       return litAuthClient.getProvider(ProviderType.StytchOtp);
     default:

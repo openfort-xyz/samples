@@ -13,40 +13,45 @@ export function RegisterButton() {
   const handleRegisterButtonClick = async () => {
     try {
       setRegisterLoading(true);
-      openfort.createSessionKey();
-      await openfort.saveSessionKey();
-      const address = openfort.sessionKey.address;
-      const registerResponse = await fetch(
-        `/api/examples/protected-register-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ address }),
-        }
-      );
-      const registerResponseJSON = await registerResponse.json();
-
-      if (registerResponseJSON.data?.nextAction) {
-        const provider = new ethers.providers.Web3Provider(walletClient as any);
-        const signer = provider.getSigner();
-        let signedTransaction = await signer.signMessage(
-          arrayify(registerResponseJSON.data.nextAction.payload.userOpHash)
+      const sessionKey = openfort.configureSessionKey();
+      if (!sessionKey.isRegistered) {
+        const address = sessionKey.address;
+        const registerResponse = await fetch(
+          `/api/examples/protected-register-session`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ address }),
+          }
         );
+        const registerResponseJSON = await registerResponse.json();
 
-        const openfortTransactionResponse =
-          await openfort.sendSignatureSessionRequest(
-            registerResponseJSON.data.id,
-            signedTransaction
+        if (registerResponseJSON.data?.nextAction) {
+          const provider = new ethers.providers.Web3Provider(
+            walletClient as any
           );
-        if (openfortTransactionResponse) {
-          console.log("success:", openfortTransactionResponse);
+          const signer = provider.getSigner();
+          let signedTransaction = await signer.signMessage(
+            arrayify(
+              registerResponseJSON.data.nextAction.payload.userOperationHash
+            )
+          );
+
+          const openfortTransactionResponse =
+            await openfort.sendSignatureSessionRequest(
+              registerResponseJSON.data.id,
+              signedTransaction
+            );
+          if (openfortTransactionResponse) {
+            console.log("success:", openfortTransactionResponse);
+            alert("Action performed successfully");
+          }
+        } else {
+          console.log("success:", registerResponseJSON.data);
           alert("Action performed successfully");
         }
-      } else {
-        console.log("success:", registerResponseJSON.data);
-        alert("Action performed successfully");
       }
     } catch (error) {
       console.error("Error:", error);

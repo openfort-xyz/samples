@@ -28,3 +28,12 @@
 [submodule "unity-recaptcha-sample"]
 	path = unity-recaptcha-sample
 	url = https://github.com/openfort-xyz/unity-recaptcha-sample
+[submodule "sample-browser-nextjs-embedded-signer"]
+	path = sample-browser-nextjs-embedded-signer
+	url = https://github.com/openfort-xyz/sample-browser-nextjs-embedded-signer
+[submodule "sample-unity-android-embedded-signer"]
+	path = sample-unity-android-embedded-signer
+	url = https://github.com/openfort-xyz/sample-unity-android-embedded-signer
+[submodule "sample-unity-webgl-embedded-signer"]
+	path = sample-unity-webgl-embedded-signer
+	url = https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer

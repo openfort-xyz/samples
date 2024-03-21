@@ -1,77 +1,63 @@
-# Particle Network with Openfort
+<div align="center">
+  <a href="https://particle.network/">
+    <img src="https://i.imgur.com/xmdzXU4.png" />
+  </a>
+  <h3>
+    Particle Openfort Demo
+  </h3>
+</div>
 
-This sample uses Particle Network as the key management and authentication solution.
+⚡️ Demo application showcasing the utilization of Openfort session keys & player accounts in tandem with authentication/wallet creation through [Particle Auth](https://docs.particle.network/developers/auth-service). Specifically, this application facilitates the creation of a wallet/identity with Particle, which is then used to create an Openfort player, upon which a session key can be generated to test within a **gasless** and **popupless** NFT mint.
 
-It uses Server-Side Verification (SSV) via Social login to authenticate a player. It will create a self-custodial account for the player and collect an asset with it.
+Built using **Particle Auth**, **Openfort**, **Typescript**, and **Ethers**.
 
+## 🔑 Particle Auth
+Particle Auth, a component of Particle Network's Wallet-as-a-Service, enables seamless onboarding to an application-embedded MPC-TSS/AA wallet facilitated by social login, such as Google, GitHub, email, phone number, etc.
 
-## Demo
+👉 Try the demo: https://web-demo.particle.network
 
-- [Live demo](https://sample-particle-network-nextjs.vercel.app/)
+👉 Learn more about Particle Network: https://particle.network
 
-This demo authenticates a player using NextAuth. It will create a smart contract wallet where the private key and the user authentication is managed by Particle Network.
+![Particle Auth Example](https://i.imgur.com/dGaV3jF.png)
 
+## 🛠️ Quickstart
 
-## Features
-
-- 🍨 Next.JS as ⚛️ React client framework with NextAuth for authentication.
-- 3️⃣ Particle Network as the key management and authentication solution.
-- 🏰 Openfort Session Keys.
-
-## How to run locally
-
-**1. Clone and configure the sample**
-
+### Clone this repository
 ```
-git clone https://github.com/openfort-xyz/samples
-cd particle-network-nextjs
-```
-
-Copy the .env.local.example file into a file named .env.local in the folder of the server you want to use. For example:
-
-```
-cp .env.local.example .env.local
+git clone https://github.com/TABASCOatw/particle-openfort-demo.git
 ```
 
-You will need an Openfort account in order to run the demo. Once you set up your account, go to the Openfort [developer dashboard](https://dashboard.openfort.xyz/apikeys) to find your API keys.
-
+### Install dependencies
 ```
-NEXT_PUBLIC_OPENFORT_PUBLIC_KEY=<replace-with-your-publishable-key>
-NEXTAUTH_OPENFORT_SECRET_KEY=<replace-with-your-secret-key>
+yarn install
 ```
-
-The other environment variables are configurable:
-
-`NEXT_PUBLIC_PROJECT_ID`,`NEXT_PUBLIC_CLIENT_KEY`,`NEXT_PUBLIC_APP_ID` is the client_id from Particle. You can get it from https://dashboard.particle.network/
-
-**2. Create a Policy and Contract**
-
-[![Required](https://img.shields.io/badge/REQUIRED-TRUE-ORANGE.svg)](https://shields.io/)
-
-You can create Policies and add Contracts in the Dashboard or with the API. This sample requires a Policy and a Contract to run. Once you've created them, and add its ID to your `.env`.
-
-`NEXTAUTH_OPENFORT_CONTRACT` is the ID of a [Contract](https://www.openfort.xyz/docs/reference/api/create-contract-object) for your contract. A contract has a chainId. 
-If you need a test contract address, use 0x38090d1636069c0ff1Af6bc1737Fb996B7f63AC0 (NFT contract deployed in 80001 Mumbai).
-
-`NEXTAUTH_OPENFORT_POLICY` is the ID of a [Policy](https://www.openfort.xyz/docs/reference/api/create-a-policy-object) for your contract. A policy has a contract and chainId. For this demo to work, the policy must have both the contract and the register sessions as rules.
-
-
-**3. Follow the server instructions on how to run**
-
-Install & Run:
-
-```bash
+OR
+```
 npm install
+```
+
+### Set environment variables
+This project requires a number of keys from Particle Network and WalletConnect to be defined in `.env`. The following should be defined:
+- `NEXT_PUBLIC_APP_ID`, the ID of the corresponding application in your [Particle Network dashboard](https://dashboard.particle.network/#/applications).
+- `NEXT_PUBLIC_PROJECT_ID`, the ID of the corresponding project in your [Particle Network dashboard](https://dashboard.particle.network/#/applications).
+-  `NEXT_PUBLIC_CLIENT_KEY`, the client key of the corresponding project in your [Particle Network dashboard](https://dashboard.particle.network/#/applications).
+-  `NEXTAUTH_OPENFORT_SECRET_KEY`, the secret API key of your Openfort project found in the [Openfort dashboard](https://dashboard.openfort.xyz/)
+-  `NEXTAUTH_OPENFORT_CONTRACT`, the contract ID of a whitelisted/specified contract within the [Openfort dashboard](https://dashboard.openfort.xyz/)
+-  `NEXTAUTH_OPENFORT_POLICY`, the policy ID of a gas policy created within the [Openfort dashboard](https://dashboard.openfort.xyz/)
+-  `NEXT_PUBLIC_OPENFORT_PUBLIC_KEY`, the publishable (public) API key corresponding with a project created within the [Openfort dashboard](https://dashboard.openfort.xyz/)
+-  `PARTICLE_SECRET_PROJECT_ID`, the server key of your Particle project created through the [Particle Network dashboard](https://dashboard.particle.network/#/applications)
+
+### Start the project
+```
 npm run dev
-# or
-yarn
+```
+OR
+```
 yarn dev
 ```
 
-## Get support
-If you found a bug or want to suggest a new [feature/use case/sample], please [file an issue](../../../issues).
+##
+Originally featured in "[Utilizing Session Keys with Particle WaaS and Openfort](https://twitter.com/TABASCOweb3/status/1713146824511684855)"
 
-If you have questions, comments, or need help with code, we're here to help:
-- on [Discord](https://discord.com/invite/t7x7hwkJF4)
-- on Twitter at [@openfortxyz](https://twitter.com/openfortxyz)
-- by [email](mailto:support+github@openfort.xyz)
+##
+This repository was originally derived from an example outlined within [this demo](https://github.com/openfort-xyz/samples/tree/main/particle-network-nextjs).

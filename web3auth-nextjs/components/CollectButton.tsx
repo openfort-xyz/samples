@@ -46,16 +46,19 @@ export function CollectButton({
             const collectResponseJSON = await collectResponse.json();
 
             if (collectResponseJSON.data?.nextAction) {
-                if (!(await openfort.loadSessionKey())) {
+                const sessionKey = openfort.configureSessionKey();
+
+                if (!sessionKey.isRegistered) {
                     const rpc = new RPC(web3auth.provider!);
                     const ownerSignedTransaction = await rpc.signMessage(
-                        collectResponseJSON.data.nextAction.payload.userOpHash,
+                        collectResponseJSON.data.nextAction.payload.userOperationHash,
                     );
 
                     toast.dismiss(toastId);
                     toastId = toast.loading("Owner Key Waiting for Signature");
                     openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
                         collectResponseJSON.data.id,
+                        collectResponseJSON.data.nextAction.payload.userOperationHash,
                         ownerSignedTransaction,
                     );
                     if (openfortTransactionResponse) {
@@ -63,16 +66,14 @@ export function CollectButton({
                         toast.success("Item Collected Successfully");
                     }
                 } else {
-                    const sessionSignedTransaction = openfort.signMessage(
-                        collectResponseJSON.data.nextAction.payload.userOpHash,
+                    const sessionSignedTransaction = await openfort.sendSignatureTransactionIntentRequest(
+                        collectResponseJSON.data.id,
+                        collectResponseJSON.data.nextAction.payload.userOperationHash,
                     );
                     toast.dismiss(toastId);
                     toastId = toast.loading("Session Key Waiting for Signature");
-                    openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
-                        collectResponseJSON.data.id,
-                        sessionSignedTransaction,
-                    );
-                    if (openfortTransactionResponse) {
+
+                    if (sessionSignedTransaction) {
                         toast.dismiss(toastId);
                         toast.success("Item Collected Successfully");
                     }

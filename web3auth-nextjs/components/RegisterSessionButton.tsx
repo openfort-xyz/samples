@@ -27,9 +27,9 @@ export function RegisterButton({
                 return;
             }
 
-            openfort.createSessionKey();
-            await openfort.saveSessionKey();
-            const address = openfort.sessionKey.address;
+            const sessionKey = openfort.configureSessionKey();
+
+            const address = sessionKey.address;
             const {idToken} = await web3auth.authenticateUser();
             const privKey: any = await web3auth.provider?.request({
                 method: "eth_private_key",
@@ -52,7 +52,7 @@ export function RegisterButton({
 
                 const rpc = new RPC(web3auth.provider!);
                 const ownerSignedSession = await rpc.signMessage(
-                    sessionResponseJSON.data.nextAction.payload.userOpHash,
+                    sessionResponseJSON.data.nextAction.payload.userOperationHash,
                 );
 
                 openfortSessionResponse = await openfort.sendSignatureSessionRequest(

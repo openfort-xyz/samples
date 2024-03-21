@@ -4,7 +4,7 @@ import {useWalletClient} from "wagmi";
 import {ethers} from "ethers";
 import {arrayify} from "@ethersproject/bytes";
 
-const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!, "http://localhost:3000");
+const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
 export function CollectButton({}) {
     const [collectLoading, setCollectLoading] = React.useState(false);
@@ -28,13 +28,11 @@ export function CollectButton({}) {
                 const provider = new ethers.providers.Web3Provider(walletClient as any);
                 const signer = provider.getSigner();
                 signedTransaction = await signer.signMessage(
-                    arrayify(collectResponseJSON.data.nextAction.payload.userOpHash),
+                    arrayify(collectResponseJSON.data.nextAction.payload.userOperationHash),
                 );
-                const optimistic = false;
                 const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
                     collectResponseJSON.data.id,
                     signedTransaction,
-                    optimistic,
                 );
                 if (openfortTransactionResponse.response?.status === 1) {
                     console.log("success:", openfortTransactionResponse);

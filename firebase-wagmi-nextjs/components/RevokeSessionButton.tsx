@@ -12,12 +12,13 @@ export function RevokeButton() {
 
   const handleRevokeButtonClick = async () => {
     try {
-      if (!(await openfort.loadSessionKey())) {
+      const sessionKey = openfort.configureSessionKey();
+      if (!sessionKey.isRegistered) {
         alert("Session key not found. Please register session key first");
         return;
       }
       setRevokeLoading(true);
-      const address = openfort.sessionKey.address;
+      const address = sessionKey.address;
 
       const revokeResponse = await fetch(
         `/api/examples/protected-revoke-session`,
@@ -35,7 +36,7 @@ export function RevokeButton() {
         const provider = new ethers.providers.Web3Provider(walletClient as any);
         const signer = provider.getSigner();
         let signedTransaction = await signer.signMessage(
-          arrayify(revokeResponseJSON.data.nextAction.payload.userOpHash)
+          arrayify(revokeResponseJSON.data.nextAction.payload.userOperationHash)
         );
 
         const openfortTransactionResponse =
@@ -44,7 +45,7 @@ export function RevokeButton() {
             signedTransaction
           );
         if (openfortTransactionResponse) {
-          openfort.removeSessionKey();
+          openfort.logout();
           console.log("success:", openfortTransactionResponse);
           alert("Action performed successfully");
         }

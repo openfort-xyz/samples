@@ -1,5 +1,5 @@
 {
-    "name": "particle-network-nextjs",
+    "name": "particle-openfort-demo",
     "version": "1.0.0",
     "private": true,
     "scripts": {
@@ -10,9 +10,10 @@
         "format": "prettier --write \"**/*.ts\""
     },
     "dependencies": {
-        "@openfort/openfort-js": "^0.3.0",
-        "@openfort/openfort-node": "^0.6.8",
+        "@openfort/openfort-js": "0.5.24",
+        "@openfort/openfort-node": "^0.6.47",
         "@particle-network/auth": "^1.2.1",
+        "@particle-network/connect": "^1.2.0",
         "@particle-network/connect-react-ui": "^1.2.0",
         "@particle-network/provider": "^1.2.0",
         "axios": "^1.5.1",

@@ -78,13 +78,11 @@ app.post("/create-transaction", async (req, res) => {
 
 app.post("/request-transfer-ownership", async (req, res) => {
   try {
-    const transferRequest =
-      await openfort.players.requestTransferAccountOwnership({
-        chainId: CHAIN_ID,
-        newOwnerAddress: req.body.newOwnerAddress,
-        player: req.body.player,
-        policy: POLICY_ID,
-      });
+    const transferRequest = await openfort.accounts.requestTransferOwnership({
+      newOwnerAddress: req.body.newOwnerAddress,
+      policy: POLICY_ID,
+      id: req.body.accountId,
+    });
 
     res.handleSuccess({ transferRequestId: transferRequest.id });
   } catch (error) {

@@ -1,69 +1,25 @@
-
 import { Provider } from "@particle-network/connect";
-import {ethers} from "ethers";
-import {arrayify} from "ethers/lib/utils";
+import { ethers, utils } from "ethers";
 
 export default class EthereumRpc {
     private provider: Provider;
+    private web3Provider: ethers.providers.Web3Provider;
 
     constructor(provider: Provider) {
         this.provider = provider;
+        this.web3Provider = new ethers.providers.Web3Provider(this.provider as any);
     }
 
-    async getAccounts(): Promise<string> {
-        try {
-            const provider = new ethers.providers.Web3Provider(this.provider as any);
-            const signer = provider.getSigner();
-            const account = await signer.getAddress();
-            return account;
-        } catch (error: unknown) {
-            return error as string;
-        }
+    private async getSigner() {
+        return this.web3Provider.getSigner();
     }
 
-    async getBalance(): Promise<string> {
+    async signMessage(message: string): Promise<string> {
         try {
-            const provider = new ethers.providers.Web3Provider(this.provider as any);
-            const signer = provider.getSigner();
-            const account = await signer.getAddress();
-            // Get user's balance in ether
-            const balance = ethers.utils.formatEther(
-                await provider.getBalance(account), // Balance is in wei
-            );
-            return balance;
+            return await (await this.getSigner()).signMessage(utils.arrayify(message));
         } catch (error) {
             return error as string;
         }
     }
 
-    async signMessage(message?: string): Promise<string> {
-        try {
-            const provider = new ethers.providers.Web3Provider(this.provider as any);
-            const signer = provider.getSigner();
-
-            const originalMessage = "HELLO WEB3";
-
-            const signedMessage = await signer.signMessage(arrayify(message ?? originalMessage));
-            return signedMessage;
-        } catch (error) {
-            return error as string;
-        }
-    }
-
-    async signAndSendTransaction(): Promise<string> {
-        try {
-            const provider = new ethers.providers.Web3Provider(this.provider as any);
-            const signer = provider.getSigner();
-            const address = await signer.getAddress();
-
-            const tx = await signer.sendTransaction({
-                to: address,
-                value: ethers.utils.parseEther("0.0001"),
-            });
-            const receipt = await tx.wait();
-            return receipt.transactionHash;
-        } catch (error) {
-            return error as string;
-        }
-    }
 }

@@ -1,9 +1,7 @@
 import * as React from "react";
-import {useWalletClient} from "wagmi";
 
 export function StartRecoveryButton() {
     const [startRecoveryLoading, setStartRecoveryLoading] = React.useState(false);
-    const {data: walletClient} = useWalletClient();
 
     const handleStartRecoveryButtonClick = async () => {
         try {

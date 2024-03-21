@@ -10,8 +10,8 @@
     },
     "author": "Openfort",
     "dependencies": {
-        "@openfort/openfort-js": "^0.3.3",
-        "@openfort/openfort-node": "^0.6.28",
+        "@openfort/openfort-js": "0.5.24",
+        "@openfort/openfort-node": "^0.6.47",
         "next": "13.4.3",
         "next-auth": "latest",
         "react": "^18.2.0",
