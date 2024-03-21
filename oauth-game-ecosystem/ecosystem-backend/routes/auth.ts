@@ -343,7 +343,7 @@ router.get("/inventory", passport.authenticate("jwt", {session: false}), async (
     const chainId = 80001;
     let playerInventory;
     try {
-        playerInventory = await openfort.players.getInventory({id: playerId, chainId});
+        playerInventory = await openfort.inventories.getPlayerCryptoCurrencyInventory({id: playerId, chainId});
     } catch (error) {
         console.log(error);
     }

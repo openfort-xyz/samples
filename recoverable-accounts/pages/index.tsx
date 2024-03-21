@@ -4,9 +4,9 @@ import {getServerSession} from "next-auth";
 import {getAuthOptions} from "./api/auth/[...nextauth]";
 import {useSession} from "next-auth/react";
 import {StartRecoveryButton} from "../components/StartRecoveryButton";
-import { CompleteRecoveryButton } from "../components/CompleteRecoveryButton";
+import {CompleteRecoveryButton} from "../components/CompleteRecoveryButton";
 import Notice from "../components/Notice";
-import { CollectButton } from "../components/CollectButton";
+import {CollectButton} from "../components/CollectButton";
 
 export const getServerSideProps: GetServerSideProps = async ({req, res}) => {
     return {
@@ -49,7 +49,7 @@ const Home: NextPage = () => {
                         <a
                             style={{display: "flex", alignItems: "center", marginLeft: "4px"}}
                             target="_blank"
-                            href={"https://testnet.snowtrace.io/address/" + data.OF_address}
+                            href={"https://mumbai.polygonscan.com/address/" + data.OF_address}
                         >
                             {data.OF_address}
                         </a>
@@ -59,12 +59,14 @@ const Home: NextPage = () => {
                     </p>
                     <CollectButton />
                     <p>
-                        2. Press on <strong>Start recovery</strong> to initiate the recovery process with the default guardian.
-                        This will start a recovery process to set the new owner as the address 0x8a16DBD0970D7829C7375eE86E58AC33Ee8ECE4a.
+                        2. Press on <strong>Start recovery</strong> to initiate the recovery process with the default
+                        guardian. This will start a recovery process to set the new owner as the address
+                        0x8a16DBD0970D7829C7375eE86E58AC33Ee8ECE4a.
                     </p>
                     <StartRecoveryButton />
                     <p>
-                        3. Press on <strong>Complete recovery</strong> to complete a recovery process with the default guardian.
+                        3. Press on <strong>Complete recovery</strong> to complete a recovery process with the default
+                        guardian.
                     </p>
                     <CompleteRecoveryButton />
                 </div>

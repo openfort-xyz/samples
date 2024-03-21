@@ -1,87 +1,76 @@
-import * as React from "react";
+import React, {useState} from "react";
 import Openfort from "@openfort/openfort-js";
 import {toast} from "react-toastify";
 import RPC from "./evm.ethers";
+import {ParticleProvider} from "@particle-network/provider";
+import {ParticleNetwork} from "@particle-network/auth";
+
+interface RegisterButtonProps {
+    provider: ParticleProvider;
+    particle: ParticleNetwork;
+    uiConsole: (message: any) => void;
+    logout: () => void;
+    playerId: string;
+}
 
 const openfort = new Openfort(process.env.NEXT_PUBLIC_OPENFORT_PUBLIC_KEY!);
 
-export function RegisterButton({
-    provider,
-    particle,
-    uiConsole,
-    logout,
-    playerId,
-}: {
-    provider: any;
-    particle: any;
-    uiConsole: any;
-    logout: any;
-    playerId: string;
-}) {
-    const [registerLoading, setRegisterLoading] = React.useState(false);
+export const RegisterButton: React.FC<RegisterButtonProps> = ({provider, particle, uiConsole, logout, playerId}) => {
+    const [loading, setLoading] = useState<boolean>(false);
 
-    const handleRegisterButtonClick = async () => {
-        var openfortSessionResponse;
-        try {
-            if (!provider) {
-                uiConsole("provider not initialized yet");
-                return;
-            }
+    const handleReg = async () => {
+        if (!provider || !particle.auth) return;
+        const auth = particle.auth.getUserInfo();
+        if (!auth) {
+            toast.error("Authentication info not found");
+            return;
+        }
 
-            const authInfo = particle.auth.getUserInfo();
+        setLoading(true);
+        const sessionKey = openfort.configureSessionKey();
 
-            openfort.createSessionKey();
-            await openfort.saveSessionKey();
-            const address = openfort.sessionKey.address;
-
-            let toastId = toast.loading("Registering session...");
-
-            const sessionResponse = await fetch("/api/register-session", {
+        const toastId = toast.loading("Registering...");
+        if (!sessionKey.isRegistered) {
+            const res = await fetch("/api/register-session", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${authInfo.token}`,
+                    Authorization: `Bearer ${auth.token}`,
                 },
-                body: JSON.stringify({user_uuid: authInfo.uuid, sessionPubKey: address, player: playerId}),
+                body: JSON.stringify({
+                    user_uuid: auth.uuid,
+                    sessionPubKey: sessionKey.address,
+                    player: playerId,
+                }),
             });
-            const sessionResponseJSON = await sessionResponse.json();
-            if (sessionResponseJSON.data?.nextAction) {
-                toast.dismiss(toastId);
-                toastId = toast.loading("Session Key Waiting for Signature");
-
-                const rpc = new RPC(provider!);
-                const ownerSignedSession = await rpc.signMessage(
-                    sessionResponseJSON.data.nextAction.payload.userOpHash,
+            const json = await res.json();
+            if (json.data?.nextAction) {
+                const rpc = new RPC(provider);
+                const openfortResp = await openfort.sendSignatureSessionRequest(
+                    json.data.id,
+                    await rpc.signMessage(json.data.nextAction.payload.userOperationHash),
                 );
 
-                openfortSessionResponse = await openfort.sendSignatureSessionRequest(
-                    sessionResponseJSON.data.id,
-                    ownerSignedSession,
-                );
-
-                if (openfortSessionResponse) {
-                    toast.dismiss(toastId);
-
-                    toast.success("Session Key Registered Successfully");
+                if (openfortResp) {
+                    toast.success("Registered successfully");
+                    uiConsole(openfortResp);
+                } else {
+                    toast.error("Registration failed");
+                    logout();
                 }
             } else {
-                toast.dismiss(toastId);
-                toast.error("Session Key Registration Failed");
+                toast.error("Registration failed");
                 logout();
             }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            uiConsole(openfortSessionResponse);
-            setRegisterLoading(false);
         }
+
+        setLoading(false);
+        toast.dismiss(toastId);
     };
 
     return (
-        <div>
-            <button className="card" type="button" disabled={registerLoading} onClick={handleRegisterButtonClick}>
-                {registerLoading ? "Registering..." : "Register session"}
-            </button>
-        </div>
+        <button className="card" disabled={loading} onClick={handleReg}>
+            {loading ? "Registering..." : "Register Session"}
+        </button>
     );
-}
+};

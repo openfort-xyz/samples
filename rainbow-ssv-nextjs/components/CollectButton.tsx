@@ -21,22 +21,26 @@ export function CollectButton({}) {
             const collectResponseJSON = await collectResponse.json();
 
             if (collectResponseJSON.data?.nextAction) {
-                let signedTransaction: string;
-                if (openfort.loadSessionKey()) {
+                let openfortTransactionResponse;
+                const sessionKey = openfort.configureSessionKey();
+
+                if (sessionKey.isRegistered) {
                     // sign with the session key
-                    signedTransaction = openfort.signMessage(collectResponseJSON.data.nextAction.payload.userOpHash);
+                    openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
+                        collectResponseJSON.data.id,
+                        collectResponseJSON.data.nextAction.payload.userOperationHash,
+                    );
                 } else {
-                    // sign with the owner signer
-                    signedTransaction = await walletClient!.signMessage({
-                        message: {raw: collectResponseJSON.data.nextAction.payload.userOpHash},
+                    const signedTransaction = await walletClient!.signMessage({
+                        message: {raw: collectResponseJSON.data.nextAction.payload.userOperationHash},
                     });
+                    openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
+                        collectResponseJSON.data.id,
+                        collectResponseJSON.data.nextAction.payload.userOperationHash,
+                        signedTransaction,
+                    );
                 }
-                const optimistic = false;
-                const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
-                    collectResponseJSON.data.id,
-                    signedTransaction,
-                    optimistic,
-                );
+
                 if (openfortTransactionResponse.response?.status === 1) {
                     console.log("success:", openfortTransactionResponse);
                     alert("Mint performed successfully");

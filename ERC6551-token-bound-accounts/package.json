@@ -11,7 +11,7 @@
         "dev": "nodemon ./index.ts"
     },
     "dependencies": {
-        "@openfort/openfort-node": "^0.6.4",
+        "@openfort/openfort-node": "^0.6.47",
         "ethers": "^5.7.1"
     },
     "devDependencies": {

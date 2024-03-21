@@ -23,28 +23,35 @@ export function CollectButton() {
       const collectResponseJSON = await collectResponse.json();
 
       if (collectResponseJSON.data?.nextAction) {
-        let signedTransaction;
-        if (await openfort.loadSessionKey()) {
+        let openfortTransactionResponse;
+        const sessionKey = openfort.configureSessionKey();
+
+        if (sessionKey.isRegistered) {
           // sign with the session key
-          signedTransaction = openfort.signMessage(
-            collectResponseJSON.data.nextAction.payload.userOpHash
-          );
+          openfortTransactionResponse =
+            await openfort.sendSignatureTransactionIntentRequest(
+              collectResponseJSON.data.id,
+              collectResponseJSON.data.nextAction.payload.userOperationHash
+            );
         } else {
           // sign with the owner signer
           const provider = new ethers.providers.Web3Provider(
             walletClient as any
           );
           const signer = provider.getSigner();
-          signedTransaction = await signer.signMessage(
-            arrayify(collectResponseJSON.data.nextAction.payload.userOpHash)
+          const signedTransaction = await signer.signMessage(
+            arrayify(
+              collectResponseJSON.data.nextAction.payload.userOperationHash
+            )
           );
+          openfortTransactionResponse =
+            await openfort.sendSignatureTransactionIntentRequest(
+              collectResponseJSON.data.id,
+              collectResponseJSON.data.nextAction.payload.userOperationHash,
+              signedTransaction
+            );
         }
 
-        const openfortTransactionResponse =
-          await openfort.sendSignatureTransactionIntentRequest(
-            collectResponseJSON.data.id,
-            signedTransaction
-          );
         if (openfortTransactionResponse) {
           console.log("success:", openfortTransactionResponse);
           alert("Action performed successfully");

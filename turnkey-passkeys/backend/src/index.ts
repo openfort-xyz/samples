@@ -275,7 +275,7 @@ app.post("/api/wallet/construct-tx", async (req, res) => {
       createTransactionIntentRequest
     );
     const aBytes = ethers.utils.arrayify(
-      transactionIntent.nextAction?.payload.userOpHash!
+      transactionIntent.nextAction?.payload.userOperationHash!
     );
     const msg = ethers.utils.hashMessage(aBytes);
     res.status(200).json({

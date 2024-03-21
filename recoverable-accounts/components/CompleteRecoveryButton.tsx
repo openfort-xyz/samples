@@ -1,14 +1,8 @@
 import * as React from "react";
-import Openfort from "@openfort/openfort-js";
-import {ethers} from "ethers";
-import {arrayify} from "@ethersproject/bytes";
 import {useWalletClient} from "wagmi";
-
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http://localhost:3000");
 
 export function CompleteRecoveryButton() {
     const [completeRecoveryLoading, setCompleteRecoveryLoading] = React.useState(false);
-    const {data: walletClient} = useWalletClient();
 
     const handleCompleteRecoveryButtonClick = async () => {
         try {

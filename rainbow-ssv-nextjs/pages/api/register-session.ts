@@ -3,7 +3,7 @@ import {getServerSession} from "next-auth/next";
 import {getAuthOptions} from "./auth/[...nextauth]";
 
 import type {NextApiRequest, NextApiResponse} from "next";
-import Openfort, {CreatePlayerSessionRequest} from "@openfort/openfort-node";
+import Openfort, {CreateSessionRequest} from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -14,8 +14,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Get the address of the session key.
         const {address} = req.body;
 
-        const createSessionRequest: CreatePlayerSessionRequest = {
-            playerId: session.playerId,
+        const createSessionRequest: CreateSessionRequest = {
+            player: session.playerId,
             address: address!.toString(),
             chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             validUntil: 281474976710655,
@@ -25,7 +25,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         };
 
         try {
-            const playerSession = await openfort.players.createSession(createSessionRequest);
+            const playerSession = await openfort.sessions.create(createSessionRequest);
 
             return res.send({
                 data: playerSession,

@@ -38,20 +38,21 @@ export default function ProtectedPage() {
     const handleRegisterButtonClick = async () => {
         try {
             setRegisterLoading(true);
-            openfort.createSessionKey();
-            await openfort.saveSessionKey();
-            const address = openfort.sessionKey.address;
-            const sessionResponse = await fetch(`/api/examples/protected-register-session`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({address}),
-            });
-            const sessionResponseJSON = await sessionResponse.json();
-            console.log("success:", sessionResponseJSON);
-            if (sessionResponseJSON.data) {
-                alert("Session created successfully");
+            const sessionKey = openfort.configureSessionKey();
+            if (!sessionKey.isRegistered) {
+                const address = sessionKey.address;
+                const sessionResponse = await fetch(`/api/examples/protected-register-session`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({address}),
+                });
+                const sessionResponseJSON = await sessionResponse.json();
+                console.log("success:", sessionResponseJSON);
+                if (sessionResponseJSON.data) {
+                    alert("Session created successfully");
+                }
             }
         } catch (error) {
             console.error("Error:", error);
@@ -73,12 +74,11 @@ export default function ProtectedPage() {
             const collectResponseJSON = await collectResponse.json();
 
             if (collectResponseJSON.data?.nextAction) {
-                const sessionSignedTransaction = openfort.signMessage(
-                    collectResponseJSON.data.nextAction.payload.userOpHash,
-                );
+                const sessionKey = openfort.configureSessionKey();
+
                 const openfortTransactionResponse = await openfort.sendSignatureTransactionIntentRequest(
                     collectResponseJSON.data.id,
-                    sessionSignedTransaction,
+                    collectResponseJSON.data.nextAction.payload.userOperationHash,
                 );
                 if (openfortTransactionResponse) {
                     console.log("success:", openfortTransactionResponse);
@@ -98,7 +98,8 @@ export default function ProtectedPage() {
     const handleTransaferOwnershipButtonClick = async () => {
         try {
             setTransferOwnershipLoading(true);
-            if (!(await openfort.loadSessionKey())) {
+            const sessionKey = openfort.configureSessionKey();
+            if (!sessionKey.isRegistered) {
                 alert("Session key not found. Please register session key first");
                 return;
             }

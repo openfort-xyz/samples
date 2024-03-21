@@ -3,9 +3,9 @@ import {getServerSession} from "next-auth/next";
 import {getAuthOptions} from "./auth/[...nextauth]";
 
 import type {NextApiRequest, NextApiResponse} from "next";
-import Openfort, {Interaction, CreateTransactionIntentRequest, CreateAccountRequest, DataAccountTypes} from "@openfort/openfort-node";
+import Openfort, {Interaction, CreateTransactionIntentRequest} from "@openfort/openfort-node";
 
-const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!, "http://localhost:3000");
+const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
     const session = await getServerSession(req, res, getAuthOptions(req));

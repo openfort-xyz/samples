@@ -40,7 +40,7 @@ app.get("/", async (req: Request, res: Response) => {
   let message =
     "Send a request to /FULL_KMS_EXAMPLE to create a transaction intent and sign it using your own KMS.";
   message +=
-    "</br></br>If you already have a userOp hash you want to sign, send it using the endpoint /Sign_KMS?userOpHash= to get the signature";
+    "</br></br>If you already have a userOp hash you want to sign, send it using the endpoint /Sign_KMS?userOperationHash= to get the signature";
   res.send(message);
   console.log(result);
 });
@@ -76,7 +76,7 @@ app.get("/FULL_KMS_EXAMPLE", async (req: Request, res: Response) => {
   if(!result.nextAction){
     return res.send("Alert! Account custody is not configured with your KMS but with Openfort. Please check the logs for more information.")
   }
-  let userop_hash = result.nextAction.payload.userOpHash!;
+  let userop_hash = result.nextAction.payload.userOperationHash!;
   let tin = result.id;
   console.log('Success! The message that the KMS needs to sign is: '+userop_hash);
   let response =
@@ -113,16 +113,16 @@ app.get("/FULL_KMS_EXAMPLE", async (req: Request, res: Response) => {
 // Sign_KMS call:
 // It will get a userOp hash and sign it using the configured GCP KMS
 app.get("/Sign_KMS", async (req: Request, res: Response) => {
-  if (!req.query.userOpHash) {
-    let error = "Error: Missing userOpHash parameter.";
+  if (!req.query.userOperationHash) {
+    let error = "Error: Missing userOperationHash parameter.";
     console.error(error);
     res.send(error);
-  } else if (req.query.userOpHash.length != 66) {
+  } else if (req.query.userOperationHash.length != 66) {
     let error = "Wrong userOp hash length.";
     console.error(error);
     res.send(error);
   } else {
-    let userop_hash = req.query.userOpHash as string;
+    let userop_hash = req.query.userOperationHash as string;
     console.log('Success! The message that the KMS needs to sign is: '+userop_hash);
     let response = "1- UserOp hash to sign: " + userop_hash;
     let signed_message = await sign_userop_hash(userop_hash);

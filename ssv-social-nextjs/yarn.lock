@@ -586,23 +586,24 @@
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.3.1.tgz#8831ef002114670c603c458ab8b11328406953a9"
   integrity sha512-EbqwksQwz9xDRGfDST86whPBgM65E0OH/pCgqW0GBVzO22bNE+NuIbeTb714+IfSjU3aRk47EUvXIb5bTsenKA==
 
-"@openfort/openfort-js@^0.3.3":
-  version "0.3.3"
-  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.3.3.tgz#120ed31dfc98613ab8722eb566d5d2ec48d4f222"
-  integrity sha512-rcYQd8pYZ4IWO/MtVl0BVQUHcpC3gJFB+wSSVTn/LU9f+Sz6aGIru21xBVxxS8QrDki8/dk2umKEnUkn3Twj4Q==
+"@openfort/openfort-js@0.5.24":
+  version "0.5.24"
+  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.5.24.tgz#56fd19b5b0f39d3ed12299b4f4bc524763a36b5d"
+  integrity sha512-PMNfEq7SJNwH9Xdh812of3bC1lBOvfdUNlADRsukM8KZJLAKWpTh/iqRQuiviXZv0yOjbURiT9olvtzXAgaoLQ==
   dependencies:
     "@ethersproject/bytes" "^5.7.0"
     "@ethersproject/hash" "^5.7.0"
     "@ethersproject/signing-key" "^5.7.0"
     "@noble/curves" "^1.1.0"
-    axios "^1.4.0"
+    axios "1.6.7"
     es6-promise "^4.2.8"
+    jose "^5.2.2"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.6.28":
-  version "0.6.28"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.28.tgz#301af58b599eeeef29d4c0aa8c6524c8d3713a37"
-  integrity sha512-EPoGdFSm0KME8unT1fbzgEImIKh0Hq+6uFB2W16yzfMDAEK0p22BCmZbsSCubpY9kvtDqi+4TMf7edPaV+N0mA==
+"@openfort/openfort-node@^0.6.47":
+  version "0.6.47"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.47.tgz#7cd070cfeed5e9f514ae5906144c37d367ee209a"
+  integrity sha512-5Sx4i+951hDSZxJUUffCcT5ylw/XlZ5tU2CNGSktZ8bnGXCYfdKX5yt3h7w/SmDiCMohllu5LrnRP7VyBN8nDw==
   dependencies:
     "@types/node" "*"
     "@types/node-fetch" "^2.5.7"
@@ -1406,21 +1407,21 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.npmjs.org/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
+axios@1.6.7:
+  version "1.6.7"
+  resolved "https://registry.npmjs.org/axios/-/axios-1.6.7.tgz#7b48c2e27c96f9c68a2f8f31e2ab19f59b06b0a7"
+  integrity sha512-/hDJGff6/c7u0hDkvkGxR/oy6CbCs8ziCsC7SqmhjfozqiJGc8Z11wrv9z9lYfY4K8l+H9TpjcMDX0xOZmx+RA==
+  dependencies:
+    follow-redirects "^1.15.4"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
 axios@^0.21.0:
   version "0.21.4"
   resolved "https://registry.npmjs.org/axios/-/axios-0.21.4.tgz#c67b90dc0568e5c1cf2b0b858c43ba28e2eda575"
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
-
-axios@^1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/axios/-/axios-1.4.0.tgz#38a7bf1224cd308de271146038b551d725f0be1f"
-  integrity sha512-S4XCWMEmzvo64T9GfvQDOXgYRDJ/wsSZc7Jvdgx5u1sd0JwsuPLqb3SYmusag+edF6ziyMensPVqLTSc1PiSEA==
-  dependencies:
-    follow-redirects "^1.15.0"
-    form-data "^4.0.0"
-    proxy-from-env "^1.1.0"
 
 balanced-match@^1.0.0:
   version "1.0.2"
@@ -1836,10 +1837,15 @@ find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-follow-redirects@^1.14.0, follow-redirects@^1.15.0:
+follow-redirects@^1.14.0:
   version "1.15.2"
   resolved "https://registry.yarnpkg.com/follow-redirects/-/follow-redirects-1.15.2.tgz#b460864144ba63f2681096f274c4e57026da2c13"
   integrity sha512-VQLG33o04KaQ8uYi2tVNbdrWp1QWxNNea+nmIB4EVM28v0hmP17z7aG1+wAkNzVq4KeXTq3221ye5qTJP91JwA==
+
+follow-redirects@^1.15.4:
+  version "1.15.6"
+  resolved "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.6.tgz#7f815c0cda4249c74ff09e95ef97c23b5fd0399b"
+  integrity sha512-wWN62YITEaOpSK584EZXJafH1AGpO8RVgElfkuXbTOrPX4fIfOyEpW/CsiNd8JdYrAoOvafRTOEnvsO++qCqFA==
 
 for-each@^0.3.3:
   version "0.3.3"
@@ -2067,6 +2073,11 @@ jose@^4.11.4, jose@^4.14.1:
   version "4.14.4"
   resolved "https://registry.npmjs.org/jose/-/jose-4.14.4.tgz"
   integrity sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==
+
+jose@^5.2.2:
+  version "5.2.3"
+  resolved "https://registry.npmjs.org/jose/-/jose-5.2.3.tgz#071c87f9fe720cff741a403c8080b69bfe13164a"
+  integrity sha512-KUXdbctm1uHVL8BYhnyHkgp3zDX5KW8ZhAKVFEfUbU2P8Alpzjb+48hHvjOdQIyPshoblhzsuqOwEEAbtHVirA==
 
 js-sha3@0.8.0:
   version "0.8.0"

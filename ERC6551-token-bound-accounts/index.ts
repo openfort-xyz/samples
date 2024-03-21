@@ -1,4 +1,4 @@
-import Openfort, {DataAccountTypes, Interaction, PolicySchema, SponsorSchema} from "@openfort/openfort-node";
+import Openfort, {Interaction} from "@openfort/openfort-node";
 import {ethers} from "ethers";
 const openfort = new Openfort(process.env.OPENFORT_SECRET_KEY!);
 
@@ -46,22 +46,20 @@ async function Option1() {
             name: "test",
             chainId: chainId,
             strategy: {
-                sponsorSchema: SponsorSchema.PayForUser,
-                tokenContract: undefined,
-                tokenContractAmount: undefined,
+                sponsorSchema: "pay_for_user",
             },
         });
         // Create a policy rule for the ERC6551Registry contract
         await openfort.policyRules.create({
             contract: ERC6551Registry.id,
-            type: PolicySchema.ContractFunctions,
+            type: "contract_functions",
             policy: policy.id,
             functionName: "All functions",
         });
         // Create a policy rule for SimpleNFT
         await openfort.policyRules.create({
             contract: SimpleNFT.id,
-            type: PolicySchema.ContractFunctions,
+            type: "contract_functions",
             policy: policy.id,
             functionName: "All functions",
         });
@@ -155,7 +153,7 @@ async function Option1() {
         // Add the newly created account to the policy to allow for sponsoring
         await openfort.policyRules.create({
             contract: ERC6551Account.id,
-            type: PolicySchema.ContractFunctions,
+            type: "contract_functions",
             policy: policy.id,
             functionName: "All functions",
         });
@@ -258,24 +256,20 @@ async function Option2() {
             name: "test",
             chainId: chainId,
             strategy: {
-                sponsorSchema: SponsorSchema.PayForUser,
-                tokenContract: undefined,
-                tokenContractAmount: undefined,
+                sponsorSchema: "pay_for_user",
             },
         });
         // Create a policy rule for the SimpleNFT contract
         await openfort.policyRules.create({
             contract: SimpleNFT.id,
-            type: PolicySchema.ContractFunctions,
+            type: "contract_functions",
             policy: policy.id,
             functionName: "All functions",
         });
         // Create a policy rule for self account interactions
         await openfort.policyRules.create({
-            contract: null,
-            type: PolicySchema.AccountFunctions,
+            type: "contract_functions",
             policy: policy.id,
-            functionName: null,
         });
         // Create player in OF for the 6551 account
         const player_6551 = await openfort.players.create({
@@ -335,7 +329,7 @@ async function Option2() {
         const account = await openfort.accounts.create({
             player: player_6551.id,
             chainId: chainId,
-            accountType: DataAccountTypes.Erc6551,
+            accountType: 'ERC6551V1',
             tokenContract: SimpleNFT.id,
             tokenId: simpleOwnerNFTTokenId,
             externalOwnerAddress: upgradeable_account.address,

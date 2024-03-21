@@ -3,7 +3,7 @@ import {getServerSession} from "next-auth/next";
 import {getAuthOptions} from "./auth/[...nextauth]";
 
 import type {NextApiRequest, NextApiResponse} from "next";
-import Openfort, {RevokePlayerSessionRequest} from "@openfort/openfort-node";
+import Openfort, {RevokeSessionRequest} from "@openfort/openfort-node";
 
 const openfort = new Openfort(process.env.NEXTAUTH_OPENFORT_SECRET_KEY!);
 
@@ -14,14 +14,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         // Get the address of the session key.
         const {address} = req.body;
 
-        const revokeSessionRequest: RevokePlayerSessionRequest = {
-            playerId: session.playerId,
+        const revokeSessionRequest: RevokeSessionRequest = {
+            player: session.playerId,
             address: address!.toString(),
             chainId: Number(process.env.NEXTAUTH_OPENFORT_CHAINID!),
             policy: process.env.NEXTAUTH_OPENFORT_POLICY!,
         };
         try {
-            const playerSession = await openfort.players.revokeSession(revokeSessionRequest);
+            const playerSession = await openfort.sessions.revoke(revokeSessionRequest);
 
             return res.send({
                 data: playerSession,

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
 import AuthMethods from './AuthMethods';
-import EmailSMSAuth from './EmailSMSAuth';
 import WalletMethods from './WalletMethods';
 import WebAuthn from './WebAuthn';
 import StytchOTP from './StytchOTP';
@@ -10,7 +9,6 @@ interface LoginProps {
   handleGoogleLogin: () => Promise<void>;
   handleDiscordLogin: () => Promise<void>;
   authWithEthWallet: any;
-  authWithOTP: any;
   authWithWebAuthn: any;
   authWithStytch: any;
   signUp: any;
@@ -23,7 +21,6 @@ export default function LoginMethods({
   handleGoogleLogin,
   handleDiscordLogin,
   authWithEthWallet,
-  authWithOTP,
   authWithWebAuthn,
   authWithStytch,
   signUp,
@@ -55,20 +52,6 @@ export default function LoginMethods({
             </div>
           </>
         )}
-        {view === 'email' && (
-          <EmailSMSAuth
-            method={'email'}
-            setView={setView}
-            authWithOTP={authWithOTP}
-          />
-        )}
-        {/* {view === 'phone' && (
-          <EmailSMSAuth
-            method={'phone'}
-            setView={setView}
-            authWithOTP={authWithOTP}
-          />
-        )} */}
         {view === 'phone' && (
           <StytchOTP authWithStytch={authWithStytch} setView={setView} />
         )}
