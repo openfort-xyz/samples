@@ -12,6 +12,7 @@ export function RegisterButton() {
         try {
             setRegisterLoading(true);
             const sessionKey = openfort.configureSessionKey();
+            console.log("sessionKey", sessionKey);
             if (!sessionKey.isRegistered) {
                 const address = sessionKey.address;
                 const registerResponse = await fetch(`/api/register-session`, {
@@ -30,7 +31,7 @@ export function RegisterButton() {
                     });
 
                     const optimistic = false;
-                    const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
+                    const openfortTransactionResponse = await openfort.sendRegisterSessionRequest(
                         registerResponseJSON.data.id,
                         signedTransaction,
                         optimistic,

@@ -40,7 +40,7 @@ export function RegisterButton() {
           );
 
           const openfortTransactionResponse =
-            await openfort.sendSignatureSessionRequest(
+            await openfort.sendRegisterSessionRequest(
               registerResponseJSON.data.id,
               signedTransaction
             );

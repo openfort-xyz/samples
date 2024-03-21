@@ -10,7 +10,7 @@
         "format": "prettier --write \"**/*.ts\""
     },
     "dependencies": {
-        "@openfort/openfort-js": "0.5.24",
+        "@openfort/openfort-js": "^0.5.25",
         "@openfort/openfort-node": "^0.6.47",
         "@particle-network/auth": "^1.2.1",
         "@particle-network/connect": "^1.2.0",

@@ -46,7 +46,7 @@ export const RegisterButton: React.FC<RegisterButtonProps> = ({provider, particl
             const json = await res.json();
             if (json.data?.nextAction) {
                 const rpc = new RPC(provider);
-                const openfortResp = await openfort.sendSignatureSessionRequest(
+                const openfortResp = await openfort.sendRegisterSessionRequest(
                     json.data.id,
                     await rpc.signMessage(json.data.nextAction.payload.userOperationHash),
                 );
