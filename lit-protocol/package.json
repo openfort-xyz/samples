@@ -14,7 +14,7 @@
     "@lit-protocol/lit-auth-client": "^2.2.49",
     "@lit-protocol/pkp-ethers": "^2.2.49",
     "@lit-protocol/types": "^2.2.49",
-    "@openfort/openfort-js": "0.5.24",
+    "@openfort/openfort-js": "^0.5.25",
     "@openfort/openfort-node": "^0.6.47",
     "@radix-ui/react-radio-group": "^1.1.3",
     "@stytch/nextjs": "^9.0.0",

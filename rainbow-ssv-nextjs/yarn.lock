@@ -668,10 +668,10 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@openfort/openfort-js@^0.5.24":
-  version "0.5.24"
-  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.5.24.tgz#56fd19b5b0f39d3ed12299b4f4bc524763a36b5d"
-  integrity sha512-PMNfEq7SJNwH9Xdh812of3bC1lBOvfdUNlADRsukM8KZJLAKWpTh/iqRQuiviXZv0yOjbURiT9olvtzXAgaoLQ==
+"@openfort/openfort-js@^0.5.25":
+  version "0.5.25"
+  resolved "https://registry.npmjs.org/@openfort/openfort-js/-/openfort-js-0.5.25.tgz#eeb86bea5977c3be5c06a5a4351aeabb1faddcd9"
+  integrity sha512-k6/jXzojxRJcTPl3Luz2VHXB1eDTWeIhPg4f0sHIm5PRIMcHq59LQ1+HbgN9uJ+LIywsE3aHxSPBJq4Pjp7lcQ==
   dependencies:
     "@ethersproject/bytes" "^5.7.0"
     "@ethersproject/hash" "^5.7.0"
@@ -682,10 +682,10 @@
     jose "^5.2.2"
     path "^0.12.7"
 
-"@openfort/openfort-node@^0.6.46":
-  version "0.6.46"
-  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.46.tgz#07a68591d44d2644e66896662d31819e70212fb4"
-  integrity sha512-ViZ1NsrSDUTBip/qMaBXbb0rhrEdIwhIttEyCD84CcsmHpjMmLkvQTRr2C3z8aFXVvrNkDAk/7wEDtcS8qmRyw==
+"@openfort/openfort-node@^0.6.47":
+  version "0.6.47"
+  resolved "https://registry.npmjs.org/@openfort/openfort-node/-/openfort-node-0.6.47.tgz#7cd070cfeed5e9f514ae5906144c37d367ee209a"
+  integrity sha512-5Sx4i+951hDSZxJUUffCcT5ylw/XlZ5tU2CNGSktZ8bnGXCYfdKX5yt3h7w/SmDiCMohllu5LrnRP7VyBN8nDw==
   dependencies:
     "@types/node" "*"
     "@types/node-fetch" "^2.5.7"

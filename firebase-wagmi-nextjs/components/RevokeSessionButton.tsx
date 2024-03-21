@@ -40,7 +40,7 @@ export function RevokeButton() {
         );
 
         const openfortTransactionResponse =
-          await openfort.sendSignatureSessionRequest(
+          await openfort.sendRegisterSessionRequest(
             revokeResponseJSON.data.id,
             signedTransaction
           );

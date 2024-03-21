@@ -55,7 +55,7 @@ export function RegisterButton({
                     sessionResponseJSON.data.nextAction.payload.userOperationHash,
                 );
 
-                openfortSessionResponse = await openfort.sendSignatureSessionRequest(
+                openfortSessionResponse = await openfort.sendRegisterSessionRequest(
                     sessionResponseJSON.data.id,
                     ownerSignedSession,
                 );

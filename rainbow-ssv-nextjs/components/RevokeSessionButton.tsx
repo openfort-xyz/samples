@@ -32,7 +32,7 @@ export function RevokeButton() {
                     message: {raw: revokeResponseJSON.data.nextAction.payload.userOperationHash},
                 });
                 const optimistic = false;
-                const openfortTransactionResponse = await openfort.sendSignatureSessionRequest(
+                const openfortTransactionResponse = await openfort.sendRegisterSessionRequest(
                     revokeResponseJSON.data.id,
                     signedTransaction,
                     optimistic,
