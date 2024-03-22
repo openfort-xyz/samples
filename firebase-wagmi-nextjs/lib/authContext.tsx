@@ -70,7 +70,7 @@ export const signOut = async () => {
   const auth = getAuth();
   destroyCookie(null, "idToken");
   try {
-    await openfort.removeSessionKey();
+    await openfort.logout();
   } catch (error) {
     console.error("Failed to remove session key:", error);
   }
