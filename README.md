@@ -44,6 +44,8 @@ To test a sample, follow the instructions inside its folder.
 - [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
 - [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)
 - [Use Unity Game Servies (UGS) with embedded wallets to mint NFTs](https://github.com/openfort-xyz/ugs-unity-game-services-sample)
+- [Block bot behavior from your game - ReCAPTCHA Unity](unity-recaptcha-sample)
+- [Use Unity Ads to sponsor transaction gas fees](https://github.com/openfort-xyz/unity-ad-sample)
 ### Key Management
 - [Use an external KMS to sign transaction intents](external-kms-game)
 - [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
@@ -61,6 +63,6 @@ To test a sample, follow the instructions inside its folder.
 - [Validate Signatures with Smart Contracts and Seaport Protocol](https://github.com/eloi010/seaport-js)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Backend quickstarts](backend-quickstarts)
-- [Block bot behavior from your game - ReCAPTCHA Unity](unity-recaptcha-sample)
-- [In-App Purchases with (UGS) to buy NFTs and ERC-20s with your Credit Card](https://github.com/openfort-xyz/iap-unity-sample)
-
+- [In-App Purchases with (UGS) to buy NFTs and ERC-20s with Android](https://github.com/openfort-xyz/iap-unity-sample)
+- [In-App Purchases with (UGS) to buy NFTs and ERC-20s with Apple](https://github.com/openfort-xyz/apple-compliant-crypto-iap-sample)
+- [Build a Farcaster Frame with Openfort](https://github.com/openfort-xyz/openfort-fc-frames-demo)
