@@ -44,7 +44,7 @@ To test a sample, follow the instructions inside its folder.
 - [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
 - [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)
 - [Use Unity Game Servies (UGS) with embedded wallets to mint NFTs](https://github.com/openfort-xyz/ugs-unity-game-services-sample)
-- [Block bot behavior from your game - ReCAPTCHA Unity]([unity-recaptcha-sample](https://github.com/openfort-xyz/unity-recaptcha-sample/))
+- [Block bot behavior from your game - ReCAPTCHA Unity](https://github.com/openfort-xyz/unity-recaptcha-sample/))
 - [Use Unity Ads to sponsor transaction gas fees](https://github.com/openfort-xyz/unity-ad-sample)
 ### Key Management
 - [Use an external KMS to sign transaction intents](external-kms-game)
