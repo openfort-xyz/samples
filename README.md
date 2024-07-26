@@ -40,7 +40,7 @@ To test a sample, follow the instructions inside its folder.
 - [Backend quickstarts](backend-quickstarts)
 
 ### Openfort Ecosystem
-- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
+- Coming Soon
   
 ### Gaming Backends
 - [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
@@ -68,7 +68,8 @@ _Not mantained by Openfort_
 - [Use Lit Protocol as the key management and authentication solution](lit-protocol)
 - [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
 
-## Archieve
+## Archive
 - [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
+- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Complete open-source authentication solution with session keys](ssv-social-nextjs)
 - [Use an external KMS to sign transaction intents](external-kms-game)
