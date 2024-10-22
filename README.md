@@ -59,15 +59,16 @@ To test a sample, follow the instructions inside its folder.
 - [Build a Farcaster Frame](https://github.com/openfort-xyz/openfort-fc-frames-demo)
 - [EIP7702 with ERC4337 CLI tool](https://github.com/openfort-xyz/openfort-7702-cli)
 
-_Not mantained by Openfort_
-- [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
-- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
-- [Use Lit Protocol as the key management and authentication solution](lit-protocol)
-- [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
-- [Connect to Opensea from Unity with WalletConnect](https://github.com/openfort-xyz/opensea-walletconnect-unity-sample)
 
 ## Archive
 - [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
 - [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
 - [Complete open-source authentication solution with session keys](ssv-social-nextjs)
 - [Use an external KMS to sign transaction intents](external-kms-game)
+- [Connect to Opensea from Unity with WalletConnect](https://github.com/openfort-xyz/opensea-walletconnect-unity-sample)
+
+  _Not mantained by Openfort_
+- [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
+- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
+- [Use Lit Protocol as the key management and authentication solution](lit-protocol)
+- [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
