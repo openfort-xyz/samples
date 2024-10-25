@@ -55,7 +55,7 @@ To test a sample, follow the instructions inside its folder.
   
 ### Miscellaneous
 - [Backend quickstarts](backend-quickstarts)
-- [Build a Telegram mini-app]()
+- [Build a Telegram mini-app with Embedded Wallets](https://github.com/openfort-xyz/sample-telegram-mini-app-Embedded-Wallet-)
 - [Build a Farcaster Frame](https://github.com/openfort-xyz/openfort-fc-frames-demo)
 - [EIP7702 with ERC4337 CLI tool](https://github.com/openfort-xyz/openfort-7702-cli)
 
