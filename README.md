@@ -1,74 +1,23 @@
 ![Openfort Protocol][banner-image]
 
-<div align="center">
-  <h4>
-    <a href="https://www.openfort.xyz/">
-      Website
-    </a>
-    <span> | </span>
-    <a href="https://www.openfort.xyz/docs">
-      Documentation
-    </a>
-    <span> | </span>
-    <a href="https://www.openfort.xyz/docs/api">
-      API Docs
-    </a>
-    <span> | </span>
-    <a href="https://twitter.com/openfortxyz">
-      Twitter
-    </a>
-  </h4>
-</div>
-
 [banner-image]: .github/img/OpenfortRed.png
 
 # Openfort Samples
 
-Catalogue of various sample integrations using Openfort and built by Openfort. Each example contains its own README with further instructions and explanations.
+Cloneable starter templates & example repos to help kickstart your next project on Openfort.
 
-## Usage
-To test a sample, follow the instructions inside its folder.
+## Using Examples
 
-## Samples
-### Embedded wallets
-- [Authentication with Firebase in NextJS](https://github.com/openfort-xyz/firebase-auth-sample)
-- [Authentication in NextJS](https://github.com/openfort-xyz/sample-browser-nextjs-embedded-signer)
-- [Authentication in Unity WebGL](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)
-- [Authentication with Firebase for Google Play](https://github.com/openfort-xyz/sample-unity-android-embedded-signer)
+Each directory in this repository is a standalone example that you can clone and use as a starting point for your next project.
 
-### Ecosystem wallets
-- [Ecosystem SDK](https://github.com/openfort-xyz/ecosystem-sample)
-  
-### Gaming backend integration
-- [Use a Playfab as the authentication and backend logic solution](https://github.com/openfort-xyz/playfab-unity-sample)
-- [Use the Openfort Firebase extension to create wallets from Firestore](https://github.com/openfort-xyz/firebase-extension-unity-sample)
-- [Use Unity Gaming Servies (UGS) with embedded wallets to mint NFTs](https://github.com/openfort-xyz/ugs-unity-game-services-sample)
+Within each directory, you'll find a `README.md` file with instructions on how to clone the example and get started.
 
-### Gaming samples
-- [Block bot behavior from your game - ReCAPTCHA Unity](https://github.com/openfort-xyz/unity-recaptcha-sample/))
-- [Use Unity Ads to sponsor transaction gas fees](https://github.com/openfort-xyz/unity-ad-sample)
-- [In-app purchases (IAP) sample](https://github.com/openfort-xyz/apple-compliant-crypto-iap-sample)
-  
-### Types of smart accounts
-- [Use Recoverable Accounts](recoverable-accounts)
-- [Build with Token Bound Accounts (ERC6551)](ERC6551-token-bound-accounts)
-  
-### Miscellaneous
-- [Backend quickstarts](backend-quickstarts)
-- [Build a Telegram mini-app with Embedded Wallets](https://github.com/openfort-xyz/sample-telegram-mini-app-Embedded-Wallet-)
-- [Build a Farcaster Frame](https://github.com/openfort-xyz/openfort-fc-frames-demo)
-- [EIP7702 with ERC4337 CLI tool](https://github.com/openfort-xyz/openfort-7702-cli)
-
-
-## Archive
-- [Use Firebase Auth with Firestore and Wagmi](firebase-wagmi-nextjs)
-- [Create your own gaming ecosystem using OAuth](oauth-game-ecosystem)
-- [Complete open-source authentication solution with session keys](ssv-social-nextjs)
-- [Use an external KMS to sign transaction intents](external-kms-game)
-- [Connect to Opensea from Unity with WalletConnect](https://github.com/openfort-xyz/opensea-walletconnect-unity-sample)
-
-  _Not mantained by Openfort_
-- [Use Particle Network as the key management and authentication solution](particle-network-nextjs)
-- [Use Web3Auth as the key management and authentication solution](web3auth-nextjs)
-- [Use Lit Protocol as the key management and authentication solution](lit-protocol)
-- [Use passkeys and Turnkey to create non-custodial wallets](turnkey-passkeys)
+| Example Name                                                                                                              | Description                                                                                                             |
+| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------- |
+| [Authentication with Firebase in NextJS](https://github.com/openfort-xyz/firebase-auth-sample)                           | [Embedded] Implement user authentication and wallet creation using Firebase authentication in a Next.js application.     |
+| [Authentication in NextJS](https://github.com/openfort-xyz/sample-browser-nextjs-embedded-signer)                        | [Embedded] Create and manage embedded wallets with Next.js without external authentication providers.                    |
+| [Authentication in Unity WebGL](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)                      | [Embedded] Integrate embedded wallet authentication in Unity WebGL builds for browser-based games.                       |                          |
+| [Ecosystem SDK](https://github.com/openfort-xyz/ecosystem-sample)                                                        | [Ecosystem] Example implementation of the Openfort ecosystem SDK for wallet management and integration.                   |                               |
+| [Backend Quickstarts](backend-quickstarts)                                                                              | Collection of backend implementation examples for different programming languages and frameworks.                         |
+| [Telegram Mini-app](https://github.com/openfort-xyz/sample-telegram-mini-app)                                           | Build a blockchain-enabled mini-application within Telegram using Openfort.                                              |                                                |
+| [EIP7702 CLI Tool](https://github.com/openfort-xyz/openfort-7702-cli)                                                  | Command-line tool for working with EIP7702 standard in conjunction with ERC4337 accounts.                                |
