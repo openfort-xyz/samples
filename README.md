@@ -23,7 +23,6 @@ Within each directory, you'll find a `README.md` file with instructions on how t
 | [Openfort Node Example](https://github.com/openfort-xyz/openfort-node/tree/main/example)                                    | Node.js backend integration example for Embedded Wallet                                         |
 | [WalletConnect Wallet Sample](https://github.com/openfort-xyz/walletconnect-wallet-sample)                                 | WalletConnect-based Embedded Wallet example                                                     |
 | [Firebase Auth Sample](https://github.com/openfort-xyz/firebase-auth-sample)                                                | Firebase authentication-based Embedded Wallet example                                           |
-| [Openfort Kit Vite](https://github.com/smarthug/openfort-kit-vite)                                               | Vite-based Openfort Kit example utilizing Embedded Wallet                                       |
 | [Openfort Node Quickstart](https://github.com/smarthug/openfort-node-sample)                                         | Node.js-based Openfort example for automatic recovery of signer                                        |                                                          |
 | [Bridge with Relay.link](https://github.com/openfort-xyz/reservoir0x-relay-embeddedwallet)  | Sample to make bridging with Openfort JS, Wagmi and Relay.link | 
 ### Mobile
