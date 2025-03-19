@@ -18,13 +18,12 @@ Within each directory, you'll find a `README.md` file with instructions on how t
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [Openfort Kit Examples](https://github.com/openfort-xyz/openfort-kit/tree/main/examples)                                    | Collection of Embedded Wallet examples using Openfort Kit                                        |
-| [Openfort Embedded Wallet Quickstart](https://github.com/smarthug/openfort-embedded-wallet-quickstart)            | Quick start guide for Embedded Wallet [video](https://youtu.be/IZ7-bLpvTPA?si=sK7LOOUfZ4GgOxrs) 
-| [Openfort JS Apps](https://github.com/openfort-xyz/openfort-js/tree/main/examples/apps)                                     | Embedded Wallet examples in JavaScript environments like NextJS                                  |
+| [Openfort JS Examples](https://github.com/openfort-xyz/openfort-js/tree/main/examples/apps)                                     | Embedded Wallet examples in JavaScript environments like NextJS                                  |
 | [Openfort Node Example](https://github.com/openfort-xyz/openfort-node/tree/main/example)                                    | Node.js backend integration example for Embedded Wallet                                         |
-| [Firebase Auth Sample](https://github.com/openfort-xyz/firebase-auth-sample)                                                | Firebase authentication-based Embedded Wallet example                                           |
+| [Firebase Auth in NextJS](https://github.com/openfort-xyz/embedded-wallet-firebase-auth-sample-nextjs)                                                | Firebase authentication-based Embedded Wallet example                                           |
 | [Bridge with Relay.link](https://github.com/openfort-xyz/reservoir0x-relay-embeddedwallet)  | Sample to make bridging with Openfort JS, Wagmi and Relay.link | 
-### Mobile
 
+### Mobile
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [React Native Auth Sample](https://github.com/openfort-xyz/react-native-auth-sample)                                        | Authentication example in React Native (Embedded Wallet)                                         |
@@ -42,8 +41,19 @@ Within each directory, you'll find a `README.md` file with instructions on how t
 
 
 ## Ecosystem Wallet Examples
-
+### Web
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Ecosystem Sample](https://github.com/openfort-xyz/ecosystem-sample)                                                         | Demo NextJS app using ecosystem SDK to connect to the Rapid Fire ecosystem                       |
+| [Ecosystem Sample](https://github.com/openfort-xyz/ecosystem-sample)                                                         | Demo app using ecosystem SDK to create an ecosystem wallet                       |
+| [Ecosystem Sample with third party auth](https://github.com/openfort-xyz/ecosystem-sample/tree/feat/third-party-auth)                                                         | Demo app using ecosystem SDK with third party auth (Firebase) to create an ecosystem wallet                       |
+
+### Unity
+| Example Name                                                                                                              | Description                                                                                     | 
+| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| [Ecosystem Wallet Unity Example](https://github.com/openfort-xyz/mobile-wallet-protocol-unity-client/tree/main/Project)                              | Sample Unity application that integrates with any ecosystem wallet                                |
+
+
+### Mobile
+| Example Name                                                                                                              | Description                                                                                     | 
+| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
 | [Ecosystem Wallet Expo Example](https://github.com/openfort-xyz/ecosystem-wallet-expo-example)                              | Sample Expo application that integrates with any ecosystem wallet                                |
