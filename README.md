@@ -11,7 +11,7 @@ Each directory in this repository is a standalone example that you can clone and
 Within each directory, you'll find a `README.md` file with instructions on how to clone the example and get started.
 
 
-## Embedded Wallet Examples
+## Invisble Wallet 
 
 ### Web
 
@@ -26,7 +26,7 @@ Within each directory, you'll find a `README.md` file with instructions on how t
 ### Mobile
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [React Native Auth Sample](https://github.com/openfort-xyz/react-native-auth-sample)                                        | Authentication example in React Native (Embedded Wallet)                                         |
+| [React Native Sample](https://github.com/openfort-xyz/react-native-auth-sample)                                        | Authentication example in React Native (Embedded Wallet)                                         |
 | [Sample Telegram Mini-app Embedded Wallet](https://github.com/openfort-xyz/sample-telegram-mini-app-Embedded-Wallet)        | Embedded Wallet mini-app example for Telegram                                                   |
 | [Sample Telegram](https://github.com/openfort-xyz/sample-telegram)                                                          | Blockchain mini-app example for Telegram (Embedded Wallet)                                      |
 | [Openfort Frames V2 Demo](https://github.com/smarthug/openfort-frames-v2-demo) | Demo to show how to use Openfort Frames V2 |
@@ -35,12 +35,12 @@ Within each directory, you'll find a `README.md` file with instructions on how t
 
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Openfort Unity Quickstart](https://github.com/smarthug/openfort-unity-quickstart)                               | Quick start guide for Embedded Wallet in Unity   [video](https://youtu.be/IZ7-bLpvTPA?si=sK7LOOUfZ4GgOxrs)
-| [Sample Unity WebGL Embedded Signer](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)                    | Embedded Wallet Signer demo for Unity WebGL                                                     |
+| [Openfort Unity Samples](https://github.com/openfort-xyz/openfort-csharp-unity/tree/main/sample)                               | Quick start guide for Embedded Wallet in Unity   [video](https://youtu.be/IZ7-bLpvTPA?si=sK7LOOUfZ4GgOxrs)
+| [Sample Unity WebGL](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)                    | Embedded Wallet Signer demo for Unity WebGL                                                     |
                                                
 
 
-## Ecosystem Wallet Examples
+## Cross-app Wallet
 ### Web
 | Example Name                                                                                                              | Description                                                                                     | 
 | ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
