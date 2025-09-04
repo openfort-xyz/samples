@@ -18,6 +18,8 @@ function App() {
   const [sendTransaction, sending] = useSendTransaction(walletClient);
   const [isSupplying, setIsSupplying] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
 
   // Read USDC balance
   const { data: usdcBalance, refetch: refetchUsdcBalance } = useReadContract({
@@ -30,6 +32,8 @@ function App() {
     },
   });
 
+  const user = address ? evmAddress(address) : undefined;
+
   // Fetch all Aave markets
   const {
     data: markets,
@@ -37,8 +41,9 @@ function App() {
     error: marketsError,
   } = useAaveMarkets({
     chainIds: currentChainId ? [chainId(currentChainId)] : [],
-    user: address ? evmAddress(address) : undefined,
+    user, 
   });
+
 
   // Get user's Aave supplies
   const { data: userSupplies, loading: suppliesLoading, error: suppliesError } = useUserSupplies({
@@ -47,39 +52,33 @@ function App() {
         chainId: market.chain.chainId,
         address: market.address,
       })) || [],
-    user: address
-      ? evmAddress(address)
-      : undefined,
-  });
+    user, 
+  }, [refreshKey, user]);
+
 
   // Find USDC supply balance and APY
   const usdcSupplyData = useMemo(() => {
     if (!userSupplies || userSupplies.length === 0) {
       return { balance: "0.00", apy: "0.00" };
     }
-    
-    // Look for USDC supply position
-    const usdcSupply = userSupplies.find((supply: any) => 
+    const usdcSupply = userSupplies.find((supply: any) =>
       supply.currency?.symbol === 'USDC'
     );
-    
     if (usdcSupply?.balance?.amount?.value && usdcSupply?.apy?.formatted) {
       return {
         balance: parseFloat(usdcSupply.balance.amount.value).toFixed(2),
         apy: usdcSupply.apy.formatted
       };
     }
-    
     return { balance: "0.00", apy: "0.00" };
   }, [userSupplies]);
 
-  console.log("User supplies:", userSupplies);
-  console.log("USDC supply data:", usdcSupplyData);
 
+  // Deposit to Aave vault
   const usdcReserve = useMemo(() => {
     if (!markets || markets.length === 0) return null;
     const market = markets[0];
-    const usdcSupplyReserve = market.supplyReserves.find(reserve => 
+    const usdcSupplyReserve = market.supplyReserves.find(reserve =>
       reserve.underlyingToken.symbol === 'USDC'
     );
     if (usdcSupplyReserve) {
@@ -92,19 +91,12 @@ function App() {
     return null;
   }, [markets]);
 
-  console.log("Available Aave markets:", markets);
-  console.log("Found USDC reserve:", usdcReserve);
-
-
-  // Deposit to Aave vault
   const handleDepositToAave = async () => {
     if (!walletClient || !address || !usdcReserve) {
       console.error("Missing requirements:", { walletClient: !!walletClient, address: !!address, usdcReserve: !!usdcReserve });
       return;
     }
-
     setIsSupplying(true);
-
     try {
       const supplyResult = await supply({
         market: evmAddress(usdcReserve.marketAddress),
@@ -146,16 +138,13 @@ function App() {
           setIsSupplying(false);
           return;
       }
-
       if (transactionResult.isErr()) {
         console.error("Transaction failed:", transactionResult.error);
       } else {
-        console.log("Supply successful with hash:", transactionResult.value);
         // Refetch balances after successful transaction
         setTimeout(() => {
           refetchUsdcBalance();
-          // Force a page refresh to update Aave supplies since there's no refetch available
-          window.location.reload();
+          setRefreshKey(refreshKey + 1);
         }, 2000); // Wait 2 seconds for blockchain to update
       }
     } catch (error) {
@@ -171,74 +160,52 @@ function App() {
       console.error("Missing requirements:", { walletClient: !!walletClient, address: !!address, usdcReserve: !!usdcReserve });
       return;
     }
-
-    // Check if user has any USDC supply to withdraw
     if (!usdcSupplyData.balance || parseFloat(usdcSupplyData.balance) === 0) {
       console.error("No USDC supply to withdraw");
       return;
     }
-
     setIsWithdrawing(true);
-
     try {
-      console.log("Withdrawing USDC from Aave...");
-      console.log("Using market:", usdcReserve.marketAddress);
-      console.log("Using USDC currency:", usdcReserve.currencyAddress);
-      console.log("Withdrawing amount:", usdcSupplyData.balance);
-      
       const withdrawResult = await withdraw({
         market: evmAddress(usdcReserve.marketAddress),
         amount: {
           erc20: {
             currency: evmAddress(usdcReserve.currencyAddress),
-            value: { max: true }, // Withdraw full balance
+            value: { exact: bigDecimal(usdcSupplyData.balance) },  // Withdraw full balance
           },
         },
         sender: evmAddress(walletClient.account.address),
         chainId: usdcReserve.chainId,
       });
-
       if (withdrawResult.isErr()) {
         console.error("Withdraw preparation failed:", withdrawResult.error);
         setIsWithdrawing(false);
         return;
       }
-
       const plan = withdrawResult.value;
-      console.log("Withdraw plan:", plan);
-
       let transactionResult;
-
       switch (plan.__typename) {
         case "TransactionRequest":
-          console.log("Executing withdraw transaction");
           transactionResult = await sendTransaction(plan);
           break;
-          
         case "InsufficientBalanceError":
           console.error(`Insufficient balance: ${plan.required.value} required.`);
           setIsWithdrawing(false);
           return;
-          
         default:
           console.error("Unknown plan type:", plan);
           setIsWithdrawing(false);
           return;
       }
-
       if (transactionResult.isErr()) {
         console.error("Withdraw transaction failed:", transactionResult.error);
       } else {
-        console.log("Withdraw successful with hash:", transactionResult.value);
-        // Refetch balances after successful transaction
         setTimeout(() => {
           refetchUsdcBalance();
-          // Force a page refresh to update Aave supplies since there's no refetch available
-          window.location.reload();
+          setRefreshKey(refreshKey + 1);
         }, 2000); // Wait 2 seconds for blockchain to update
       }
     } catch (error) {
-      console.error("Aave withdraw failed:", error);
     } finally {
       setIsWithdrawing(false);
     }
@@ -280,7 +247,7 @@ function App() {
 
           {/* Aave Supply Balance Card */}
           <div className="bg-black/95 rounded-2xl p-8 border border-neutral-700 shadow-xl w-80 h-64 flex items-center justify-center">
-          <div className="text-center">
+            <div className="text-center">
               {isConnected && address ? (
                 <div className="space-y-3">
                   <div className="text-xs text-neutral-400 uppercase tracking-wider">
@@ -324,9 +291,10 @@ function App() {
             label="Connect Wallet"
           />
 
+          {/* Action buttons */}
           {isConnected && (
             <div className="w-80 space-y-4">
-              <button 
+              <button
                 onClick={handleDepositToAave}
                 disabled={isLoading || !usdcReserve || !usdcBalance || usdcBalance === 0n}
                 className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -335,9 +303,9 @@ function App() {
                   <>
                     <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
                     <span>
-                      {isSupplying ? 'Supplying...' : 
-                       supplying.loading ? 'Preparing...' : 
-                       'Sending Transaction...'}
+                      {isSupplying ? 'Supplying...' :
+                        supplying.loading ? 'Preparing...' :
+                          'Sending Transaction...'}
                     </span>
                   </>
                 ) : (
@@ -348,7 +316,7 @@ function App() {
                 )}
               </button>
 
-              <button 
+              <button
                 onClick={handleWithdrawFromAave}
                 disabled={isLoading || !usdcReserve || parseFloat(usdcSupplyData.balance) === 0}
                 className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -357,9 +325,9 @@ function App() {
                   <>
                     <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
                     <span>
-                      {isWithdrawing ? 'Withdrawing...' : 
-                       withdrawing.loading ? 'Preparing...' : 
-                       'Sending Transaction...'}
+                      {isWithdrawing ? 'Withdrawing...' :
+                        withdrawing.loading ? 'Preparing...' :
+                          'Sending Transaction...'}
                     </span>
                   </>
                 ) : (

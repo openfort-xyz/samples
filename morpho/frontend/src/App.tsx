@@ -21,7 +21,7 @@ function App() {
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [vaultApy, setVaultApy] = useState<string>("0.00");
   const [userVaultBalance, setUserVaultBalance] = useState<bigint>(0n);
-  
+
   const { isConnected } = useStatus();
   const { address, chainId } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -62,7 +62,7 @@ function App() {
         functionName: 'convertToAssets',
         args: [userShares],
       });
-      
+
       setUserVaultBalance(userAssets);
     } catch (error) {
       console.error("Error fetching vault balance:", error);
@@ -78,7 +78,7 @@ function App() {
   useEffect(() => {
     const fetchVaultApy = async () => {
       if (!chainId) return;
-      
+
       const GET_VAULT_APY = gql`
         query VaultApy($vaultAddress: String!, $chainId: Int!) {
           vaultByAddress(address: $vaultAddress, chainId: $chainId) {
@@ -86,14 +86,14 @@ function App() {
           }
         }
       `;
-      
+
       try {
         const client = new GraphQLClient(MORPHO_API);
         const data = await client.request(GET_VAULT_APY, {
           vaultAddress: VAULT_ADDRESS,
           chainId: chainId,
         }) as any;
-        
+
         const netApy = data?.vaultByAddress?.state?.netApy;
         if (netApy) {
           setVaultApy((Number(netApy) * 100).toFixed(2));
@@ -102,7 +102,7 @@ function App() {
         console.error("Error fetching vault APY:", err);
       }
     };
-    
+
     fetchVaultApy();
   }, [address, chainId]);
 
@@ -118,7 +118,7 @@ function App() {
         functionName: 'approve',
         args: [VAULT_ADDRESS as `0x${string}`, walletBalance],
       });
-      
+
       // Wait for approval
       await new Promise(resolve => setTimeout(resolve, 5000));
 
@@ -251,7 +251,7 @@ function App() {
           <OpenfortButton />
           {isConnected && (
             <div className="w-80 space-y-4">
-              <button 
+              <button
                 onClick={handleSupply}
                 disabled={isLoading}
                 className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -269,7 +269,7 @@ function App() {
                 )}
               </button>
 
-              <button 
+              <button
                 onClick={handleWithdraw}
                 disabled={isLoading}
                 className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
