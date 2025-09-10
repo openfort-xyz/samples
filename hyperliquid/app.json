@@ -5,13 +5,13 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "expo",
+    "scheme": "openfort.hyperliquid",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.openfort-hyperliquid",
+      "bundleIdentifier": "com.openfort.hyperliquid",
       "infoPlist": {
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
@@ -19,8 +19,8 @@
       }
     },
     "android": {
-      "package": "com.openfort-hyperliquid",
-      "scheme": "openfort-hyperliquid",
+      "package": "com.openfort.hyperliquid",
+      "scheme": "openfort.hyperliquid",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -33,9 +33,9 @@
       "favicon": "./assets/images/favicon.png"
     },
     "extra": {
-      "openfortPublishableKey": 
-      "openfortShieldPublishableKey": 
-      "openfortShieldEncryptionKey": 
+      "openfortPublishableKey": "",
+      "openfortShieldPublishableKey": "",
+      "openfortShieldEncryptionKey": ""
     },
     "plugins": [
       "expo-router",

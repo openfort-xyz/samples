@@ -1,8 +1,8 @@
-import { OpenfortProvider, RecoveryMethod } from "@openfort/react-native";
+import { OpenfortProvider, RecoveryMethod, AccountTypeEnum } from "@openfort/react-native";
 import Constants from "expo-constants";
 import { Stack } from "expo-router";
-export default function RootLayout() {
 
+export default function RootLayout() {
   return (
     <OpenfortProvider
       publishableKey={Constants.expoConfig?.extra?.openfortPublishableKey}
@@ -18,14 +18,14 @@ export default function RootLayout() {
       }}
       supportedChains={[
         {
-          id: 42161,
-          name: 'Arbitrum One',
+          id: 421614,
+          name: 'Arbitrum Sepolia',
           nativeCurrency: {
             name: 'Ether',
             symbol: 'ETH',
             decimals: 18
           },
-          rpcUrls: { default: { http: ['https://arb1.arbitrum.io/rpc'] } },
+          rpcUrls: { default: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] } },
         },
       ]}
     >

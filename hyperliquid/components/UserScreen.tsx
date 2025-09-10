@@ -1,122 +1,85 @@
-import { OAuthProvider, useOAuth, useOpenfort, UserWallet, useUser, useWallets } from "@openfort/react-native";
-import React, { useCallback, useState, useEffect } from "react";
-import { Button, ScrollView, Text, View, StyleSheet, TouchableOpacity, Dimensions, ActivityIndicator } from "react-native";
+import { useOpenfort, useUser, useWallets } from "@openfort/react-native";
+import React from "react";
+import { ScrollView, Text, View, StyleSheet, TouchableOpacity, Dimensions, ActivityIndicator, TextInput, Alert } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
-import { readContract } from "@wagmi/core";
-
+import { LineChart } from 'react-native-chart-kit';
+import { useWalletBalance } from "../hooks/useUserBalances";
 import { useHypeUsdc, useHypeBalances } from '../services/HyperliquidClient';
-
+import { useTradingState } from '../hooks/useTradingState';
+import { usePriceChart } from '../hooks/usePriceChart';
+import { CustomButton, GradientButton } from './ui';
+import { transactionHandlers, getMaxAmount } from '../utils/transactions';
 
 const { width, height } = Dimensions.get('window');
 
 export const UserScreen = () => {
-
   const { user } = useUser();
   const { isReady, error, logout: signOut } = useOpenfort();
-  const { wallets, setActiveWallet, createWallet, activeWallet, isCreating } = useWallets();
+  const { wallets, setActiveWallet, createWallet, activeWallet, isCreating, exportPrivateKey } = useWallets();
 
-  // Use the custom hook to continuously get @107 asset price
+  // Asset price & balances
   const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading, error: hypeUsdcError } = useHypeUsdc(1000);
-  const { balances: hypeBalances, isLoading: hypeBalancesLoading, error: hypeBalancesError } = useHypeBalances(activeWallet?.address);
+  const { balances: hypeBalances, isLoading: hypeBalancesLoading, error: hypeBalancesError, refetch: refetchHypeBalances } = useHypeBalances(activeWallet?.address);
+  const { balance: walletBalance, loading, refetch: refetchWalletBalance } = useWalletBalance(activeWallet?.address);
 
-  // Hyperliquid state
-  // const [hypePrice, setHypePrice] = useState<string>('0');
-  // const [hypePosition, setHypePosition] = useState<HypePosition | null>(null);
-  // const [userState, setUserState] = useState<UserState | null>(null);
-  // const [userBalances, setUserBalances] = useState<UserBalances | null>(null);
-  // const [portfolioSummary, setPortfolioSummary] = useState<any>(null);
-  // const [isLoadingHypeData, setIsLoadingHypeData] = useState(false);
-  // const [hyperliquidClient] = useState(() => new HyperliquidClient(false)); // mainnet
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      console.log("refetching wallet balance and hype balances");
+      refetchWalletBalance();
+      refetchHypeBalances();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [refetchWalletBalance, refetchHypeBalances]);
 
+  // Custom hooks for state management
+  const tradingState = useTradingState();
+  const { priceHistory } = usePriceChart(hypeUsdcPrice, hypeUsdcLoading);
 
-  // // Fetch HYPE price
-  // const fetchHypePrice = useCallback(async () => {
-  //   try {
-  //     const price = await hyperliquidClient.getHypeUsdcPrice();
-  //     setHypePrice(price);
-  //   } catch (error) {
-  //     console.error('Error fetching HYPE price:', error);
-  //   }
-  // }, [hyperliquidClient]);
-
-  // // Fetch user HYPE data
-  // const fetchUserHypeData = useCallback(async () => {
-  //   if (!activeWallet?.address) return;
-
-  //   setIsLoadingHypeData(true);
-  //   try {
-  //     const [
-  //       { position, accountState },
-  //       balances,
-  //       portfolio
-  //     ] = await Promise.all([
-  //       hyperliquidClient.getUserHypeData(activeWallet.address),
-  //       hyperliquidClient.getUserBalances(activeWallet.address),
-  //       hyperliquidClient.getUserPortfolioSummary(activeWallet.address)
-  //     ]);
-
-  //     setHypePosition(position);
-  //     setUserState(accountState);
-  //     setUserBalances(balances);
-  //     setPortfolioSummary(portfolio);
-  //   } catch (error) {
-  //     console.error('Error fetching user HYPE data:', error);
-  //   } finally {
-  //     setIsLoadingHypeData(false);
-  //   }
-  // }, [hyperliquidClient, activeWallet?.address]);
-
-  // // Fetch HYPE price every 5 seconds
-  // useEffect(() => {
-  //   fetchHypePrice();
-  //   const priceInterval = setInterval(fetchHypePrice, 5000);
-  //   return () => clearInterval(priceInterval);
-  // }, [fetchHypePrice]);
-
-  // // Fetch user data when wallet changes or every 10 seconds
-  // useEffect(() => {
-  //   if (activeWallet?.address) {
-  //     fetchUserHypeData();
-  //     const dataInterval = setInterval(fetchUserHypeData, 10000);
-  //     return () => clearInterval(dataInterval);
-  //   }
-  // }, [fetchUserHypeData, activeWallet?.address]);
-
-  const CustomButton = ({ title, onPress, style, textStyle, disabled }: any) => (
-    <TouchableOpacity
-      style={[styles.button, style, disabled && styles.buttonDisabled]}
-      onPress={onPress}
-      disabled={disabled}
-    >
-      <Text style={[styles.buttonText, textStyle, disabled && styles.buttonTextDisabled]}>{title}</Text>
-    </TouchableOpacity>
+  // Transaction handlers 
+  const handleBuy = () => transactionHandlers.handleBuy(
+    activeWallet,
+    tradingState.buyAmount,
+    hypeBalances,
+    tradingState.setIsBuying,
+    tradingState.setBuyAmount
   );
 
-  const GradientButton = ({ title, onPress, disabled }: any) => (
-    <TouchableOpacity onPress={onPress} disabled={disabled}>
-      <LinearGradient
-        colors={disabled ? ['#4A5568', '#2D3748'] : ['#00D4AA', '#00B894']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 0 }}
-        style={[styles.gradientButton, disabled && styles.gradientButtonDisabled]}
-      >
-        <Text style={styles.gradientButtonText}>{title}</Text>
-      </LinearGradient>
-    </TouchableOpacity>
+  const handleSell = () => transactionHandlers.handleSell(
+    activeWallet,
+    tradingState.sellAmount,
+    hypeBalances,
+    tradingState.setIsSelling,
+    tradingState.setSellAmount
   );
 
-  const handleBuy = () => {
+  const handleMaxBuy = () => {
+    const maxAmount = getMaxAmount(hypeBalances?.account?.usdcBalance);
+    tradingState.setBuyAmount(maxAmount);
   };
 
-  const handleSell = () => {
-    // }
+  const handleTransfer = () => transactionHandlers.handleTransfer(
+    tradingState.transferAmount,
+    walletBalance,
+    activeWallet,
+    exportPrivateKey,
+    tradingState.setIsTransferring,
+    tradingState.setTransferAmount,
+    () => {
+      refetchWalletBalance();
+      refetchHypeBalances();
+    }
+  );
+
+  const handleMaxTransfer = () => {
+    const maxAmount = getMaxAmount(walletBalance);
+    tradingState.setTransferAmount(maxAmount);
   };
 
   if (!user) {
     return null;
   }
 
-  // Show wallet connection UI if no active wallet
+  // Wallet connection UI
   if (!activeWallet?.address) {
     return (
       <View style={styles.container}>
@@ -127,10 +90,8 @@ export const UserScreen = () => {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <Text style={styles.title}>Hyperliquid Trading</Text>
-            <Text style={styles.subtitle}>Connect a wallet to start trading</Text>
+            <Text style={styles.subtitle}>Create a wallet to start trading</Text>
           </View>
-
-          {/* Wallet Section */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Wallet Management</Text>
             <View style={styles.card}>
@@ -140,10 +101,10 @@ export const UserScreen = () => {
                 disabled={isCreating}
                 onPress={() => createWallet({
                   recoveryPassword: "password",
-                  onError: (error) => {
+                  onError: (error: any) => {
                     alert("Error creating wallet: " + error.message);
                   },
-                  onSuccess: ({ wallet }) => {
+                  onSuccess: ({ wallet }: any) => {
                     alert("Wallet created successfully: " + wallet?.address);
                   },
                 })}
@@ -165,20 +126,17 @@ export const UserScreen = () => {
     );
   }
 
+  // Main UI
   return (
     <View style={styles.container}>
-      {/* Background gradient */}
       <LinearGradient
         colors={['#0F1419', '#1A1F2E', '#0F1419']}
         style={styles.backgroundGradient}
       />
-
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header Section */}
         <View style={styles.header}>
           <Text style={styles.title}>Hyperliquid Trading</Text>
         </View>
-
         <View style={styles.section}>
           <View style={styles.priceContainer}>
             <View style={styles.priceHeader}>
@@ -187,78 +145,184 @@ export const UserScreen = () => {
             </View>
             <Text style={styles.priceValue}>${hypeUsdcPrice?.toFixed(4) ?? 'N/A'}</Text>
 
-            {/* {hypePosition && (
-              <View style={styles.positionInfo}>
-                <View style={styles.positionRow}>
-                  <Text style={styles.positionLabel}>Position Size:</Text>
-                  <Text style={[styles.positionValue, { color: parseFloat(hypePosition.size) > 0 ? '#00D4AA' : '#EF4444' }]}>
-                    {parseFloat(hypePosition.size).toFixed(4)} HYPE
-                  </Text>
-                </View>
-                <View style={styles.positionRow}>
-                  <Text style={styles.positionLabel}>Unrealized PnL:</Text>
-                  <Text style={[styles.positionValue, { color: parseFloat(hypePosition.unrealizedPnl) >= 0 ? '#00D4AA' : '#EF4444' }]}>
-                    ${parseFloat(hypePosition.unrealizedPnl).toFixed(2)}
-                  </Text>
-                </View>
-                <View style={styles.positionRow}>
-                  <Text style={styles.positionLabel}>Entry Price:</Text>
-                  <Text style={styles.positionValue}>
-                    ${hypePosition.entryPrice ? parseFloat(hypePosition.entryPrice).toFixed(4) : 'N/A'}
-                  </Text>
-                </View>
+            {/* Price Chart */}
+            {priceHistory.length > 1 && (
+              <View style={styles.chartSection}>
+                <LineChart
+                  data={{
+                    labels: [],
+                    datasets: [{
+                      data: priceHistory,
+                      strokeWidth: 2,
+                    }]
+                  }}
+                  width={width - 88}
+                  height={160}
+                  chartConfig={{
+                    backgroundColor: 'transparent',
+                    backgroundGradientFrom: 'rgba(15, 20, 25, 0)',
+                    backgroundGradientTo: 'rgba(15, 20, 25, 0)',
+                    decimalPlaces: 4,
+                    color: (opacity = 1) => `rgba(0, 212, 170, ${opacity})`,
+                    labelColor: (opacity = 1) => `rgba(139, 148, 158, ${opacity})`,
+                    style: {
+                      borderRadius: 16,
+                    },
+                    propsForDots: {
+                      r: "3",
+                      strokeWidth: "1",
+                      stroke: "#00D4AA"
+                    },
+                    propsForBackgroundLines: {
+                      strokeDasharray: "5,5",
+                      stroke: "rgba(139, 148, 158, 0.2)",
+                      strokeWidth: 1
+                    }
+                  }}
+                  bezier
+                  style={styles.chart}
+                  withHorizontalLabels={true}
+                  withVerticalLabels={true}
+                  withDots={true}
+                  withShadow={false}
+                  withInnerLines={true}
+                  withOuterLines={false}
+                />
               </View>
-            )} */}
+            )}
+            {priceHistory.length <= 1 && (
+              <View style={styles.chartPlaceholderContainer}>
+                <Text style={styles.chartPlaceholderText}>Collecting price data...</Text>
+                <Text style={styles.chartPlaceholderSubtext}>Chart will appear after a few price updates</Text>
+              </View>
+            )}
           </View>
         </View>
 
-
-        {/* {portfolioSummary && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Portfolio Summary</Text>
-            <View style={styles.card}>
-              <View style={styles.positionRow}>
-                <Text style={styles.positionLabel}>Total Unrealized PnL:</Text>
-                <Text style={[styles.positionValue, { color: parseFloat(portfolioSummary.totalUnrealizedPnl) >= 0 ? '#00D4AA' : '#EF4444' }]}>
-                  ${parseFloat(portfolioSummary.totalUnrealizedPnl).toFixed(2)}
-                </Text>
-              </View>
-              <View style={styles.positionRow}>
-                <Text style={styles.positionLabel}>Active Positions:</Text>
-                <Text style={styles.positionValue}>{portfolioSummary.totalPositions}</Text>
-              </View>
-              <View style={styles.positionRow}>
-                <Text style={styles.positionLabel}>Margin Utilization:</Text>
-                <Text style={[styles.positionValue, { color: parseFloat(portfolioSummary.marginUtilization) > 80 ? '#EF4444' : '#00D4AA' }]}>
-                  {portfolioSummary.marginUtilization}%
-                </Text>
-              </View>
-            </View>
-          </View>
-        )} */}
-
+        {/* Trading Actions */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Trading Actions</Text>
-          <View style={styles.tradingButtonsContainer}>
-            <View style={styles.tradingButtonWrapper}>
-              <GradientButton
-                title="BUY"
-                onPress={handleBuy}
-                disabled={hypeUsdcLoading}
-              />
-            </View>
-            <View style={styles.tradingButtonWrapper}>
-              <CustomButton
-                title="SELL"
-                onPress={handleSell}
-                style={styles.sellButton}
-                textStyle={styles.sellButtonText}
-                disabled={hypeUsdcLoading}
-              />
+          <View style={styles.card}>
+            <View style={styles.transferContainer}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Amount (USDC)</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.transferInput}
+                    value={tradingState.buyAmount}
+                    onChangeText={tradingState.setBuyAmount}
+                    placeholder="0.00"
+                    placeholderTextColor="#8B949E"
+                    keyboardType="numeric"
+                    editable={!tradingState.isBuying}
+                  />
+                  <TouchableOpacity
+                    style={styles.maxButton}
+                    onPress={handleMaxBuy}
+                    disabled={tradingState.isBuying}
+                  >
+                    <Text style={styles.maxButtonText}>MAX</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={styles.transferButtonContainer}>
+                <GradientButton
+                  title={tradingState.isBuying ? "Buying..." : "Buy HYPE"}
+                  onPress={handleBuy}
+                  disabled={tradingState.isBuying || !tradingState.buyAmount || parseFloat(tradingState.buyAmount) <= 0}
+                />
+              </View>
             </View>
           </View>
         </View>
 
+        {/* Position Balance Section */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Position Balance</Text>
+          <View style={styles.card}>
+            {hypeBalances?.account && hypeUsdcPrice ? (() => {
+              const hypePosition = hypeBalances.account?.assetPositions?.find((pos: any) => pos.coin === 'HYPE');
+              if (hypePosition) {
+                const currentHypeAmount = parseFloat(hypePosition.total || '0');
+                const entryValue = parseFloat(hypePosition.entryNtl || '0');
+                const currentValue = currentHypeAmount * hypeUsdcPrice;
+                const pnl = currentValue - entryValue;
+                const pnlPercentage = entryValue > 0 ? ((pnl / entryValue) * 100) : 0;
+                return (
+                  <>
+                    <View style={styles.positionRow}>
+                      <Text style={styles.positionLabel}>HYPE Amount:</Text>
+                      <Text style={styles.positionValue}>{currentHypeAmount.toFixed(4)} HYPE</Text>
+                    </View>
+                    <View style={styles.positionRow}>
+                      <Text style={styles.positionLabel}>Current Value:</Text>
+                      <Text style={styles.positionValue}>${currentValue.toFixed(2)} USDC</Text>
+                    </View>
+                    <View style={styles.positionRow}>
+                      <Text style={styles.positionLabel}>Entry Value:</Text>
+                      <Text style={styles.positionValue}>${entryValue.toFixed(2)} USDC</Text>
+                    </View>
+                    <View style={styles.positionRow}>
+                      <Text style={styles.positionLabel}>PNL:</Text>
+                      <Text style={[
+                        styles.positionValue,
+                        { color: pnl >= 0 ? '#00D4AA' : '#EF4444' }
+                      ]}>
+                        ${pnl.toFixed(2)} ({pnlPercentage >= 0 ? '+' : ''}{pnlPercentage.toFixed(2)}%)
+                      </Text>
+                    </View>
+
+                    {/* Sell HYPE Section */}
+                    {currentHypeAmount > 0 && (
+                      <View style={styles.sellSection}>
+                        <View style={styles.inputContainer}>
+                          <Text style={styles.inputLabel}>Sell Amount (HYPE)</Text>
+                          <View style={styles.inputWrapper}>
+                            <TextInput
+                              style={styles.transferInput}
+                              value={tradingState.sellAmount}
+                              onChangeText={tradingState.setSellAmount}
+                              placeholder="0.0000"
+                              placeholderTextColor="#8B949E"
+                              keyboardType="numeric"
+                              editable={!tradingState.isSelling}
+                            />
+                            <TouchableOpacity
+                              style={styles.maxButton}
+                              onPress={() => tradingState.setSellAmount(currentHypeAmount.toString())}
+                              disabled={tradingState.isSelling}
+                            >
+                              <Text style={styles.maxButtonText}>MAX</Text>
+                            </TouchableOpacity>
+                          </View>
+                          <View style={styles.transferButtonContainer}>
+                            <GradientButton
+                              title={tradingState.isSelling ? "Selling..." : "Sell HYPE"}
+                              onPress={handleSell}
+                              disabled={tradingState.isSelling || !tradingState.sellAmount || parseFloat(tradingState.sellAmount) <= 0}
+                              variant="danger"
+                            />
+                          </View>
+                        </View>
+                      </View>
+                    )}
+                  </>
+                );
+              } else {
+                return (
+                  <View style={styles.positionRow}>
+                    <Text style={styles.positionLabel}>No HYPE position found</Text>
+                  </View>
+                );
+              }
+            })() : (
+              <Text style={styles.positionLabel}>Loading position data...</Text>
+            )}
+          </View>
+        </View>
+
+        {/* Account Balances */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account Balances</Text>
           <View style={styles.card}>
@@ -266,20 +330,53 @@ export const UserScreen = () => {
               <>
                 <View style={styles.positionRow}>
                   <Text style={styles.positionLabel}>Hyperliquid Balance:</Text>
-                  <Text style={styles.positionValue}>${parseFloat(hypeBalances).toFixed(2)}</Text>
-                </View>
-                <View style={styles.positionRow}>
-                  <Text style={styles.positionLabel}>Position Balance:</Text>
-                  <Text style={styles.positionValue}>${parseFloat(hypeBalances.totalPositionValue).toFixed(2)}</Text>
+                  <Text style={styles.positionValue}>{hypeBalances?.account?.usdcBalance ?? 0} USDC</Text>
                 </View>
                 <View style={styles.positionRow}>
                   <Text style={styles.positionLabel}>Wallet Balance:</Text>
-                  <Text style={styles.positionValue}>${}</Text>
+                  <Text style={styles.positionValue}>{walletBalance ?? 0} USDC</Text>
                 </View>
               </>
             ) : (
               <Text style={styles.positionLabel}>Loading balance data...</Text>
             )}
+          </View>
+        </View>
+
+        {/* Transfer */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Transfer to Hyperliquid</Text>
+          <View style={styles.card}>
+            <View style={styles.transferContainer}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Amount (USDC)</Text>
+                <View style={styles.inputWrapper}>
+                  <TextInput
+                    style={styles.transferInput}
+                    value={tradingState.transferAmount}
+                    onChangeText={tradingState.setTransferAmount}
+                    placeholder="0.00"
+                    placeholderTextColor="#8B949E"
+                    keyboardType="numeric"
+                    editable={!tradingState.isTransferring}
+                  />
+                  <TouchableOpacity
+                    style={styles.maxButton}
+                    onPress={handleMaxTransfer}
+                    disabled={tradingState.isTransferring}
+                  >
+                    <Text style={styles.maxButtonText}>MAX</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={styles.transferButtonContainer}>
+                <GradientButton
+                  title={tradingState.isTransferring ? "Transferring..." : "Transfer to Hyperliquid"}
+                  onPress={handleTransfer}
+                  disabled={tradingState.isTransferring || !tradingState.transferAmount || parseFloat(tradingState.transferAmount) <= 0}
+                />
+              </View>
+            </View>
           </View>
         </View>
 
@@ -293,31 +390,6 @@ export const UserScreen = () => {
                 {`${activeWallet.address.slice(0, 6)}...${activeWallet.address.slice(-4)}`}
               </Text>
             </View>
-            {wallets.length > 1 && (
-              <>
-                <Text style={styles.subsectionTitle}>Switch Wallet</Text>
-                <View style={styles.walletsList}>
-                  {wallets.filter(w => w.address !== activeWallet.address).map((w, i) => (
-                    <View key={w.address + i} style={styles.walletItem}>
-                      <CustomButton
-                        title={`${w.address.slice(0, 6)}...${w.address.slice(-4)}`}
-                        onPress={() => setActiveWallet({
-                          recoveryPassword: "password",
-                          address: w.address,
-                          onSuccess: () => {
-                            alert("Active wallet set to: " + w.address);
-                          },
-                          onError: (error) => {
-                            alert("Error setting active wallet: " + error.message);
-                          }
-                        })}
-                        style={styles.walletButton}
-                      />
-                    </View>
-                  ))}
-                </View>
-              </>
-            )}
           </View>
         </View>
 
@@ -335,6 +407,7 @@ export const UserScreen = () => {
   );
 };
 
+// Styles
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -573,6 +646,173 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#FFFFFF',
     fontWeight: '500',
+  },
+  transferContainer: {
+    gap: 20,
+  },
+  inputContainer: {
+    gap: 8,
+  },
+  inputLabel: {
+    fontSize: 14,
+    color: '#8B949E',
+    fontWeight: '500',
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  transferInput: {
+    flex: 1,
+    height: 48,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.1)',
+    paddingHorizontal: 16,
+    fontSize: 16,
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
+  maxButton: {
+    height: 48,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0, 212, 170, 0.1)',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 212, 170, 0.3)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  maxButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#00D4AA',
+  },
+  transferButtonContainer: {
+    marginTop: 4,
+  },
+  chartSection: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  chart: {
+    borderRadius: 10,
+  },
+  chartPlaceholderContainer: {
+    marginTop: 20,
+    paddingVertical: 40,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  chartPlaceholderText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#8B949E',
+    marginBottom: 4,
+  },
+  chartPlaceholderSubtext: {
+    fontSize: 12,
+    color: '#8B949E',
+    textAlign: 'center',
+  },
+  vaultSelection: {
+    marginBottom: 20,
+  },
+  vaultSelectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    marginBottom: 12,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  loadingText: {
+    color: '#8B949E',
+    marginLeft: 8,
+    fontSize: 14,
+  },
+  vaultScrollView: {
+    paddingVertical: 4,
+  },
+  vaultOption: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 10,
+    minWidth: 120,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  selectedVault: {
+    backgroundColor: 'rgba(0, 245, 255, 0.2)',
+    borderColor: '#00f5ff',
+  },
+  vaultName: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
+  selectedVaultText: {
+    color: '#00f5ff',
+  },
+  vaultAddress: {
+    color: 'rgba(255, 255, 255, 0.6)',
+    fontSize: 10,
+    textAlign: 'center',
+    marginTop: 4,
+  },
+  vaultSelectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  createVaultButton: {
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  createVaultButtonText: {
+    color: 'white',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  createVaultForm: {
+    backgroundColor: 'rgba(26, 31, 46, 0.6)',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 245, 255, 0.2)',
+  },
+  formRow: {
+    marginBottom: 16,
+  },
+  formInput: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 8,
+    padding: 12,
+    color: 'white',
+    fontSize: 14,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  formTextArea: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
+  sellSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(255, 255, 255, 0.1)',
   },
 });
 
