@@ -6,7 +6,7 @@ import {
 } from "@openfort/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig } from "wagmi";
-import { base } from "viem/chains";
+import { base, baseSepolia } from "viem/chains";
 import { AaveProvider } from "@aave/react";
 import { aaveClient } from "./lib/aave";
 
@@ -14,7 +14,7 @@ const config = createConfig(
   getDefaultConfig({
     appName: "Openfort Wallet App",
     walletConnectProjectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || "demo",
-    chains: [base],
+    chains: [import.meta.env.VITE_USE_TESTNET === 'true' ? baseSepolia : base],
     ssr: false,
   })
 );
