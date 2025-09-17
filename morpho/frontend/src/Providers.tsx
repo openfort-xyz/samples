@@ -2,7 +2,6 @@ import React from "react";
 import {
   OpenfortProvider,
   getDefaultConfig,
-  RecoveryMethod,
 } from "@openfort/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider, createConfig } from "wagmi";

@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { useAccount, useReadContract, useWalletClient } from 'wagmi';
-import { createPublicClient, http, parseAbi, type Address } from 'viem';
+import { createPublicClient, http, parseAbi, type Address, type Hash } from 'viem';
 import { base } from 'viem/chains';
 import { USDC_CONTRACT_ADDRESS, usdcAbi } from '../contracts/usdc';
 import { SELECTED_BASE_MAINNET_RPC_URL } from '../lib/rpc';
@@ -12,6 +12,11 @@ const MINIMAL_VAULT_ABI = parseAbi([
   "function deposit(uint256 assets, address receiver) external returns (uint256)",
   "function redeem(uint256 shares, address receiver, address owner) external returns (uint256)",
 ]);
+
+const POLL_INTERVAL_MS = 1_000;
+const MAX_BALANCE_ATTEMPTS = 10;
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function useVaultOperations() {
   const [isSupplying, setIsSupplying] = useState(false);
@@ -41,67 +46,138 @@ export function useVaultOperations() {
     query: { enabled: !!address },
   });
 
-  const fetchVaultBalance = useCallback(async () => {
-    if (!address || !viemClient) return;
+  const waitForTransaction = useCallback(async (hash: Hash) => {
+    await viemClient.waitForTransactionReceipt({ hash });
+  }, [viemClient]);
+
+  const readVaultBalance = useCallback(async () => {
+    if (!address) return 0n;
+
+    const userShares = await viemClient.readContract({
+      address: VAULT_ADDRESS as Address,
+      abi: MINIMAL_VAULT_ABI,
+      functionName: 'balanceOf',
+      args: [address as Address],
+    });
+
+    if (userShares === 0n) {
+      return 0n;
+    }
+
+    return viemClient.readContract({
+      address: VAULT_ADDRESS as Address,
+      abi: MINIMAL_VAULT_ABI,
+      functionName: 'convertToAssets',
+      args: [userShares],
+    });
+  }, [address, viemClient]);
+
+  const updateVaultBalance = useCallback(async () => {
     try {
-      const userShares = await viemClient.readContract({
-        address: VAULT_ADDRESS as Address,
-        abi: MINIMAL_VAULT_ABI,
-        functionName: 'balanceOf',
-        args: [address as Address],
-      });
-
-      const userAssets = await viemClient.readContract({
-        address: VAULT_ADDRESS as Address,
-        abi: MINIMAL_VAULT_ABI,
-        functionName: 'convertToAssets',
-        args: [userShares],
-      });
-
-      setUserVaultBalance(userAssets);
+      const vaultBalance = await readVaultBalance();
+      setUserVaultBalance(vaultBalance);
+      return vaultBalance;
     } catch (error) {
       console.error("Error fetching vault balance:", error);
+      return undefined;
     }
-  }, [address, viemClient]);
+  }, [readVaultBalance]);
+
+  const fetchVaultBalance = useCallback(async () => {
+    await updateVaultBalance();
+  }, [updateVaultBalance]);
+
+  const waitForWalletBalanceChange = useCallback(async (previousBalance: bigint) => {
+    if (!address) return previousBalance;
+
+    for (let attempt = 0; attempt < MAX_BALANCE_ATTEMPTS; attempt++) {
+      try {
+        const result = await refetchWalletBalance();
+        const currentBalance = result.data ?? previousBalance;
+
+        if (currentBalance !== previousBalance) {
+          return currentBalance;
+        }
+      } catch (error) {
+        console.error("Error refreshing wallet balance:", error);
+        break;
+      }
+
+      await delay(POLL_INTERVAL_MS);
+    }
+
+    return previousBalance;
+  }, [address, refetchWalletBalance]);
+
+  const waitForVaultBalanceChange = useCallback(async (previousBalance: bigint) => {
+    for (let attempt = 0; attempt < MAX_BALANCE_ATTEMPTS; attempt++) {
+      const currentBalance = await updateVaultBalance();
+
+      if (currentBalance !== undefined && currentBalance !== previousBalance) {
+        return currentBalance;
+      }
+
+      await delay(POLL_INTERVAL_MS);
+    }
+
+    return previousBalance;
+  }, [updateVaultBalance]);
 
   const handleSupply = useCallback(async () => {
     if (!walletClient || !address || !walletBalance || walletBalance === 0n) return;
 
     setIsSupplying(true);
     try {
-      await walletClient.writeContract({
+      const initialWalletBalance = walletBalance;
+      const initialVaultBalance = userVaultBalance;
+
+      const approveHash = await walletClient.writeContract({
         address: USDC_CONTRACT_ADDRESS,
         abi: usdcAbi,
         functionName: 'approve',
         args: [VAULT_ADDRESS as `0x${string}`, walletBalance],
       });
 
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      await waitForTransaction(approveHash);
 
-      await walletClient.writeContract({
+      const depositHash = await walletClient.writeContract({
         address: VAULT_ADDRESS as `0x${string}`,
         abi: MINIMAL_VAULT_ABI,
         functionName: 'deposit',
         args: [walletBalance, address as `0x${string}`],
       });
 
-      setTimeout(() => {
-        refetchWalletBalance();
-        fetchVaultBalance();
-      }, 5000);
+      await waitForTransaction(depositHash);
 
-    } catch (error: any) {
-      alert(`Deposit failed: ${error?.message || 'Unknown error'}`);
+      await Promise.all([
+        waitForWalletBalanceChange(initialWalletBalance),
+        waitForVaultBalanceChange(initialVaultBalance),
+      ]);
+
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Deposit failed: ${message}`);
     } finally {
       setIsSupplying(false);
     }
-  }, [walletClient, address, walletBalance, refetchWalletBalance, fetchVaultBalance]);
+  }, [
+    walletClient,
+    address,
+    walletBalance,
+    userVaultBalance,
+    waitForTransaction,
+    waitForWalletBalanceChange,
+    waitForVaultBalanceChange,
+  ]);
 
   const handleWithdraw = useCallback(async () => {
     if (!walletClient || !address || !userVaultBalance || userVaultBalance === 0n) return;
 
     setIsWithdrawing(true);
     try {
+      const initialWalletBalance = walletBalance ?? 0n;
+      const initialVaultBalance = userVaultBalance;
+
       const userShares = await viemClient.readContract({
         address: VAULT_ADDRESS as Address,
         abi: MINIMAL_VAULT_ABI,
@@ -115,7 +191,7 @@ export function useVaultOperations() {
         return;
       }
 
-      await walletClient.writeContract({
+      const redeemHash = await walletClient.writeContract({
         address: VAULT_ADDRESS as Address,
         abi: MINIMAL_VAULT_ABI,
         functionName: 'redeem',
@@ -123,25 +199,39 @@ export function useVaultOperations() {
         gas: 500000n,
       });
 
-      setTimeout(() => {
-        refetchWalletBalance();
-        fetchVaultBalance();
-      }, 5000);
+      await waitForTransaction(redeemHash);
 
-    } catch (error: any) {
-      if (error?.message?.includes('rate limit') || error?.message?.includes('overrate')) {
+      await Promise.all([
+        waitForWalletBalanceChange(initialWalletBalance),
+        waitForVaultBalanceChange(initialVaultBalance),
+      ]);
+
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const normalisedMessage = message.toLowerCase();
+
+      if (normalisedMessage.includes('rate limit') || normalisedMessage.includes('overrate')) {
         alert("Rate limit exceeded. Please wait a moment and try again.");
-      } else if (error?.message?.includes('insufficient funds') || error?.message?.includes('gas')) {
+      } else if (normalisedMessage.includes('insufficient funds') || normalisedMessage.includes('gas')) {
         alert("Insufficient gas or funds for withdrawal transaction.");
-      } else if (error?.message?.includes('user rejected')) {
+      } else if (normalisedMessage.includes('user rejected')) {
         alert("Transaction was cancelled.");
       } else {
-        alert(`Withdraw failed: ${error?.message || 'Unknown error'}`);
+        alert(`Withdraw failed: ${message || 'Unknown error'}`);
       }
     } finally {
       setIsWithdrawing(false);
     }
-  }, [walletClient, address, userVaultBalance, viemClient, refetchWalletBalance, fetchVaultBalance]);
+  }, [
+    walletClient,
+    address,
+    userVaultBalance,
+    walletBalance,
+    viemClient,
+    waitForTransaction,
+    waitForWalletBalanceChange,
+    waitForVaultBalanceChange,
+  ]);
 
   return {
     isSupplying,

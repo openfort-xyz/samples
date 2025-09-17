@@ -5,6 +5,14 @@ import { GraphQLClient, gql } from 'graphql-request';
 const MORPHO_API = "https://blue-api.morpho.org/graphql";
 const VAULT_ADDRESS = "0xbeeF010f9cb27031ad51e3333f9aF9C6B1228183";
 
+interface VaultApyResponse {
+  vaultByAddress?: {
+    state?: {
+      netApy?: number | string;
+    };
+  };
+}
+
 const GET_VAULT_APY = gql`
   query VaultApy($vaultAddress: String!, $chainId: Int!) {
     vaultByAddress(address: $vaultAddress, chainId: $chainId) {
@@ -23,10 +31,10 @@ export function useVaultApy() {
 
       try {
         const client = new GraphQLClient(MORPHO_API);
-        const data = await client.request(GET_VAULT_APY, {
+        const data = await client.request<VaultApyResponse>(GET_VAULT_APY, {
           vaultAddress: VAULT_ADDRESS,
           chainId: chainId,
-        }) as any;
+        });
 
         const netApy = data?.vaultByAddress?.state?.netApy;
         if (netApy) {
