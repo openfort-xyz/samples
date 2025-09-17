@@ -21,7 +21,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 export function useVaultOperations() {
   const [isSupplying, setIsSupplying] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [userVaultBalance, setUserVaultBalance] = useState<bigint>(0n);
+  const [userVaultBalance, setUserVaultBalance] = useState<bigint | undefined>(undefined);
 
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient();
@@ -51,7 +51,7 @@ export function useVaultOperations() {
   }, [viemClient]);
 
   const readVaultBalance = useCallback(async () => {
-    if (!address) return 0n;
+    if (!address) return undefined;
 
     const userShares = await viemClient.readContract({
       address: VAULT_ADDRESS as Address,
@@ -109,7 +109,7 @@ export function useVaultOperations() {
     return previousBalance;
   }, [address, refetchWalletBalance]);
 
-  const waitForVaultBalanceChange = useCallback(async (previousBalance: bigint) => {
+  const waitForVaultBalanceChange = useCallback(async (previousBalance: bigint | undefined) => {
     for (let attempt = 0; attempt < MAX_BALANCE_ATTEMPTS; attempt++) {
       const currentBalance = await updateVaultBalance();
 
@@ -171,7 +171,7 @@ export function useVaultOperations() {
   ]);
 
   const handleWithdraw = useCallback(async () => {
-    if (!walletClient || !address || !userVaultBalance || userVaultBalance === 0n) return;
+    if (!walletClient || !address || userVaultBalance === undefined || userVaultBalance === 0n) return;
 
     setIsWithdrawing(true);
     try {
