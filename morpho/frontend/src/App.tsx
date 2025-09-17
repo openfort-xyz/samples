@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { OpenfortButton, useStatus } from "@openfort/react";
 import { useAccount, useReadContract, useWalletClient } from 'wagmi';
 import { USDC_CONTRACT_ADDRESS, usdcAbi } from './contracts/usdc';
 import { formatUsdcBalance } from './lib/utils';
+import { SELECTED_BASE_MAINNET_RPC_URL } from './lib/rpc';
 import { GraphQLClient, gql } from "graphql-request";
 import { createPublicClient, http, parseAbi, type Address } from 'viem';
 import { base } from 'viem/chains';
@@ -28,15 +29,17 @@ function App() {
 
   const isLoading = isSupplying || isWithdrawing;
 
-  const viemClient = createPublicClient({
-    chain: base,
-    transport: http("https://mainnet.base.org", {
-      retryCount: 3,
-      retryDelay: 1000,
-      batch: { batchSize: 50, wait: 500 },
-    }),
-    batch: { multicall: { batchSize: 1024, wait: 200 } },
-  });
+  const viemClient = useMemo(() => (
+    createPublicClient({
+      chain: base,
+      transport: http(SELECTED_BASE_MAINNET_RPC_URL, {
+        retryCount: 3,
+        retryDelay: 1000,
+        batch: { batchSize: 50, wait: 500 },
+      }),
+      batch: { multicall: { batchSize: 1024, wait: 200 } },
+    })
+  ), []);
 
   const { data: walletBalance, refetch: refetchWalletBalance } = useReadContract({
     address: USDC_CONTRACT_ADDRESS,
