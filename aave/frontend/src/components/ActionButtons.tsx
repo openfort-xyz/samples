@@ -88,7 +88,7 @@ export function ActionButtons({
             ) : (
               <>
                 <span className="mr-2">️↙️</span>
-                Withdraw from pool
+                Withdraw all from pool
               </>
             )}
           </button>
