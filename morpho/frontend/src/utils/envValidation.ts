@@ -1,9 +1,7 @@
 interface EnvConfig {
   VITE_OPENFORT_PUBLISHABLE_KEY: string;
-  VITE_OPENFORT_SECRET_KEY: string;
   VITE_OPENFORT_POLICY_ID: string;
   VITE_OPENFORT_SHIELD_PUBLIC_KEY: string;
-  VITE_OPENFORT_SHIELD_SECRET_KEY: string;
   VITE_WALLET_CONNECT_PROJECT_ID: string;
   VITE_BACKEND_URL: string;
   VITE_FRONTEND_URL: string;
@@ -16,10 +14,8 @@ interface ValidationError {
 
 const ENV_DESCRIPTIONS = {
   VITE_OPENFORT_PUBLISHABLE_KEY: "Openfort publishable key for client-side authentication",
-  VITE_OPENFORT_SECRET_KEY: "Openfort secret key for server operations",
   VITE_OPENFORT_POLICY_ID: "Policy ID for Ethereum provider configuration",
   VITE_OPENFORT_SHIELD_PUBLIC_KEY: "Shield public key for wallet encryption",
-  VITE_OPENFORT_SHIELD_SECRET_KEY: "Shield secret key for wallet operations",
   VITE_WALLET_CONNECT_PROJECT_ID: "WalletConnect project ID for wallet connections",
   VITE_BACKEND_URL: "Backend API URL",
   VITE_FRONTEND_URL: "Frontend application URL"
