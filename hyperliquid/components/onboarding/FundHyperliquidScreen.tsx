@@ -1,6 +1,7 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Clipboard from 'expo-clipboard';
 
 import { GradientButton } from "../ui";
 
@@ -30,6 +31,13 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
 
   const hasExchangeBalance = (hyperliquidBalance ?? 0) > 0;
   const hasWalletBalance = (walletBalance ?? 0) > 0;
+
+  const copyToClipboard = async () => {
+    if (walletAddress) {
+      await Clipboard.setStringAsync(walletAddress);
+      Alert.alert("Copied!", "Wallet address copied to clipboard");
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -76,7 +84,14 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
 
         <View style={styles.addressCard}>
           <Text style={styles.addressLabel}>Wallet address</Text>
-          <Text style={styles.addressValue}>{truncated ?? "—"}</Text>
+          <View style={styles.addressRow}>
+            <Text style={styles.addressValue}>{truncated ?? "—"}</Text>
+            {walletAddress && (
+              <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
+                <Text style={styles.copyButtonText}>Copy</Text>
+              </TouchableOpacity>
+            )}
+          </View>
           <Text style={styles.addressHint}>Use this address when requesting funds or initiating transfers.</Text>
         </View>
 
@@ -209,11 +224,31 @@ const styles = StyleSheet.create({
     color: "#8B949E",
     fontSize: 13,
   },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   addressValue: {
     color: "#FFFFFF",
     fontSize: 18,
     fontWeight: "600",
     fontFamily: "monospace",
+    flex: 1,
+  },
+  copyButton: {
+    backgroundColor: "rgba(0, 212, 170, 0.12)",
+    borderWidth: 1,
+    borderColor: "rgba(0, 212, 170, 0.35)",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginLeft: 12,
+  },
+  copyButtonText: {
+    color: "#00D4AA",
+    fontSize: 12,
+    fontWeight: "600",
   },
   addressHint: {
     color: "#6B7280",
