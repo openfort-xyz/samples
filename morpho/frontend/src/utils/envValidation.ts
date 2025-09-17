@@ -26,7 +26,6 @@ export function validateEnvironmentVariables(): ValidationError[] {
 
   const requiredVars: Array<keyof EnvConfig> = [
     'VITE_OPENFORT_PUBLISHABLE_KEY',
-    'VITE_OPENFORT_POLICY_ID',
     'VITE_OPENFORT_SHIELD_PUBLIC_KEY',
     'VITE_BACKEND_URL',
     'VITE_FRONTEND_URL'

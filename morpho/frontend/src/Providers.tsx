@@ -38,7 +38,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             walletConfig={{
               shieldPublishableKey: import.meta.env.VITE_OPENFORT_SHIELD_PUBLIC_KEY,
               createEncryptedSessionEndpoint: `${import.meta.env.VITE_BACKEND_URL}/api/create-encryption-session`,
-              ethereumProviderPolicyId: import.meta.env.VITE_OPENFORT_POLICY_ID,
+              ethereumProviderPolicyId: import.meta.env.VITE_OPENFORT_POLICY_ID || undefined,
             }}
           >
             {children}
