@@ -138,7 +138,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                     },
                   ],
                 }}
-                width={width - 64}
+                width={width - 136}
                 height={160}
                 chartConfig={{
                   backgroundColor: "transparent",
