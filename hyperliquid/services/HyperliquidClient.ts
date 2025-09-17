@@ -24,15 +24,25 @@ const infoClient = new Hyperliquid.InfoClient({
 // Removed priceClient using WebSocket transport - using HTTP transport instead
 
 const EXCHANGE_ENDPOINT = `${HYPERLIQUID_TESTNET_HTTP_URL}/exchange`;
-const IS_TESTNET = HYPERLIQUID_TESTNET_HTTP_URL.toLowerCase().includes("testnet");
+const MAX_PRICE_DECIMALS_SPOT = 8;
+const DEFAULT_HYPE_SZ_DECIMALS = 2;
+const DEFAULT_HYPE_SIZE_STEP = Number((1 / Math.pow(10, DEFAULT_HYPE_SZ_DECIMALS)).toFixed(DEFAULT_HYPE_SZ_DECIMALS));
+const DEFAULT_HYPE_PRICE_DECIMALS = MAX_PRICE_DECIMALS_SPOT - DEFAULT_HYPE_SZ_DECIMALS;
 
-export const createExchangeClient = (privateKey: string) => {
-    const wallet = new ethers.Wallet(privateKey);
-    return new Hyperliquid.ExchangeClient({
-        wallet: wallet,
-        transport: httpTransport,
-    });
+type HypeSizing = {
+    szDecimals: number;
+    priceDecimals: number;
+    minSize: number;
 };
+
+const DEFAULT_HYPE_SIZING: HypeSizing = {
+    szDecimals: DEFAULT_HYPE_SZ_DECIMALS,
+    priceDecimals: DEFAULT_HYPE_PRICE_DECIMALS,
+    minSize: DEFAULT_HYPE_SIZE_STEP,
+};
+
+export const DEFAULT_MIN_HYPE_ORDER_SIZE = DEFAULT_HYPE_SIZING.minSize;
+const IS_TESTNET = HYPERLIQUID_TESTNET_HTTP_URL.toLowerCase().includes("testnet");
 
 type OrderAction = ReturnType<typeof actionSorter.order>;
 
@@ -45,14 +55,55 @@ type EmbeddedWalletSigner = {
     exportPrivateKey?: () => Promise<string>;
 };
 
+let hypeSizingPromise: Promise<HypeSizing> | null = null;
+
+const fetchHypeSizing = async (): Promise<HypeSizing> => {
+    try {
+        const spotMeta = await infoClient.spotMeta();
+        console.log('Full spotMeta response:', JSON.stringify(spotMeta, null, 2));
+        const token = spotMeta.tokens.find((t: any) => t.name === HYPE_SYMBOL);
+        console.log('Found HYPE token metadata:', JSON.stringify(token, null, 2));
+        if (!token) {
+            throw new Error('HYPE token metadata not found in spotMeta response');
+        }
+
+        const szDecimals = typeof token.szDecimals === 'number' ? Math.max(0, token.szDecimals) : DEFAULT_HYPE_SIZING.szDecimals;
+        const priceDecimals = Math.max(0, MAX_PRICE_DECIMALS_SPOT - szDecimals);
+        const minSize = Number((1 / Math.pow(10, szDecimals)).toFixed(szDecimals));
+
+        return {
+            szDecimals,
+            priceDecimals,
+            minSize,
+        };
+    } catch (error) {
+        console.warn('Failed to fetch HYPE sizing metadata, falling back to defaults:', error);
+        return DEFAULT_HYPE_SIZING;
+    }
+};
+
+const getHypeSizing = async (): Promise<HypeSizing> => {
+    if (!hypeSizingPromise) {
+        hypeSizingPromise = fetchHypeSizing();
+    }
+
+    try {
+        return await hypeSizingPromise;
+    } catch (error) {
+        hypeSizingPromise = null;
+        throw error;
+    }
+};
+
 const signAndSubmitOrder = async (
     params: {
         activeWallet: any;
         action: OrderAction;
         embeddedWallet?: EmbeddedWalletSigner;
+        privateKey?: string | null;
     }
 ) => {
-    const { activeWallet, action, embeddedWallet } = params;
+    const { activeWallet, action, embeddedWallet, privateKey } = params;
     const nonce = Date.now();
     const actionHash = createL1ActionHash({ action, nonce });
 
@@ -77,7 +128,11 @@ const signAndSubmitOrder = async (
 
     let signatureHex: string | undefined;
 
-    if (embeddedWallet?.signTypedData) {
+    if (privateKey) {
+        const normalizedKey = privateKey.startsWith('0x') ? privateKey : `0x${privateKey}`;
+        const wallet = new ethers.Wallet(normalizedKey);
+        signatureHex = await wallet.signTypedData(domain, types, message);
+    } else if (embeddedWallet?.signTypedData) {
         signatureHex = await embeddedWallet.signTypedData(
             domain,
             {
@@ -107,8 +162,8 @@ const signAndSubmitOrder = async (
                 ],
             });
         } catch (error: any) {
-            const message = error?.message ?? 'Unknown provider error';
-            throw new Error(`Unable to sign Hyperliquid order: ${message}`);
+            const errMessage = error?.message ?? 'Unknown provider error';
+            throw new Error(`Unable to sign Hyperliquid order: ${errMessage}`);
         }
     }
 
@@ -286,6 +341,10 @@ export const buy = async (
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<boolean> => {
     try {
+        console.log('=== DEBUG: Buy function called ===');
+        console.log('activeWallet object:', JSON.stringify(activeWallet, null, 2));
+        console.log('activeWallet.address:', activeWallet?.address);
+        console.log('Expected address: 0x4ce1bd61AcBdA517F03B336665b793987265fCd1');
         console.log('Attempting to buy HYPE with', amount, 'USDC');
 
         const allMids = await infoClient.allMids();
@@ -294,24 +353,56 @@ export const buy = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const buyPrice = parseFloat(hypePrice) * (1 + slippage);
-        const quantity = Math.floor((amount / buyPrice) * 1000) / 1000;
+        const { szDecimals, priceDecimals, minSize } = await getHypeSizing();
+        console.log('HYPE sizing details:', { szDecimals, priceDecimals, minSize });
+
+        const buyPriceRaw = parseFloat(hypePrice) * (1 + slippage);
+        const priceScale = Math.pow(10, priceDecimals);
+        const buyPriceRounded = Math.round(buyPriceRaw * priceScale) / priceScale;
+        const buyPrice = Math.max(buyPriceRounded, buyPriceRaw); // ensure we don't undercut mid
+        const buyPriceStr = buyPrice
+            .toFixed(priceDecimals)
+            .replace(/\.0+$/, '')
+            .replace(/(\.\d*[1-9])0+$/, '$1');
+
+        const minNotional = buyPrice * minSize;
+        if (amount < minNotional) {
+            throw new Error(
+                `Order size too small. Hyperliquid requires at least ${minSize} ${HYPE_SYMBOL} (~${minNotional.toFixed(2)} USDC at current price).`
+            );
+        }
+
+        const rawQuantity = amount / buyPrice;
+        console.log('Raw quantity before rounding:', rawQuantity);
+        let quantity = Number(rawQuantity.toFixed(szDecimals));
+        console.log('Quantity after rounding to szDecimals:', quantity);
+        if (quantity < minSize) {
+            quantity = minSize;
+            console.log('Quantity adjusted to minSize:', quantity);
+        }
+
+        const quantityStr = quantity
+            .toFixed(szDecimals)
+            .replace(/\.0+$/, '')
+            .replace(/(\.\d*[1-9])0+$/, '$1');
+        console.log('Final quantity string for order:', quantityStr);
 
         console.log('Calculated buy order:');
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
-        console.log('- Buy price (with slippage):', buyPrice.toFixed(6), 'USDC');
-        console.log('- Quantity:', quantity, 'HYPE');
+        console.log('- Buy price (with slippage):', buyPriceStr, 'USDC');
+        console.log('- Quantity:', quantityStr, 'HYPE');
 
         const orderWire = {
             a: HYPE_ASSET_ID,
             b: true,
-            p: buyPrice.toFixed(6),
-            s: quantity.toFixed(3),
+            p: buyPriceStr,
+            s: quantityStr,
             r: false,
             t: {
                 limit: { tif: "Ioc" },
             },
         };
+        console.log('Order wire structure:', JSON.stringify(orderWire, null, 2));
 
         const embeddedWallet = options?.openfortClient?.embeddedWallet;
 
@@ -336,28 +427,19 @@ export const buy = async (
             }
         }
 
-        if (privateKeyHex && !privateKeyHex.startsWith('0x')) {
-            privateKeyHex = `0x${privateKeyHex}`;
-        }
+        const action = actionSorter.order({
+            type: "order",
+            orders: [orderWire],
+            grouping: "na",
+        });
+        console.log('Final action structure:', JSON.stringify(action, null, 2));
 
-        if (privateKeyHex) {
-            const exchangeClient = createExchangeClient(privateKeyHex);
-            result = await exchangeClient.order({
-                orders: [orderWire],
-                grouping: "na",
-            });
-        } else {
-            const action = actionSorter.order({
-                type: "order",
-                orders: [orderWire],
-                grouping: "na",
-            });
-            result = await signAndSubmitOrder({
-                activeWallet,
-                action,
-                embeddedWallet,
-            });
-        }
+        result = await signAndSubmitOrder({
+            activeWallet,
+            action,
+            embeddedWallet,
+            privateKey: privateKeyHex,
+        });
 
         console.log('Buy order result:', result);
 
@@ -404,19 +486,37 @@ export const sell = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const sellPrice = parseFloat(hypePrice) * (1 - slippage);
-        const quantity = Math.floor(amount * 1000) / 1000;
+        const { szDecimals, priceDecimals, minSize } = await getHypeSizing();
+
+        const sellPriceRaw = parseFloat(hypePrice) * (1 - slippage);
+        const priceScale = Math.pow(10, priceDecimals);
+        const sellPriceRounded = Math.round(sellPriceRaw * priceScale) / priceScale;
+        const sellPrice = Math.max(sellPriceRounded, sellPriceRaw);
+        const sellPriceStr = sellPrice
+            .toFixed(priceDecimals)
+            .replace(/\.0+$/, '')
+            .replace(/(\.\d*[1-9])0+$/, '$1');
+
+        if (amount < minSize) {
+            throw new Error(`Order size too small. Hyperliquid requires at least ${minSize} ${HYPE_SYMBOL} per order.`);
+        }
+
+        const quantity = Number(amount.toFixed(szDecimals));
+        const quantityStr = quantity
+            .toFixed(szDecimals)
+            .replace(/\.0+$/, '')
+            .replace(/(\.\d*[1-9])0+$/, '$1');
 
         console.log('Calculated sell order:');
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
-        console.log('- Sell price (with slippage):', sellPrice.toFixed(6), 'USDC');
-        console.log('- Quantity:', quantity, 'HYPE');
+        console.log('- Sell price (with slippage):', sellPriceStr, 'USDC');
+        console.log('- Quantity:', quantityStr, 'HYPE');
 
         const orderWire = {
             a: HYPE_ASSET_ID,
             b: false,
-            p: sellPrice.toFixed(6),
-            s: quantity.toFixed(3),
+            p: sellPriceStr,
+            s: quantityStr,
             r: false,
             t: {
                 limit: { tif: "Ioc" },
@@ -446,28 +546,19 @@ export const sell = async (
             }
         }
 
-        if (privateKeyHex && !privateKeyHex.startsWith('0x')) {
-            privateKeyHex = `0x${privateKeyHex}`;
-        }
+        const action = actionSorter.order({
+            type: "order",
+            orders: [orderWire],
+            grouping: "na",
+        });
+        console.log('Final action structure:', JSON.stringify(action, null, 2));
 
-        if (privateKeyHex) {
-            const exchangeClient = createExchangeClient(privateKeyHex);
-            result = await exchangeClient.order({
-                orders: [orderWire],
-                grouping: "na",
-            });
-        } else {
-            const action = actionSorter.order({
-                type: "order",
-                orders: [orderWire],
-                grouping: "na",
-            });
-            result = await signAndSubmitOrder({
-                activeWallet,
-                action,
-                embeddedWallet,
-            });
-        }
+        result = await signAndSubmitOrder({
+            activeWallet,
+            action,
+            embeddedWallet,
+            privateKey: privateKeyHex,
+        });
 
         console.log('Sell order result:', result);
 

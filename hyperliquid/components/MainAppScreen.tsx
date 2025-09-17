@@ -116,7 +116,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     <View style={styles.section}>
       <Text style={styles.sectionHeading}>Welcome to the Hyperliquid swapper</Text>
       <Text style={styles.sectionSubheading}>
-        We'll walk you through swapping USDC and {HYPE_SYMBOL} using your embedded wallet. Each screen
+        We will walk you through swapping USDC and {HYPE_SYMBOL} using your embedded wallet. Each screen
         highlights one action, so you always know what to do next.
       </Text>
       <Text style={styles.apiOnboardingNote}>

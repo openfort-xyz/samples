@@ -1,7 +1,7 @@
 import { Alert } from 'react-native';
 
 import { HYPE_SYMBOL } from '../constants/hyperliquid';
-import { transfer, buy, sell } from '../services/HyperliquidClient';
+import { transfer, buy, sell, DEFAULT_MIN_HYPE_ORDER_SIZE } from '../services/HyperliquidClient';
 
 export interface TransactionHandlers {
   handleBuy: (
@@ -108,8 +108,8 @@ export const transactionHandlers: TransactionHandlers = {
       return false;
     }
 
-    if (amount < 0.001) {
-      Alert.alert('Minimum Amount', `Minimum sell amount is 0.001 ${HYPE_SYMBOL}`);
+    if (amount < DEFAULT_MIN_HYPE_ORDER_SIZE) {
+      Alert.alert('Minimum Amount', `Minimum sell amount is ${DEFAULT_MIN_HYPE_ORDER_SIZE} ${HYPE_SYMBOL}`);
       return false;
     }
 
