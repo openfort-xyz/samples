@@ -4,3 +4,12 @@
 
 expo-env.d.ts
 # @end expo-cli
+
+# Environment files
+.env.local
+.env.*.local
+.env
+
+# Expo cache and device files
+.expo/cache/
+.expo/devices.json
