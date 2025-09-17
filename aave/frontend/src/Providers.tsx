@@ -9,19 +9,27 @@ import { WagmiProvider, createConfig } from "wagmi";
 import { base } from "viem/chains";
 import { AaveProvider } from "@aave/react";
 import { aaveClient } from "./lib/aave";
-
-const config = createConfig(
-  getDefaultConfig({
-    appName: "Openfort Wallet App",
-    walletConnectProjectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || "demo",
-    chains: [base],
-    ssr: false,
-  })
-);
+import { getEnvironmentStatus } from "./utils/envValidation";
 
 const queryClient = new QueryClient();
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const envStatus = getEnvironmentStatus();
+
+  // Only create config and render providers if environment is valid
+  if (!envStatus.isValid) {
+    return <>{children}</>;
+  }
+
+  const config = createConfig(
+    getDefaultConfig({
+      appName: "Openfort Wallet App",
+      walletConnectProjectId: import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID || "demo",
+      chains: [base],
+      ssr: false,
+    })
+  );
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>

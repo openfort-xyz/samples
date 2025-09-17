@@ -27,16 +27,18 @@ export function EnvValidationWrapper({ children }: EnvValidationWrapperProps) {
     );
   }
 
-  if (!envStatus.isValid && showModal) {
+  if (!envStatus.isValid) {
     return (
       <>
-        <div className="min-h-screen bg-black/95 blur-sm">
-          {children}
+        <div className="min-h-screen bg-black/95 flex items-center justify-center">
+          <div className="text-white">Loading...</div>
         </div>
-        <EnvErrorModal
-          errors={envStatus.errors}
-          onClose={() => setShowModal(false)}
-        />
+        {showModal && (
+          <EnvErrorModal
+            errors={envStatus.errors}
+            onClose={() => setShowModal(false)}
+          />
+        )}
       </>
     );
   }
