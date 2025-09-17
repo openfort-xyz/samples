@@ -4,6 +4,9 @@
 **/yarn.lock
 **/pnpm-lock.yaml
 
+# Expo
+**/.expo/
+
 # Environment variables
 .env
 .env.local
