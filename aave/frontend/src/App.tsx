@@ -1,24 +1,27 @@
 import { OpenfortButton, useStatus } from "@openfort/react";
-import { useAccount } from "wagmi";
-import { useState, useMemo } from 'react';
-import { useReadContract } from 'wagmi';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useAccount, useReadContract, useWalletClient, usePublicClient } from "wagmi";
 import { formatUsdcBalance } from './lib/utils';
 import { usdcAbi, USDC_CONTRACT_ADDRESS } from './contracts/usdc';
-import { errAsync, useSupply, evmAddress, bigDecimal, useAaveMarkets, chainId, PageSize, useUserSupplies, useWithdraw } from "@aave/react";
+import { useSupply, evmAddress, bigDecimal, useAaveMarkets, chainId, useWithdraw, useAaveClient } from "@aave/react";
 import { useSendTransaction } from "@aave/react/viem";
-import { useWalletClient } from "wagmi";
+import { userSupplies as fetchUserSupplies } from "@aave/client/actions";
+import type { MarketUserReserveSupplyPosition } from "@aave/graphql";
 
 function App() {
-  const { chainId: currentChainId } = useAccount();
+  const { address, chainId: currentChainId } = useAccount();
+  const publicClient = usePublicClient({ chainId: currentChainId });
   const { isConnected } = useStatus();
   const { data: walletClient } = useWalletClient();
-  const { address } = useAccount();
   const [supply, supplying] = useSupply();
   const [withdraw, withdrawing] = useWithdraw();
   const [sendTransaction, sending] = useSendTransaction(walletClient);
   const [isSupplying, setIsSupplying] = useState(false);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const aaveClient = useAaveClient();
+  const [userSupplyPositions, setUserSupplyPositions] = useState<MarketUserReserveSupplyPosition[] | undefined>(undefined);
+  const [suppliesLoading, setSuppliesLoading] = useState(true);
+  const [suppliesError, setSuppliesError] = useState<Error | null>(null);
 
 
   // Read USDC balance
@@ -35,43 +38,74 @@ function App() {
   const user = address ? evmAddress(address) : undefined;
 
   // Fetch all Aave markets
-  const {
-    data: markets,
-    loading: marketsLoading,
-    error: marketsError,
-  } = useAaveMarkets({
+  const { data: markets } = useAaveMarkets({
     chainIds: currentChainId ? [chainId(currentChainId)] : [],
     user, 
   });
 
+  const refreshUserSupplies = useCallback(async () => {
+    if (!aaveClient || !user) {
+      setUserSupplyPositions(undefined);
+      setSuppliesLoading(false);
+      setSuppliesError(null);
+      return;
+    }
+    if (!markets || markets.length === 0) {
+      if (!markets) {
+        setUserSupplyPositions(undefined);
+        setSuppliesLoading(true);
+      } else {
+        setUserSupplyPositions([]);
+        setSuppliesLoading(false);
+      }
+      setSuppliesError(null);
+      return;
+    }
 
-  // Get user's Aave supplies
-  const { data: userSupplies, loading: suppliesLoading, error: suppliesError } = useUserSupplies({
-    markets:
-      markets?.map((market) => ({
+    setSuppliesLoading(true);
+    setSuppliesError(null);
+
+    const result = await fetchUserSupplies(aaveClient, {
+      markets: markets.map((market) => ({
         chainId: market.chain.chainId,
         address: market.address,
-      })) || [],
-    user, 
-  }, [refreshKey, user]);
+      })),
+      user,
+    });
 
+    if (result.isErr()) {
+      console.error("Failed to fetch user supplies:", result.error);
+      setSuppliesError(result.error);
+      setUserSupplyPositions(undefined);
+    } else {
+      setUserSupplyPositions(result.value);
+    }
+
+    setSuppliesLoading(false);
+  }, [aaveClient, user, markets]);
+
+  useEffect(() => {
+    void refreshUserSupplies();
+  }, [refreshUserSupplies]);
 
   // Find USDC supply balance and APY
   const usdcSupplyData = useMemo(() => {
-    if (!userSupplies || userSupplies.length === 0) {
-      return { balance: "0.00", apy: "0.00" };
+    if (!userSupplyPositions || userSupplyPositions.length === 0) {
+      return { displayBalance: "0.00", rawBalance: "0", apy: "0.00" };
     }
-    const usdcSupply = userSupplies.find((supply: any) =>
+    const usdcSupply = userSupplyPositions.find((supply) =>
       supply.currency?.symbol === 'USDC'
     );
     if (usdcSupply?.balance?.amount?.value && usdcSupply?.apy) {
+      const rawBalance = usdcSupply.balance.amount.value;
       return {
-        balance: parseFloat(usdcSupply.balance.amount.value).toFixed(6),
+        displayBalance: parseFloat(rawBalance).toFixed(6),
+        rawBalance,
         apy: usdcSupply.apy.formatted
       };
     }
-    return { balance: "0.00", apy: "0.00" };
-  }, [userSupplies]);
+    return { displayBalance: "0.00", rawBalance: "0", apy: "0.00" };
+  }, [userSupplyPositions]);
 
 
   // Deposit to Aave vault
@@ -141,11 +175,15 @@ function App() {
       if (transactionResult.isErr()) {
         console.error("Transaction failed:", transactionResult.error);
       } else {
-        // Refetch balances after successful transaction
-        setTimeout(() => {
-          refetchUsdcBalance();
-          setRefreshKey(refreshKey + 1);
-        }, 2000); // Wait 2 seconds for blockchain to update
+        try {
+          if (publicClient) {
+            await publicClient.waitForTransactionReceipt({ hash: transactionResult.value });
+          }
+        } catch (receiptError) {
+          console.error("Waiting for transaction receipt failed:", receiptError);
+        }
+        await refetchUsdcBalance();
+        await refreshUserSupplies();
       }
     } catch (error) {
       console.error("Aave deposit failed:", error);
@@ -160,7 +198,7 @@ function App() {
       console.error("Missing requirements:", { walletClient: !!walletClient, address: !!address, usdcReserve: !!usdcReserve });
       return;
     }
-    if (!usdcSupplyData.balance || parseFloat(usdcSupplyData.balance) === 0) {
+    if (!usdcSupplyData.rawBalance || parseFloat(usdcSupplyData.rawBalance) === 0) {
       console.error("No USDC supply to withdraw");
       return;
     }
@@ -171,7 +209,7 @@ function App() {
         amount: {
           erc20: {
             currency: evmAddress(usdcReserve.currencyAddress),
-            value: { exact: bigDecimal(usdcSupplyData.balance) },  // Withdraw full balance
+            value: { exact: bigDecimal(usdcSupplyData.rawBalance) },  // Withdraw full balance
           },
         },
         sender: evmAddress(walletClient.account.address),
@@ -200,10 +238,15 @@ function App() {
       if (transactionResult.isErr()) {
         console.error("Withdraw transaction failed:", transactionResult.error);
       } else {
-        setTimeout(() => {
-          refetchUsdcBalance();
-          setRefreshKey(refreshKey + 1);
-        }, 2000); // Wait 2 seconds for blockchain to update
+        try {
+          if (publicClient) {
+            await publicClient.waitForTransactionReceipt({ hash: transactionResult.value });
+          }
+        } catch (receiptError) {
+          console.error("Waiting for transaction receipt failed:", receiptError);
+        }
+        await refetchUsdcBalance();
+        await refreshUserSupplies();
       }
     } catch (error) {
     } finally {
@@ -257,7 +300,7 @@ function App() {
                     {suppliesLoading ? (
                       <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
                     ) : (
-                      usdcSupplyData.balance
+                      usdcSupplyData.displayBalance
                     )}
                   </div>
                   <div className="text-sm text-neutral-300">
@@ -318,7 +361,7 @@ function App() {
 
               <button
                 onClick={handleWithdrawFromAave}
-                disabled={isLoading || !usdcReserve || parseFloat(usdcSupplyData.balance) === 0}
+                disabled={isLoading || !usdcReserve || parseFloat(usdcSupplyData.rawBalance) === 0}
                 className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {(isWithdrawing || withdrawing.loading) && !isSupplying && !supplying.loading ? (
