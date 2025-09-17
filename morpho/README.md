@@ -51,7 +51,7 @@ Open two terminals from `morpho/`:
 2. **Frontend**
    ```bash
    cd frontend
-   npm install --legacy-peer-deps
+   npm install
    npm run dev -- --host # serves on http://localhost:5173
    ```
    - Use `npm run build` / `npm run preview` for production builds.
