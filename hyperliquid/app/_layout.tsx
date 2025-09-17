@@ -1,6 +1,7 @@
 import { OpenfortProvider } from "@openfort/react-native";
 import { Stack } from "expo-router";
 
+import { EnvValidationWrapper } from "../components/envValidation/EnvValidationWrapper";
 import { SUPPORTED_CHAINS } from "../constants/network";
 import {
   getEthereumProviderPolicyId,
@@ -10,7 +11,7 @@ import {
 } from "../utils/config";
 import { getEncryptionSessionFromEndpoint } from "../services/walletRecovery";
 
-export default function RootLayout() {
+function Providers() {
   const publishableKey = getPublishableKey();
   const shieldPublishableKey = getShieldPublishableKey();
   const shieldEncryptionKey = getShieldEncryptionKey();
@@ -33,5 +34,13 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
     </OpenfortProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <EnvValidationWrapper>
+      <Providers />
+    </EnvValidationWrapper>
   );
 }
