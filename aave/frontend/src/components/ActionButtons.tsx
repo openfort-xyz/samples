@@ -32,6 +32,13 @@ export function ActionButtons({
   onDepositToAave,
   onWithdrawFromAave
 }: ActionButtonsProps) {
+  const handleSupplyClick = () => {
+    if (!usdcBalance || usdcBalance < BigInt(1000000)) { // 1 USDC = 1,000,000 (6 decimals)
+      alert('Insufficient balance. You need at least 1 USDC to supply to the pool.');
+      return;
+    }
+    onDepositToAave();
+  };
   return (
     <div className="bg-neutral-900 rounded-2xl border border-neutral-700 shadow-xl p-8 mb-6 flex flex-col items-center justify-center space-y-4">
       <OpenfortButton
@@ -43,7 +50,7 @@ export function ActionButtons({
       {isConnected && (
         <div className="w-80 space-y-4">
           <button
-            onClick={onDepositToAave}
+            onClick={handleSupplyClick}
             disabled={isLoading || !usdcReserve || !usdcBalance || usdcBalance === 0n}
             className="w-full bg-white text-black font-semibold py-3 px-6 rounded-lg transition-colors duration-200 shadow-lg border border-gray-200 flex flex-row items-center justify-center hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
           >
@@ -59,7 +66,7 @@ export function ActionButtons({
             ) : (
               <>
                 <span className="mr-2">️↗️</span>
-                Supply to pool
+                Supply 1 USDC to pool
               </>
             )}
           </button>
