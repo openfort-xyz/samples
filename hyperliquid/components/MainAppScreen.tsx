@@ -35,7 +35,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   onLogout,
 }) => {
   const pairLabel = `${HYPE_SYMBOL}/USDC`;
-  const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc(1000);
+  const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
   const {
     balances: hypeBalances,
     isLoading: hypeBalancesLoading,

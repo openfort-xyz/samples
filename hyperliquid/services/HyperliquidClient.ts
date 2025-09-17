@@ -8,15 +8,11 @@ import {
   HYPE_MARKET_ID,
   HYPE_SYMBOL,
   HYPERLIQUID_TESTNET_HTTP_URL,
-  HYPERLIQUID_TESTNET_WS_URL,
   PRICE_POLL_INTERVAL_MS,
 } from "../constants/hyperliquid";
 import { CHAIN_IDS } from "../constants/network";
 
-const wsTransport = new Hyperliquid.WebSocketTransport({
-  url: HYPERLIQUID_TESTNET_WS_URL,
-  isTestnet: true,
-});
+// Removed WebSocket transport - using HTTP transport for better React Native compatibility
 const httpTransport = new Hyperliquid.HttpTransport({
   isTestnet: true,
 });
@@ -25,9 +21,7 @@ const infoClient = new Hyperliquid.InfoClient({
     transport: httpTransport, 
 });
 
-const priceClient = new Hyperliquid.InfoClient({
-    transport: wsTransport, 
-});
+// Removed priceClient using WebSocket transport - using HTTP transport instead
 
 const EXCHANGE_ENDPOINT = `${HYPERLIQUID_TESTNET_HTTP_URL}/exchange`;
 
@@ -44,10 +38,12 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
     const [price, setPrice] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
     useEffect(() => {
         const fetchPrice = async () => {
             try {
-                const allMids = await priceClient.allMids();
+                // Use HTTP transport instead of WebSocket for better reliability in React Native
+                const allMids = await infoClient.allMids();
                 const value = allMids[HYPE_MARKET_ID];
                 if (!value) {
                     throw new Error(`Asset ${HYPE_MARKET_ID} not found`);
@@ -60,10 +56,16 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
                 setIsLoading(false);
             }
         };
+
+        // Initial fetch
         fetchPrice();
+
+        // Set up interval for subsequent fetches
         const interval = setInterval(fetchPrice, intervalMs);
+
         return () => clearInterval(interval);
     }, [intervalMs]);
+
     return { price, isLoading, error };
 };
 
@@ -129,28 +131,14 @@ export const useHypeBalances = (address: `0x${string}` | undefined) => {
     return { balances, isLoading, error, refetch: fetchBalances };
 };
 
-// Transfer USDC to Hyperliquid 
+// Transfer USDC to Hyperliquid
 export const transfer = async (
-    activeWallet: any, 
+    activeWallet: any,
     amount: number
 ): Promise<boolean> => {
-    // try {
-        
-    //     // Use hardcoded private key
-    //     const privateKey = "";
-        
-    //     // Create exchange client with testnet flag
-    //     const exchangeClient = new Hyperliquid.ExchangeClient({
-    //         wallet: privateKey,
-    //         transport: new Hyperliquid.HttpTransport({ isTestnet: true })
-    //     });
-        
-    //     return true;
-        
-    // } catch (error) {
-    //     console.error('Transfer to Hyperliquid failed:', error);
-    //     throw error;
-    // }
+    // Transfer functionality to be implemented
+    console.log('Transfer function called with:', { activeWallet: activeWallet.address, amount });
+    return false;
 };
 
 // Buy HYPE using USDC on Hyperliquid
