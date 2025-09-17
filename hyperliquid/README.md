@@ -16,8 +16,10 @@ An Expo React Native application that showcases how to combine Openfort's embedd
 ### Core Screens
 - **`app/_layout.tsx`** – Wraps the app in `OpenfortProvider` with environment-driven configuration.
 - **`components/LoginScreen.tsx`** – Guest or OAuth login entry point.
-- **`components/onboarding/CreateWalletScreen.tsx`** – Wallet provisioning step shown before a wallet exists.
-- **`components/MainAppScreen.tsx`** – Primary trading UI once a wallet is ready.
+- **`components/onboarding/CreateWalletScreen.tsx`** – Step 1: provision an embedded wallet.
+- **`components/onboarding/GenerateSignerScreen.tsx`** – Step 2: export the Hyperliquid signer used for order signatures.
+- **`components/onboarding/FundHyperliquidScreen.tsx`** – Step 3: confirm wallet/exchange balances before trading.
+- **`components/MainAppScreen.tsx`** – Guided swap flow that ends with a USDC ↔︎ HYPE trade (overview → choose direction → amount → confirm → result).
 
 ### Supporting Modules
 - **`constants/network.ts`** – Typed Arbitrum Sepolia chain metadata.

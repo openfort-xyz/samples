@@ -10,7 +10,7 @@ export interface TransactionHandlers {
     hypeBalances: any,
     setIsBuying: (loading: boolean) => void,
     setBuyAmount: (amount: string) => void
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 
   handleSell: (
     activeWallet: any,
@@ -18,7 +18,7 @@ export interface TransactionHandlers {
     hypeBalances: any,
     setIsSelling: (loading: boolean) => void,
     setSellAmount: (amount: string) => void
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 
   handleTransfer: (
     transferAmount: string,
@@ -28,7 +28,7 @@ export interface TransactionHandlers {
     setIsTransferring: (loading: boolean) => void,
     setTransferAmount: (amount: string) => void,
     refetch: () => void
-  ) => Promise<void>;
+  ) => Promise<boolean>;
 }
 
 export const transactionHandlers: TransactionHandlers = {
@@ -41,7 +41,7 @@ export const transactionHandlers: TransactionHandlers = {
   ) => {
     if (!buyAmount || parseFloat(buyAmount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid USDC amount to buy');
-      return;
+      return false;
     }
 
     const amount = parseFloat(buyAmount);
@@ -49,12 +49,12 @@ export const transactionHandlers: TransactionHandlers = {
 
     if (amount > currentHypeBalance) {
       Alert.alert('Insufficient Balance', 'Buy amount exceeds Hyperliquid USDC balance');
-      return;
+      return false;
     }
 
     if (amount < 1) {
       Alert.alert('Minimum Amount', 'Minimum buy amount is $1 USDC');
-      return;
+      return false;
     }
 
     setIsBuying(true);
@@ -66,15 +66,19 @@ export const transactionHandlers: TransactionHandlers = {
       if (success) {
         setBuyAmount('');
         Alert.alert('Buy Order Complete', `Successfully bought ${HYPE_SYMBOL} with ${amount} USDC`);
+        return true;
       } else {
         Alert.alert('Buy Order Failed', 'Failed to execute buy order');
+        return false;
       }
     } catch (error) {
       console.error('Buy error:', error);
       Alert.alert('Buy Order Failed', `Failed to execute buy order: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      return false;
     } finally {
       setIsBuying(false);
     }
+    return false;
   },
 
   handleSell: async (
@@ -86,7 +90,7 @@ export const transactionHandlers: TransactionHandlers = {
   ) => {
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
       Alert.alert('Invalid Amount', `Please enter a valid ${HYPE_SYMBOL} amount to sell`);
-      return;
+      return false;
     }
 
     const amount = parseFloat(sellAmount);
@@ -95,12 +99,12 @@ export const transactionHandlers: TransactionHandlers = {
 
     if (amount > currentHypeBalance) {
       Alert.alert('Insufficient Balance', `Sell amount exceeds ${HYPE_SYMBOL} balance`);
-      return;
+      return false;
     }
 
     if (amount < 0.001) {
       Alert.alert('Minimum Amount', `Minimum sell amount is 0.001 ${HYPE_SYMBOL}`);
-      return;
+      return false;
     }
 
     setIsSelling(true);
@@ -111,13 +115,17 @@ export const transactionHandlers: TransactionHandlers = {
       if (success) {
         Alert.alert('Success', `${HYPE_SYMBOL} sell order placed successfully!`);
         setSellAmount('');
+        return true;
       }
+      return false;
     } catch (error) {
       console.error('Sell error:', error);
       Alert.alert('Sell Error', error instanceof Error ? error.message : `Failed to sell ${HYPE_SYMBOL}`);
+      return false;
     } finally {
       setIsSelling(false);
     }
+    return false;
   },
 
   handleTransfer: async (
@@ -131,7 +139,7 @@ export const transactionHandlers: TransactionHandlers = {
   ) => {
     if (!transferAmount || parseFloat(transferAmount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid transfer amount');
-      return;
+      return false;
     }
 
     const amount = parseFloat(transferAmount);
@@ -139,32 +147,39 @@ export const transactionHandlers: TransactionHandlers = {
 
     if (amount > currentWalletBalance) {
       Alert.alert('Insufficient Balance', 'Transfer amount exceeds wallet balance');
-      return;
+      return false;
     }
 
     if (amount < 5) {
       Alert.alert('Invalid Amount', 'Transfer amount must be greater than 5 USDC');
-      return;
+      return false;
     }
 
     if (!activeWallet) {
       Alert.alert('No Wallet', 'No active wallet found');
-      return;
+      return false;
     }
 
     setIsTransferring(true);
     try {
       console.log('Transferring', transferAmount, 'USDC to Hyperliquid');
-      await transfer(activeWallet, amount);
-      setTransferAmount('');
-      refetch();
-      Alert.alert('Transfer Complete', `Successfully transferred ${amount} USDC`);
+      const success = await transfer(activeWallet, amount);
+      if (success) {
+        setTransferAmount('');
+        refetch();
+        Alert.alert('Transfer Complete', `Successfully transferred ${amount} USDC`);
+        return true;
+      }
+      Alert.alert('Transfer Failed', 'Failed to transfer funds. Please try again.');
+      return false;
     } catch (error) {
       console.error('Transfer error:', error);
       Alert.alert('Transfer Failed', 'Failed to transfer funds. Please try again.');
+      return false;
     } finally {
       setIsTransferring(false);
     }
+    return false;
   }
 };
 

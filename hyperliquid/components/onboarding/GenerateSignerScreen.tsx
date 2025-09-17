@@ -4,19 +4,26 @@ import { LinearGradient } from "expo-linear-gradient";
 
 import { GradientButton } from "../ui";
 
-interface CreateWalletScreenProps {
-  isCreating: boolean;
-  onCreateWallet: () => void;
+interface GenerateSignerScreenProps {
+  isGenerating: boolean;
+  onGenerateSigner: () => void;
+  walletAddress?: string;
   step: number;
   totalSteps: number;
 }
 
-export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
-  isCreating,
-  onCreateWallet,
+export const GenerateSignerScreen: React.FC<GenerateSignerScreenProps> = ({
+  isGenerating,
+  onGenerateSigner,
+  walletAddress,
   step,
   totalSteps,
 }) => {
+  const truncated = React.useMemo(() => {
+    if (!walletAddress) return null;
+    return `${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`;
+  }, [walletAddress]);
+
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -30,28 +37,33 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Create your trading wallet</Text>
+          <Text style={styles.title}>Generate your Hyperliquid signer</Text>
           <Text style={styles.subtitle}>
-            Provision an embedded Openfort wallet that Hyperliquid will use for signing trades.
+            Openfort will export a signer key for this wallet so Hyperliquid can authorise orders on your behalf.
           </Text>
+        </View>
+
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryLabel}>Wallet address</Text>
+          <Text style={styles.summaryValue}>{truncated ?? "—"}</Text>
         </View>
 
         <View style={styles.card}>
           <GradientButton
-            title={isCreating ? "Creating wallet…" : "Create Wallet"}
-            onPress={onCreateWallet}
-            disabled={isCreating}
+            title={isGenerating ? "Generating signer…" : "Generate Signer"}
+            onPress={onGenerateSigner}
+            disabled={isGenerating}
           />
-          {isCreating && (
+          {isGenerating && (
             <View style={styles.progressRow}>
               <ActivityIndicator color="#00D4AA" />
-              <Text style={styles.progressText}>Generating secure keys…</Text>
+              <Text style={styles.progressText}>Creating EIP-712 credentials…</Text>
             </View>
           )}
         </View>
 
         <Text style={styles.hint}>
-          The wallet address lives on Arbitrum Sepolia and will be re-used for the rest of this flow.
+          The signer never leaves the device. We use it only to submit Hyperliquid orders in the next step.
         </Text>
       </View>
     </View>
@@ -99,6 +111,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#8B949E",
     lineHeight: 24,
+  },
+  summaryCard: {
+    padding: 20,
+    borderRadius: 16,
+    backgroundColor: "rgba(26, 31, 46, 0.7)",
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    gap: 8,
+  },
+  summaryLabel: {
+    color: "#8B949E",
+    fontSize: 13,
+    letterSpacing: 0.2,
+  },
+  summaryValue: {
+    color: "#FFFFFF",
+    fontSize: 18,
+    fontWeight: "600",
+    fontFamily: "monospace",
   },
   card: {
     backgroundColor: "rgba(26, 31, 46, 0.9)",

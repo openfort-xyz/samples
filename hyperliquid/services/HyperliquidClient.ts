@@ -136,6 +136,28 @@ export const transfer = async (
     activeWallet: any,
     amount: number
 ): Promise<boolean> => {
+    /*
+     * Reference implementation (from commit 46ad2404644658f40c20d0a5f8a3b0bdc2b565f5^)
+     * kept for easy copy/paste when wiring real transfers:
+     *
+     * try {
+     *   // Use hardcoded private key
+     *   const privateKey = "";
+     *
+     *   // Create exchange client with testnet flag
+     *   const exchangeClient = new Hyperliquid.ExchangeClient({
+     *     wallet: privateKey,
+     *     transport: new Hyperliquid.HttpTransport({ isTestnet: true })
+     *   });
+     *
+     *   // TODO: invoke exchangeClient to submit deposit transaction
+     *   return true;
+     * } catch (error) {
+     *   console.error('Transfer to Hyperliquid failed:', error);
+     *   throw error;
+     * }
+     */
+
     // Transfer functionality to be implemented
     console.log('Transfer function called with:', { activeWallet: activeWallet.address, amount });
     return false;

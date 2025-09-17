@@ -1,17 +1,75 @@
-import React, { useCallback } from "react";
-import { Alert } from "react-native";
-import { useOpenfort, useUser, useWallets } from "@openfort/react-native";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useOpenfort, useOpenfortClient, useUser, useWallets } from "@openfort/react-native";
 
 import { CreateWalletScreen } from "./onboarding/CreateWalletScreen";
+import { GenerateSignerScreen } from "./onboarding/GenerateSignerScreen";
+import { FundHyperliquidScreen } from "./onboarding/FundHyperliquidScreen";
 import { MainAppScreen } from "./MainAppScreen";
+import { useWalletBalance } from "../hooks/useUserBalances";
+import { useHypeBalances, useHypeUsdc } from "../services/HyperliquidClient";
+
+const ONBOARDING_SCREENS = ["create-wallet", "generate-signer", "fund-exchange"] as const;
+type OnboardingScreen = (typeof ONBOARDING_SCREENS)[number];
+type Screen = OnboardingScreen | "trading";
+
+const TOTAL_STEP_COUNT = ONBOARDING_SCREENS.length;
 
 export const UserScreen: React.FC = () => {
   const { user } = useUser();
   const { logout } = useOpenfort();
-  const { activeWallet, createWallet, isCreating, exportPrivateKey } = useWallets({ throwOnError: true });
+  const openfortClient = useOpenfortClient();
+  const wallets = useWallets({ throwOnError: true });
+  const { activeWallet, isCreating } = wallets;
+
+  const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
+  const [isGeneratingSigner, setIsGeneratingSigner] = useState(false);
+  const [hasGeneratedSigner, setHasGeneratedSigner] = useState(false);
+
+  const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
+  const {
+    balances: hypeBalances,
+    isLoading: hypeBalancesLoading,
+    refetch: refetchHypeBalances,
+  } = useHypeBalances(activeWallet?.address as `0x${string}` | undefined);
+  const {
+    balance: walletBalance,
+    loading: walletBalanceLoading,
+    refetch: refetchWalletBalance,
+  } = useWalletBalance(activeWallet?.address);
+
+  const onboardingStep = useMemo(() => {
+    if (currentScreen === "trading") return TOTAL_STEP_COUNT;
+    const index = ONBOARDING_SCREENS.indexOf(currentScreen as OnboardingScreen);
+    return index >= 0 ? index + 1 : TOTAL_STEP_COUNT;
+  }, [currentScreen]);
+
+  useEffect(() => {
+    if (activeWallet && currentScreen === "create-wallet") {
+      setCurrentScreen("generate-signer");
+    }
+  }, [activeWallet, currentScreen]);
+
+  useEffect(() => {
+    if (hasGeneratedSigner && currentScreen === "generate-signer") {
+      setCurrentScreen("fund-exchange");
+    }
+  }, [hasGeneratedSigner, currentScreen]);
+
+  useEffect(() => {
+    if (currentScreen === "fund-exchange") {
+      refetchWalletBalance();
+      refetchHypeBalances();
+      const interval = setInterval(() => {
+        refetchWalletBalance();
+        refetchHypeBalances();
+      }, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [currentScreen, refetchWalletBalance, refetchHypeBalances]);
 
   const handleCreateWallet = useCallback(() => {
-    createWallet({
+    wallets.createWallet({
       recoveryPassword: "password",
       onError: (error: any) => {
         Alert.alert("Wallet Creation Failed", error?.message ?? "Please try again later.");
@@ -20,27 +78,125 @@ export const UserScreen: React.FC = () => {
         Alert.alert("Wallet Created", `Address: ${wallet?.address}`);
       },
     });
-  }, [createWallet]);
+  }, [wallets]);
+
+  const handleGenerateSigner = useCallback(async () => {
+    if (!activeWallet?.address) return;
+    setIsGeneratingSigner(true);
+    try {
+      if (!openfortClient?.embeddedWallet?.exportPrivateKey) {
+        throw new Error("Embedded wallet client unavailable");
+      }
+      const signer = await openfortClient.embeddedWallet.exportPrivateKey();
+      if (!signer) {
+        throw new Error("Unable to export signer");
+      }
+      setHasGeneratedSigner(true);
+      Alert.alert("Signer ready", "Hyperliquid can now place orders with this wallet.");
+    } catch (error: any) {
+      console.error("Failed to export signer", error);
+      Alert.alert("Signer failed", error?.message ?? "Please try again.");
+    } finally {
+      setIsGeneratingSigner(false);
+    }
+  }, [activeWallet?.address, openfortClient]);
+
+  const handleContinueToTrading = useCallback(() => {
+    setCurrentScreen("trading");
+  }, []);
+
+  const logoutButton = (
+    <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+      <Text style={styles.logoutText}>Logout</Text>
+    </TouchableOpacity>
+  );
 
   if (!user) {
     return null;
   }
 
-  if (!activeWallet?.address) {
-    return (
-      <CreateWalletScreen
-        isCreating={isCreating}
-        onCreateWallet={handleCreateWallet}
-        onLogout={logout}
-      />
-    );
+  switch (currentScreen) {
+    case "create-wallet":
+      return (
+        <View style={styles.screenWrapper}>
+          {logoutButton}
+          <CreateWalletScreen
+            isCreating={isCreating}
+            onCreateWallet={handleCreateWallet}
+            step={onboardingStep}
+            totalSteps={TOTAL_STEP_COUNT}
+          />
+        </View>
+      );
+    case "generate-signer":
+      return (
+        <View style={styles.screenWrapper}>
+          {logoutButton}
+          <GenerateSignerScreen
+            isGenerating={isGeneratingSigner}
+            onGenerateSigner={handleGenerateSigner}
+            walletAddress={activeWallet?.address}
+            step={onboardingStep}
+            totalSteps={TOTAL_STEP_COUNT}
+          />
+        </View>
+      );
+    case "fund-exchange":
+      return (
+        <View style={styles.screenWrapper}>
+          {logoutButton}
+          <FundHyperliquidScreen
+            walletAddress={activeWallet?.address}
+            walletBalance={walletBalance}
+            hyperliquidBalance={Number(hypeBalances?.account?.usdcBalance ?? 0)}
+            isLoading={walletBalanceLoading || hypeBalancesLoading}
+            onContinue={handleContinueToTrading}
+            step={onboardingStep}
+            totalSteps={TOTAL_STEP_COUNT}
+          />
+        </View>
+      );
+    case "trading":
+    default:
+      return (
+        <View style={styles.screenWrapper}>
+          {logoutButton}
+          <MainAppScreen
+            activeWallet={activeWallet}
+            walletBalance={walletBalance}
+            walletBalanceLoading={walletBalanceLoading}
+            hypeBalances={hypeBalances}
+            hypeBalancesLoading={hypeBalancesLoading}
+            refetchWalletBalance={refetchWalletBalance}
+            refetchHypeBalances={refetchHypeBalances}
+            hypeUsdcPrice={hypeUsdcPrice}
+            hypeUsdcLoading={hypeUsdcLoading}
+          />
+        </View>
+      );
   }
-
-  return (
-    <MainAppScreen
-      activeWallet={activeWallet}
-      exportPrivateKey={exportPrivateKey}
-      onLogout={logout}
-    />
-  );
 };
+
+const styles = StyleSheet.create({
+  screenWrapper: {
+    flex: 1,
+    position: "relative",
+  },
+  logoutButton: {
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 10,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.2)",
+    backgroundColor: "rgba(15, 20, 25, 0.6)",
+  },
+  logoutText: {
+    color: "#EF4444",
+    fontWeight: "600",
+    letterSpacing: 0.3,
+  },
+});
