@@ -1,10 +1,25 @@
-import '../polyfills';
+import "../polyfills";
 import * as Hyperliquid from "@nktkas/hyperliquid";
-import { useState, useEffect, useCallback } from 'react';
-import { ethers } from 'ethers';
+import { useState, useEffect, useCallback } from "react";
+import { ethers } from "ethers";
 
-const wsTransport = new Hyperliquid.WebSocketTransport({});
-const httpTransport = new Hyperliquid.HttpTransport({isTestnet: true});
+import {
+  HYPE_ASSET_ID,
+  HYPE_MARKET_ID,
+  HYPE_SYMBOL,
+  HYPERLIQUID_TESTNET_HTTP_URL,
+  HYPERLIQUID_TESTNET_WS_URL,
+  PRICE_POLL_INTERVAL_MS,
+} from "../constants/hyperliquid";
+import { CHAIN_IDS } from "../constants/network";
+
+const wsTransport = new Hyperliquid.WebSocketTransport({
+  url: HYPERLIQUID_TESTNET_WS_URL,
+  isTestnet: true,
+});
+const httpTransport = new Hyperliquid.HttpTransport({
+  isTestnet: true,
+});
 
 const infoClient = new Hyperliquid.InfoClient({
     transport: httpTransport, 
@@ -13,6 +28,8 @@ const infoClient = new Hyperliquid.InfoClient({
 const priceClient = new Hyperliquid.InfoClient({
     transport: wsTransport, 
 });
+
+const EXCHANGE_ENDPOINT = `${HYPERLIQUID_TESTNET_HTTP_URL}/exchange`;
 
 export const createExchangeClient = (privateKey: string) => {
     const wallet = new ethers.Wallet(privateKey);
@@ -23,24 +40,20 @@ export const createExchangeClient = (privateKey: string) => {
 };
 
 // HYPE/USDC price
-export const useHypeUsdc = (intervalMs = 3000) => {
+export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
     const [price, setPrice] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     useEffect(() => {
         const fetchPrice = async () => {
             try {
-                // const allMids = await infoClient.allMids();
                 const allMids = await priceClient.allMids();
-                // if (allMids['@1035']) {
-                //     setPrice(Number(allMids['@1035']));
-                //     setError(null);
-                if (allMids['@107']) {
-                    setPrice(Number(allMids['@107']));
-                    setError(null);
-                } else {
-                    setError('Asset @107 not found');
+                const value = allMids[HYPE_MARKET_ID];
+                if (!value) {
+                    throw new Error(`Asset ${HYPE_MARKET_ID} not found`);
                 }
+                setPrice(Number(value));
+                setError(null);
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Unknown error');
             } finally {
@@ -62,6 +75,7 @@ export const useHypeBalances = (address: `0x${string}` | undefined) => {
 
     const fetchBalances = useCallback(async () => {
         if (!address) {
+            setBalances(null);
             setIsLoading(false);
             return;
         }
@@ -69,12 +83,11 @@ export const useHypeBalances = (address: `0x${string}` | undefined) => {
         setIsLoading(true);
         try {
             const clearinghouseState = await infoClient.spotClearinghouseState({
-                // user: address,
-                user: "0x33837D618394D95FdEe51Fb1e7F00596797E18C5"
+                user: address,
             });
 
             const usdcBalance = clearinghouseState?.balances?.find((b: any) => b.coin === "USDC");
-            const hypeBalance = clearinghouseState?.balances?.find((b: any) => b.coin === "HYPE");
+            const hypeBalance = clearinghouseState?.balances?.find((b: any) => b.coin === HYPE_SYMBOL);
             const usdcTotal = usdcBalance ? usdcBalance.total : null;
 
             const accountData = {
@@ -86,12 +99,14 @@ export const useHypeBalances = (address: `0x${string}` | undefined) => {
                 totalValue: 0,
                 openPositions: [],
                 unrealizedPnl: 0,
-                hypePosition: hypeBalance ? {
-                    coin: "HYPE",
-                    total: hypeBalance.total || "0",
-                    hold: hypeBalance.hold || "0",
-                    entryNtl: hypeBalance.entryNtl || "0"
-                } : null
+                hypePosition: hypeBalance
+                    ? {
+                        coin: HYPE_SYMBOL,
+                        total: hypeBalance.total || "0",
+                        hold: hypeBalance.hold || "0",
+                        entryNtl: hypeBalance.entryNtl || "0",
+                    }
+                    : null,
             };
             
             setBalances({ 
@@ -150,7 +165,7 @@ export const buy = async (
         const provider = await activeWallet.getProvider();
         
         const allMids = await infoClient.allMids();
-        const hypePrice = allMids["@1035"]; 
+        const hypePrice = allMids[HYPE_MARKET_ID]; 
         if (!hypePrice) {
             throw new Error('HYPE price not found in market data');
         }
@@ -164,7 +179,7 @@ export const buy = async (
         console.log('- Quantity:', quantity, 'HYPE');
         
         const orderWire = {
-            a: 1035,                    // HYPE asset id
+            a: HYPE_ASSET_ID,                    // HYPE asset id
             b: true,                    // isBuy
             p: buyPrice.toFixed(6),     // limit price as string
             s: quantity.toString(),     // size as string
@@ -183,7 +198,7 @@ export const buy = async (
         const domain = {
             name: "HyperliquidSignTransaction",
             version: "1",
-            chainId: 421614, 
+            chainId: CHAIN_IDS.ARBITRUM_SEPOLIA, 
             verifyingContract: "0x0000000000000000000000000000000000000000",
         };
         
@@ -220,7 +235,7 @@ export const buy = async (
         
         console.log('Parsed signature:', signature);
         
-        const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+        const response = await fetch(EXCHANGE_ENDPOINT, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json" 
@@ -279,7 +294,7 @@ export const sell = async (
         const provider = await activeWallet.getProvider();
         
         const allMids = await infoClient.allMids();
-        const hypePrice = allMids["@1035"]; 
+        const hypePrice = allMids[HYPE_MARKET_ID]; 
         if (!hypePrice) {
             throw new Error('HYPE price not found in market data');
         }
@@ -293,7 +308,7 @@ export const sell = async (
         console.log('- Quantity:', quantity, 'HYPE');
         
         const orderWire = {
-            a: 1035,                    // HYPE asset id
+            a: HYPE_ASSET_ID,                    // HYPE asset id
             b: false,                   // isBuy = false (sell)
             p: sellPrice.toFixed(6),    // limit price as string
             s: quantity.toString(),     // size as string
@@ -312,7 +327,7 @@ export const sell = async (
         const domain = {
             name: "HyperliquidSignTransaction",
             version: "1",
-            chainId: 421614, 
+            chainId: CHAIN_IDS.ARBITRUM_SEPOLIA, 
             verifyingContract: "0x0000000000000000000000000000000000000000",
         };
         
@@ -349,7 +364,7 @@ export const sell = async (
         
         console.log('Parsed sell signature:', signature);
         
-        const response = await fetch("https://api.hyperliquid-testnet.xyz/exchange", {
+        const response = await fetch(EXCHANGE_ENDPOINT, {
             method: "POST",
             headers: { 
                 "Content-Type": "application/json" 

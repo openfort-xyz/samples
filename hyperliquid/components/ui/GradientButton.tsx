@@ -27,16 +27,6 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
     }
   };
 
-  const getShadowColor = () => {
-    switch (variant) {
-      case 'danger':
-        return '#EF4444';
-      case 'primary':
-      default:
-        return '#00D4AA';
-    }
-  };
-
   return (
     <TouchableOpacity onPress={onPress} disabled={disabled}>
       <LinearGradient

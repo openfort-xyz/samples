@@ -1,4 +1,6 @@
 import { Alert } from 'react-native';
+
+import { HYPE_SYMBOL } from '../constants/hyperliquid';
 import { transfer, buy, sell } from '../services/HyperliquidClient';
 
 export interface TransactionHandlers {
@@ -57,13 +59,13 @@ export const transactionHandlers: TransactionHandlers = {
 
     setIsBuying(true);
     try {
-      Alert.alert('Buy Order Initiated', `Buying HYPE with ${amount} USDC...`);
+      Alert.alert('Buy Order Initiated', `Buying ${HYPE_SYMBOL} with ${amount} USDC...`);
 
       const success = await buy(activeWallet, amount, 0.02);
 
       if (success) {
         setBuyAmount('');
-        Alert.alert('Buy Order Complete', `Successfully bought HYPE with ${amount} USDC`);
+        Alert.alert('Buy Order Complete', `Successfully bought ${HYPE_SYMBOL} with ${amount} USDC`);
       } else {
         Alert.alert('Buy Order Failed', 'Failed to execute buy order');
       }
@@ -83,21 +85,21 @@ export const transactionHandlers: TransactionHandlers = {
     setSellAmount
   ) => {
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid HYPE amount to sell');
+      Alert.alert('Invalid Amount', `Please enter a valid ${HYPE_SYMBOL} amount to sell`);
       return;
     }
 
     const amount = parseFloat(sellAmount);
-    const hypePosition = hypeBalances?.account?.assetPositions?.find((pos: any) => pos.coin === 'HYPE');
+    const hypePosition = hypeBalances?.account?.assetPositions?.find((pos: any) => pos.coin === HYPE_SYMBOL);
     const currentHypeBalance = parseFloat(hypePosition?.total || '0');
 
     if (amount > currentHypeBalance) {
-      Alert.alert('Insufficient Balance', 'Sell amount exceeds HYPE balance');
+      Alert.alert('Insufficient Balance', `Sell amount exceeds ${HYPE_SYMBOL} balance`);
       return;
     }
 
     if (amount < 0.001) {
-      Alert.alert('Minimum Amount', 'Minimum sell amount is 0.001 HYPE');
+      Alert.alert('Minimum Amount', `Minimum sell amount is 0.001 ${HYPE_SYMBOL}`);
       return;
     }
 
@@ -107,12 +109,12 @@ export const transactionHandlers: TransactionHandlers = {
       const success = await sell(activeWallet, amount);
 
       if (success) {
-        Alert.alert('Success', 'HYPE sell order placed successfully!');
+        Alert.alert('Success', `${HYPE_SYMBOL} sell order placed successfully!`);
         setSellAmount('');
       }
     } catch (error) {
       console.error('Sell error:', error);
-      Alert.alert('Sell Error', error instanceof Error ? error.message : 'Failed to sell HYPE');
+      Alert.alert('Sell Error', error instanceof Error ? error.message : `Failed to sell ${HYPE_SYMBOL}`);
     } finally {
       setIsSelling(false);
     }

@@ -1,17 +1,24 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import { ethers } from "ethers";
 
+import { ARBITRUM_SEPOLIA_CHAIN } from "../constants/network";
+import { HYPERLIQUID_USDC_TOKEN_ADDRESS } from "../constants/hyperliquid";
+
 const ERC20_ABI = [
   "function balanceOf(address owner) view returns (uint256)",
-  "function decimals() view returns (uint8)"
+  "function decimals() view returns (uint8)",
 ];
 
 export const useWalletBalance = (walletAddress?: string) => {
   const [balance, setBalance] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const provider = useMemo(() => new ethers.JsonRpcProvider("https://sepolia-rollup.arbitrum.io/rpc"), []);
-  const tokenContract = useMemo(() => new ethers.Contract("0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d", ERC20_ABI, provider), [provider]);
+  const rpcUrl = useMemo(() => ARBITRUM_SEPOLIA_CHAIN.rpcUrls.default.http[0], []);
+  const provider = useMemo(() => new ethers.JsonRpcProvider(rpcUrl), [rpcUrl]);
+  const tokenContract = useMemo(
+    () => new ethers.Contract(HYPERLIQUID_USDC_TOKEN_ADDRESS, ERC20_ABI, provider),
+    [provider]
+  );
   
   const fetchBalance = useCallback(async () => {
     if (!walletAddress) return;

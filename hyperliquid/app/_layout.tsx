@@ -1,36 +1,36 @@
-import { OpenfortProvider, RecoveryMethod, AccountTypeEnum } from "@openfort/react-native";
-import Constants from "expo-constants";
+import { OpenfortProvider } from "@openfort/react-native";
 import { Stack } from "expo-router";
 
+import { SUPPORTED_CHAINS } from "../constants/network";
+import {
+  getEthereumProviderPolicyId,
+  getPublishableKey,
+  getShieldEncryptionKey,
+  getShieldPublishableKey,
+} from "../utils/config";
+import { getEncryptionSessionFromEndpoint } from "../services/walletRecovery";
+
 export default function RootLayout() {
+  const publishableKey = getPublishableKey();
+  const shieldPublishableKey = getShieldPublishableKey();
+  const shieldEncryptionKey = getShieldEncryptionKey();
+  const ethereumProviderPolicyId = getEthereumProviderPolicyId();
+
   return (
     <OpenfortProvider
-      publishableKey={Constants.expoConfig?.extra?.openfortPublishableKey}
-      
+      publishableKey={publishableKey}
       walletConfig={{
-        accountType: "Externally Owned Account" as any,
-        recoveryMethod: RecoveryMethod.PASSWORD,
-        debug: true,
-        ethereumProviderPolicyId: Constants.expoConfig?.extra?.openfortEthereumProviderPolicyId, // replace with your gas sponsorship policy
-        shieldPublishableKey: Constants.expoConfig?.extra?.openfortShieldPublishableKey,
-        shieldEncryptionKey: Constants.expoConfig?.extra?.openfortShieldEncryptionKey,
-        // createEncryptedSessionEndpoint: "https://your-api.com/create-encrypted-session",
+        shieldPublishableKey,
+        shieldEncryptionKey,
+        ethereumProviderPolicyId,
+        getEncryptionSession: getEncryptionSessionFromEndpoint,
+        debug: false,
       }}
-      supportedChains={[
-        {
-          id: 421614,
-          name: 'Arbitrum Sepolia',
-          nativeCurrency: {
-            name: 'Ether',
-            symbol: 'ETH',
-            decimals: 18
-          },
-          rpcUrls: { default: { http: ['https://sepolia-rollup.arbitrum.io/rpc'] } },
-        },
-      ]}
+      supportedChains={SUPPORTED_CHAINS}
+      verbose={true}
     >
       <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false, contentStyle: { paddingTop: 40, backgroundColor: '#000000' } }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
       </Stack>
     </OpenfortProvider>
   );

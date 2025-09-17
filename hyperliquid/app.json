@@ -32,11 +32,6 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "extra": {
-      "openfortPublishableKey": "",
-      "openfortShieldPublishableKey": "",
-      "openfortShieldEncryptionKey": ""
-    },
     "plugins": [
       "expo-router",
       "expo-secure-store",

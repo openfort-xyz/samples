@@ -1,8 +1,8 @@
 import { OAuthProvider, useGuestAuth, useOAuth } from "@openfort/react-native";
-import { Button, Text, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { Text, View, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 
 export default function LoginScreen() {
   const { signUpGuest } = useGuestAuth()
