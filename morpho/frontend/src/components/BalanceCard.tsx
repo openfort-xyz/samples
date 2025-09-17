@@ -1,4 +1,4 @@
-import { formatUsdcBalance } from '../lib/utils';
+import { formatUsdcBalance } from '../utils/format';
 
 interface BalanceCardProps {
   title: string;
