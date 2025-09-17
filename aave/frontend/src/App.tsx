@@ -64,9 +64,9 @@ function App() {
     const usdcSupply = userSupplies.find((supply: any) =>
       supply.currency?.symbol === 'USDC'
     );
-    if (usdcSupply?.balance?.amount?.value && usdcSupply?.apy?.formatted) {
+    if (usdcSupply?.balance?.amount?.value && usdcSupply?.apy) {
       return {
-        balance: parseFloat(usdcSupply.balance.amount.value).toFixed(2),
+        balance: parseFloat(usdcSupply.balance.amount.value).toFixed(6),
         apy: usdcSupply.apy.formatted
       };
     }
