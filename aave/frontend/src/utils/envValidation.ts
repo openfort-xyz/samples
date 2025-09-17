@@ -23,7 +23,6 @@ export function validateEnvironmentVariables(): ValidationError[] {
   const requiredVars: Array<keyof EnvConfig> = [
     'VITE_OPENFORT_PUBLISHABLE_KEY',
     'VITE_OPENFORT_SHIELD_PUBLIC_KEY',
-    'VITE_OPENFORT_POLICY_ID',
     'VITE_BACKEND_URL'
   ];
 
@@ -53,13 +52,6 @@ export function validateEnvironmentVariables(): ValidationError[] {
       errors.push({
         key,
         message: 'Openfort publishable key should start with "pk_"'
-      });
-    }
-
-    if (key === 'VITE_OPENFORT_POLICY_ID' && !value.startsWith('pol_')) {
-      errors.push({
-        key,
-        message: 'Openfort policy ID should start with "pol_"'
       });
     }
   });
