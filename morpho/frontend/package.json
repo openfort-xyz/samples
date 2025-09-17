@@ -17,7 +17,7 @@
     "@morpho-org/bundler-sdk-viem": "^3.2.7",
     "@morpho-org/morpho-ts": "^2.4.1",
     "@morpho-org/simulation-sdk-wagmi": "^3.0.3",
-    "@openfort/react": "^0.0.4",
+    "@openfort/react": "^0.0.10",
     "@tanstack/react-query": "^5.85.5",
     "dotenv": "^17.2.1",
     "graphql": "^16.11.0",
