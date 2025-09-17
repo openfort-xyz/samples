@@ -28,7 +28,6 @@ export function validateEnvironmentVariables(): ValidationError[] {
     'VITE_OPENFORT_PUBLISHABLE_KEY',
     'VITE_OPENFORT_POLICY_ID',
     'VITE_OPENFORT_SHIELD_PUBLIC_KEY',
-    'VITE_WALLET_CONNECT_PROJECT_ID',
     'VITE_BACKEND_URL',
     'VITE_FRONTEND_URL'
   ];
