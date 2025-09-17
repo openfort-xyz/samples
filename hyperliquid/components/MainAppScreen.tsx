@@ -116,8 +116,12 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     <View style={styles.section}>
       <Text style={styles.sectionHeading}>Welcome to the Hyperliquid swapper</Text>
       <Text style={styles.sectionSubheading}>
-        We’ll walk you through swapping USDC and {HYPE_SYMBOL} using your embedded wallet. Each screen
+        We'll walk you through swapping USDC and {HYPE_SYMBOL} using your embedded wallet. Each screen
         highlights one action, so you always know what to do next.
+      </Text>
+      <Text style={styles.apiOnboardingNote}>
+        Note: Before trading, your wallet owner address must be registered as an API wallet on Hyperliquid.
+        Visit https://app.hyperliquid-testnet.xyz/API to complete the onboarding process.
       </Text>
 
       <View style={styles.chartCard}>
@@ -297,6 +301,10 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
         <Text style={styles.sectionHeading}>Confirm your swap</Text>
         <Text style={styles.sectionSubheading}>
           Double-check the details below. Price estimates use the latest Hyperliquid mid price.
+        </Text>
+        <Text style={styles.apiOnboardingNote}>
+          Note: Before trading, your wallet owner address must be registered as an API wallet on Hyperliquid.
+          Visit https://app.hyperliquid-testnet.xyz/API to complete the onboarding process.
         </Text>
 
         <View style={styles.summaryCard}>
@@ -627,5 +635,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#FFFFFF",
     fontWeight: "500",
+  },
+  apiOnboardingNote: {
+    fontSize: 13,
+    color: "#EF4444",
+    lineHeight: 18,
+    backgroundColor: "rgba(239, 68, 68, 0.1)",
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "rgba(239, 68, 68, 0.3)",
   },
 });
