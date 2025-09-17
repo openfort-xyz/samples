@@ -2,6 +2,7 @@ import { OpenfortButton, useStatus } from "@openfort/react";
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useAccount, useReadContract, useWalletClient, usePublicClient } from "wagmi";
 import { formatUsdcBalance } from './lib/utils';
+import { formatSupplyBalance } from './utils/format';
 import { usdcAbi, USDC_CONTRACT_ADDRESS } from './contracts/usdc';
 import { useSupply, evmAddress, bigDecimal, useAaveMarkets, chainId, useWithdraw, useAaveClient } from "@aave/react";
 import { useSendTransaction } from "@aave/react/viem";
@@ -91,20 +92,18 @@ function App() {
   // Find USDC supply balance and APY
   const usdcSupplyData = useMemo(() => {
     if (!userSupplyPositions || userSupplyPositions.length === 0) {
-      return { displayBalance: "0.00", rawBalance: "0", apy: "0.00" };
+      return { rawBalance: "0", apy: "0.00" };
     }
     const usdcSupply = userSupplyPositions.find((supply) =>
       supply.currency?.symbol === 'USDC'
     );
     if (usdcSupply?.balance?.amount?.value && usdcSupply?.apy) {
-      const rawBalance = usdcSupply.balance.amount.value;
       return {
-        displayBalance: parseFloat(rawBalance).toFixed(6),
-        rawBalance,
+        rawBalance: usdcSupply.balance.amount.value,
         apy: usdcSupply.apy.formatted
       };
     }
-    return { displayBalance: "0.00", rawBalance: "0", apy: "0.00" };
+    return { rawBalance: "0", apy: "0.00" };
   }, [userSupplyPositions]);
 
 
@@ -300,7 +299,7 @@ function App() {
                     {suppliesLoading ? (
                       <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin mx-auto"></div>
                     ) : (
-                      usdcSupplyData.displayBalance
+                      formatSupplyBalance(usdcSupplyData.rawBalance)
                     )}
                   </div>
                   <div className="text-sm text-neutral-300">
