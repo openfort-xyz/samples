@@ -163,6 +163,7 @@ export const UserScreen: React.FC = () => {
           {logoutButton}
           <MainAppScreen
             activeWallet={activeWallet}
+            openfortClient={openfortClient}
             walletBalance={walletBalance}
             walletBalanceLoading={walletBalanceLoading}
             hypeBalances={hypeBalances}

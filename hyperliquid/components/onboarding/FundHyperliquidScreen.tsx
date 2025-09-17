@@ -67,7 +67,7 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
                 {hasWalletBalance ? "Ready" : "Needs funds"}
               </Text>
             </View>
-            <Text style={styles.statusHint}>Ensure your wallet holds testnet USDC before depositing.</Text>
+            <Text style={styles.statusHint}>Ensure your wallet holds testnet USDC before depositing. Get Arbitrum testnet USDC from https://faucet.circle.com/</Text>
           </View>
 
           <View style={styles.statusCard}>

@@ -1,5 +1,6 @@
 import "../polyfills";
 import * as Hyperliquid from "@nktkas/hyperliquid";
+import { actionSorter, createL1ActionHash } from "@nktkas/hyperliquid/signing";
 import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
 
@@ -10,7 +11,6 @@ import {
   HYPERLIQUID_TESTNET_HTTP_URL,
   PRICE_POLL_INTERVAL_MS,
 } from "../constants/hyperliquid";
-import { CHAIN_IDS } from "../constants/network";
 
 // Removed WebSocket transport - using HTTP transport for better React Native compatibility
 const httpTransport = new Hyperliquid.HttpTransport({
@@ -24,6 +24,7 @@ const infoClient = new Hyperliquid.InfoClient({
 // Removed priceClient using WebSocket transport - using HTTP transport instead
 
 const EXCHANGE_ENDPOINT = `${HYPERLIQUID_TESTNET_HTTP_URL}/exchange`;
+const IS_TESTNET = HYPERLIQUID_TESTNET_HTTP_URL.toLowerCase().includes("testnet");
 
 export const createExchangeClient = (privateKey: string) => {
     const wallet = new ethers.Wallet(privateKey);
@@ -31,6 +32,120 @@ export const createExchangeClient = (privateKey: string) => {
         wallet: wallet,
         transport: httpTransport,
     });
+};
+
+type OrderAction = ReturnType<typeof actionSorter.order>;
+
+type EmbeddedWalletSigner = {
+    signTypedData?: (
+        domain: Record<string, unknown>,
+        types: Record<string, Array<{ name: string; type: string }>>,
+        message: Record<string, unknown>
+    ) => Promise<string>;
+    exportPrivateKey?: () => Promise<string>;
+};
+
+const signAndSubmitOrder = async (
+    params: {
+        activeWallet: any;
+        action: OrderAction;
+        embeddedWallet?: EmbeddedWalletSigner;
+    }
+) => {
+    const { activeWallet, action, embeddedWallet } = params;
+    const nonce = Date.now();
+    const actionHash = createL1ActionHash({ action, nonce });
+
+    const domain = {
+        name: "Exchange",
+        version: "1",
+        chainId: 1337,
+        verifyingContract: "0x0000000000000000000000000000000000000000",
+    };
+
+    const types = {
+        Agent: [
+            { name: "source", type: "string" },
+            { name: "connectionId", type: "bytes32" },
+        ],
+    };
+
+    const message = {
+        source: IS_TESTNET ? "b" : "a",
+        connectionId: actionHash,
+    };
+
+    let signatureHex: string | undefined;
+
+    if (embeddedWallet?.signTypedData) {
+        signatureHex = await embeddedWallet.signTypedData(
+            domain,
+            {
+                EIP712Domain: [
+                    { name: "name", type: "string" },
+                    { name: "version", type: "string" },
+                    { name: "chainId", type: "uint256" },
+                    { name: "verifyingContract", type: "address" },
+                ],
+                ...types,
+            },
+            message
+        );
+    } else {
+        const provider = await activeWallet.getProvider();
+        try {
+            signatureHex = await provider.request({
+                method: 'eth_signTypedData_v4',
+                params: [
+                    activeWallet.address,
+                    JSON.stringify({
+                        domain,
+                        types,
+                        primaryType: 'Agent',
+                        message,
+                    }),
+                ],
+            });
+        } catch (error: any) {
+            const message = error?.message ?? 'Unknown provider error';
+            throw new Error(`Unable to sign Hyperliquid order: ${message}`);
+        }
+    }
+
+    if (!signatureHex) {
+        throw new Error('Failed to obtain signature for Hyperliquid order');
+    }
+
+    console.log('Signed order hex:', signatureHex);
+
+    const signature = ethers.Signature.from(signatureHex);
+    const signatureWire = {
+        r: signature.r,
+        s: signature.s,
+        v: signature.v,
+    };
+
+    console.log('Parsed signature:', signatureWire);
+
+    const response = await fetch(EXCHANGE_ENDPOINT, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            action,
+            signature: signatureWire,
+            nonce,
+        }),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('API Error Response:', errorText);
+        throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+    }
+
+    return await response.json();
 };
 
 // HYPE/USDC price
@@ -166,110 +281,91 @@ export const transfer = async (
 // Buy HYPE using USDC on Hyperliquid
 export const buy = async (
     activeWallet: any,
-    amount: number, 
-    slippage: number = 0.01 
+    amount: number,
+    slippage: number = 0.01,
+    options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<boolean> => {
     try {
-        console.log('Attempting to buy HYPE with', amount, 'USDC using raw API');
-        
-        const provider = await activeWallet.getProvider();
-        
+        console.log('Attempting to buy HYPE with', amount, 'USDC');
+
         const allMids = await infoClient.allMids();
-        const hypePrice = allMids[HYPE_MARKET_ID]; 
+        const hypePrice = allMids[HYPE_MARKET_ID];
         if (!hypePrice) {
             throw new Error('HYPE price not found in market data');
         }
-        
-        const buyPrice = parseFloat(hypePrice) * (1 + slippage); 
-        const quantity = Math.floor((amount / buyPrice) * 1000) / 1000; 
-        
+
+        const buyPrice = parseFloat(hypePrice) * (1 + slippage);
+        const quantity = Math.floor((amount / buyPrice) * 1000) / 1000;
+
         console.log('Calculated buy order:');
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
         console.log('- Buy price (with slippage):', buyPrice.toFixed(6), 'USDC');
         console.log('- Quantity:', quantity, 'HYPE');
-        
+
         const orderWire = {
-            a: HYPE_ASSET_ID,                    // HYPE asset id
-            b: true,                    // isBuy
-            p: buyPrice.toFixed(6),     // limit price as string
-            s: quantity.toString(),     // size as string
-            r: false,                   // reduceOnly
+            a: HYPE_ASSET_ID,
+            b: true,
+            p: buyPrice.toFixed(6),
+            s: quantity.toFixed(3),
+            r: false,
             t: {
-                limit: { tif: "Ioc" }   // Immediate or Cancel
-            }
-        };
-        
-        const action = {
-            type: "order",
-            orders: [orderWire],
-            grouping: "na",
-        };
-        
-        const domain = {
-            name: "HyperliquidSignTransaction",
-            version: "1",
-            chainId: CHAIN_IDS.ARBITRUM_SEPOLIA, 
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        };
-        
-        const types = {
-            "HyperliquidTransaction:Order": [
-                { name: "type", type: "string" },
-                { name: "orders", type: "string" },
-                { name: "grouping", type: "string" },
-            ],
-        };
-        
-        const message = {
-            ...action,
-            orders: JSON.stringify(action.orders),
-        };
-        
-        const signatureHex = await provider.request({
-            method: 'eth_signTypedData_v4',
-            params: [activeWallet.address, JSON.stringify({
-                domain,
-                types,
-                primaryType: 'HyperliquidTransaction:Order',
-                message
-            })]
-        });
-        
-        console.log('Signed order hex:', signatureHex);
-        
-        const signature = {
-            r: signatureHex.slice(0, 66), 
-            s: signatureHex.slice(66, 130),  
-            v: parseInt(signatureHex.slice(130, 132), 16) 
-        };
-        
-        console.log('Parsed signature:', signature);
-        
-        const response = await fetch(EXCHANGE_ENDPOINT, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json" 
+                limit: { tif: "Ioc" },
             },
-            body: JSON.stringify({ 
-                action, 
-                signature, 
-                nonce: Date.now() 
-            }),
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+        };
+
+        const embeddedWallet = options?.openfortClient?.embeddedWallet;
+
+        let result;
+        let privateKeyHex: string | null = null;
+
+        if (typeof activeWallet.getPrivateKey === 'function') {
+            try {
+                privateKeyHex = await activeWallet.getPrivateKey();
+            } catch (err) {
+                console.warn('activeWallet.getPrivateKey failed, will try other signing paths:', err);
+                privateKeyHex = null;
+            }
         }
-        
-        const result = await response.json();
+
+        if (!privateKeyHex && embeddedWallet?.exportPrivateKey) {
+            try {
+                privateKeyHex = await embeddedWallet.exportPrivateKey();
+            } catch (err) {
+                console.warn('embeddedWallet.exportPrivateKey failed, falling back to direct signing:', err);
+                privateKeyHex = null;
+            }
+        }
+
+        if (privateKeyHex && !privateKeyHex.startsWith('0x')) {
+            privateKeyHex = `0x${privateKeyHex}`;
+        }
+
+        if (privateKeyHex) {
+            const exchangeClient = createExchangeClient(privateKeyHex);
+            result = await exchangeClient.order({
+                orders: [orderWire],
+                grouping: "na",
+            });
+        } else {
+            const action = actionSorter.order({
+                type: "order",
+                orders: [orderWire],
+                grouping: "na",
+            });
+            result = await signAndSubmitOrder({
+                activeWallet,
+                action,
+                embeddedWallet,
+            });
+        }
+
         console.log('Buy order result:', result);
-        
+
+        // Handle the exchange response
         if (result.response?.type === 'order') {
             const statuses = result.response.data.statuses;
             const firstStatus = statuses[0];
-            
+
             if ('filled' in firstStatus) {
                 console.log('Order filled successfully!');
                 console.log('- Filled size:', firstStatus.filled.totalSz);
@@ -283,9 +379,9 @@ export const buy = async (
                 throw new Error(`Order failed: ${firstStatus.error}`);
             }
         }
-        
-        throw new Error('Unexpected order response format');
-        
+
+        throw new Error(`Unexpected order response format: ${JSON.stringify(result)}`);
+
     } catch (error) {
         console.error('Buy HYPE failed:', error);
         throw error;
@@ -295,110 +391,91 @@ export const buy = async (
 // Sell HYPE using USDC on Hyperliquid
 export const sell = async (
     activeWallet: any,
-    amount: number, 
-    slippage: number = 0.01 
+    amount: number,
+    slippage: number = 0.01,
+    options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<boolean> => {
     try {
-        console.log('Attempting to sell', amount, 'HYPE using raw API');
-        
-        const provider = await activeWallet.getProvider();
-        
+        console.log('Attempting to sell', amount, 'HYPE');
+
         const allMids = await infoClient.allMids();
-        const hypePrice = allMids[HYPE_MARKET_ID]; 
+        const hypePrice = allMids[HYPE_MARKET_ID];
         if (!hypePrice) {
             throw new Error('HYPE price not found in market data');
         }
-        
-        const sellPrice = parseFloat(hypePrice) * (1 - slippage); 
-        const quantity = Math.floor(amount * 1000) / 1000; 
-        
+
+        const sellPrice = parseFloat(hypePrice) * (1 - slippage);
+        const quantity = Math.floor(amount * 1000) / 1000;
+
         console.log('Calculated sell order:');
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
         console.log('- Sell price (with slippage):', sellPrice.toFixed(6), 'USDC');
         console.log('- Quantity:', quantity, 'HYPE');
-        
+
         const orderWire = {
-            a: HYPE_ASSET_ID,                    // HYPE asset id
-            b: false,                   // isBuy = false (sell)
-            p: sellPrice.toFixed(6),    // limit price as string
-            s: quantity.toString(),     // size as string
-            r: false,                   // reduceOnly
+            a: HYPE_ASSET_ID,
+            b: false,
+            p: sellPrice.toFixed(6),
+            s: quantity.toFixed(3),
+            r: false,
             t: {
-                limit: { tif: "Ioc" }   // Immediate or Cancel
-            }
-        };
-        
-        const action = {
-            type: "order",
-            orders: [orderWire],
-            grouping: "na",
-        };
-        
-        const domain = {
-            name: "HyperliquidSignTransaction",
-            version: "1",
-            chainId: CHAIN_IDS.ARBITRUM_SEPOLIA, 
-            verifyingContract: "0x0000000000000000000000000000000000000000",
-        };
-        
-        const types = {
-            "HyperliquidTransaction:Order": [
-                { name: "type", type: "string" },
-                { name: "orders", type: "string" },
-                { name: "grouping", type: "string" },
-            ],
-        };
-        
-        const message = {
-            ...action,
-            orders: JSON.stringify(action.orders),
-        };
-        
-        const signatureHex = await provider.request({
-            method: 'eth_signTypedData_v4',
-            params: [activeWallet.address, JSON.stringify({
-                domain,
-                types,
-                primaryType: 'HyperliquidTransaction:Order',
-                message
-            })]
-        });
-        
-        console.log('Signed sell order hex:', signatureHex);
-        
-        const signature = {
-            r: signatureHex.slice(0, 66), 
-            s: signatureHex.slice(66, 130),  
-            v: parseInt(signatureHex.slice(130, 132), 16) 
-        };
-        
-        console.log('Parsed sell signature:', signature);
-        
-        const response = await fetch(EXCHANGE_ENDPOINT, {
-            method: "POST",
-            headers: { 
-                "Content-Type": "application/json" 
+                limit: { tif: "Ioc" },
             },
-            body: JSON.stringify({ 
-                action, 
-                signature, 
-                nonce: Date.now() 
-            }),
-        });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            console.error('API Error Response:', errorText);
-            throw new Error(`API request failed with status ${response.status}: ${errorText}`);
+        };
+
+        const embeddedWallet = options?.openfortClient?.embeddedWallet;
+
+        let result;
+        let privateKeyHex: string | null = null;
+
+        if (typeof activeWallet.getPrivateKey === 'function') {
+            try {
+                privateKeyHex = await activeWallet.getPrivateKey();
+            } catch (err) {
+                console.warn('activeWallet.getPrivateKey failed, will try other signing paths:', err);
+                privateKeyHex = null;
+            }
         }
-        
-        const result = await response.json();
+
+        if (!privateKeyHex && embeddedWallet?.exportPrivateKey) {
+            try {
+                privateKeyHex = await embeddedWallet.exportPrivateKey();
+            } catch (err) {
+                console.warn('embeddedWallet.exportPrivateKey failed, falling back to direct signing:', err);
+                privateKeyHex = null;
+            }
+        }
+
+        if (privateKeyHex && !privateKeyHex.startsWith('0x')) {
+            privateKeyHex = `0x${privateKeyHex}`;
+        }
+
+        if (privateKeyHex) {
+            const exchangeClient = createExchangeClient(privateKeyHex);
+            result = await exchangeClient.order({
+                orders: [orderWire],
+                grouping: "na",
+            });
+        } else {
+            const action = actionSorter.order({
+                type: "order",
+                orders: [orderWire],
+                grouping: "na",
+            });
+            result = await signAndSubmitOrder({
+                activeWallet,
+                action,
+                embeddedWallet,
+            });
+        }
+
         console.log('Sell order result:', result);
-        
+
+        // Handle the exchange response
         if (result.response?.type === 'order') {
             const statuses = result.response.data.statuses;
             const firstStatus = statuses[0];
-            
+
             if ('filled' in firstStatus) {
                 console.log('Sell order filled successfully!');
                 console.log('- Filled size:', firstStatus.filled.totalSz);
@@ -412,9 +489,9 @@ export const sell = async (
                 throw new Error(`Sell order failed: ${firstStatus.error}`);
             }
         }
-        
-        throw new Error('Unexpected sell order response format');
-        
+
+        throw new Error(`Unexpected sell order response format: ${JSON.stringify(result)}`);
+
     } catch (error) {
         console.error('Sell HYPE failed:', error);
         throw error;

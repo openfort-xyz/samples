@@ -33,6 +33,7 @@ type SwapResult = {
 
 interface MainAppScreenProps {
   activeWallet: UserWallet | null;
+  openfortClient: any;
   walletBalance: number | null;
   walletBalanceLoading: boolean;
   hypeBalances: { account: any; positions: any } | null;
@@ -45,6 +46,7 @@ interface MainAppScreenProps {
 
 export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   activeWallet,
+  openfortClient,
   walletBalance,
   walletBalanceLoading,
   hypeBalances,
@@ -326,6 +328,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
             if (swapDirection === "buy") {
               const success = await transactionHandlers.handleBuy(
                 activeWallet,
+                openfortClient,
                 amountToSwap,
                 hypeBalances,
                 setIsProcessing,
@@ -346,6 +349,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
             } else {
               const success = await transactionHandlers.handleSell(
                 activeWallet,
+                openfortClient,
                 amountToSwap,
                 hypeBalances,
                 setIsProcessing,

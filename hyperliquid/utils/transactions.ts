@@ -6,6 +6,7 @@ import { transfer, buy, sell } from '../services/HyperliquidClient';
 export interface TransactionHandlers {
   handleBuy: (
     activeWallet: any,
+    openfortClient: any,
     buyAmount: string,
     hypeBalances: any,
     setIsBuying: (loading: boolean) => void,
@@ -14,6 +15,7 @@ export interface TransactionHandlers {
 
   handleSell: (
     activeWallet: any,
+    openfortClient: any,
     sellAmount: string,
     hypeBalances: any,
     setIsSelling: (loading: boolean) => void,
@@ -34,6 +36,7 @@ export interface TransactionHandlers {
 export const transactionHandlers: TransactionHandlers = {
   handleBuy: async (
     activeWallet: any,
+    openfortClient: any,
     buyAmount,
     hypeBalances,
     setIsBuying,
@@ -61,7 +64,9 @@ export const transactionHandlers: TransactionHandlers = {
     try {
       Alert.alert('Buy Order Initiated', `Buying ${HYPE_SYMBOL} with ${amount} USDC...`);
 
-      const success = await buy(activeWallet, amount, 0.02);
+      const success = await buy(activeWallet, amount, 0.02, {
+        openfortClient,
+      });
 
       if (success) {
         setBuyAmount('');
@@ -83,6 +88,7 @@ export const transactionHandlers: TransactionHandlers = {
 
   handleSell: async (
     activeWallet: any,
+    openfortClient: any,
     sellAmount,
     hypeBalances,
     setIsSelling,
@@ -110,7 +116,9 @@ export const transactionHandlers: TransactionHandlers = {
     setIsSelling(true);
 
     try {
-      const success = await sell(activeWallet, amount);
+      const success = await sell(activeWallet, amount, 0.01, {
+        openfortClient,
+      });
 
       if (success) {
         Alert.alert('Success', `${HYPE_SYMBOL} sell order placed successfully!`);
