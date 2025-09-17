@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { getEnvironmentStatus } from '../utils/envValidation';
+import { getEnvironmentStatus } from '../../utils/envValidation';
 import { EnvErrorModal } from './EnvErrorModal';
 
 interface EnvValidationWrapperProps {

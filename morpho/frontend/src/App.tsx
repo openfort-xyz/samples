@@ -267,7 +267,7 @@ function App() {
                 ) : (
                   <>
                     <span className="mr-2">️↗️</span>
-                    Supply to pool
+                    Supply 1 USDC to pool
                   </>
                 )}
               </button>
@@ -285,7 +285,7 @@ function App() {
                 ) : (
                   <>
                     <span className="mr-2">️↙️</span>
-                    Withdraw from pool
+                    Withdraw all from pool
                   </>
                 )}
               </button>
