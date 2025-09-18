@@ -287,6 +287,8 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
     const isMountedRef = useRef(true);
 
     useEffect(() => {
+        isMountedRef.current = true;
+
         return () => {
             isMountedRef.current = false;
         };
@@ -346,6 +348,8 @@ export const useHypeOrderBook = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
     const isMountedRef = useRef(true);
 
     useEffect(() => {
+        isMountedRef.current = true;
+
         return () => {
             isMountedRef.current = false;
         };
@@ -410,6 +414,8 @@ export const useHypeOpenOrders = (
     const isMountedRef = useRef(true);
 
     useEffect(() => {
+        isMountedRef.current = true;
+
         return () => {
             isMountedRef.current = false;
         };
@@ -437,7 +443,12 @@ export const useHypeOpenOrders = (
             if (!isMountedRef.current) {
                 return;
             }
-            setOrders(Array.isArray(response) ? response : []);
+
+            const nextOrders = Array.isArray(response)
+                ? response.map((order) => ({ ...order }))
+                : [];
+
+            setOrders(nextOrders);
             setError(null);
             hasLoadedRef.current = true;
         } catch (err) {

@@ -78,7 +78,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     isLoading: openOrdersLoading,
     error: openOrdersError,
     refetch: refetchOpenOrders,
-  } = useHypeOpenOrders(hyperliquidAccountAddress);
+  } = useHypeOpenOrders(hyperliquidAccountAddress, 5000);
 
   const hyperliquidUsdcBalance = React.useMemo(
     () => Number(hypeBalances?.account?.usdcBalance ?? 0),
@@ -220,10 +220,9 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     const interval = setInterval(() => {
       refetchWalletBalance();
       refetchHypeBalances();
-      refetchOpenOrders();
     }, 5000);
     return () => clearInterval(interval);
-  }, [refetchWalletBalance, refetchHypeBalances, refetchOpenOrders]);
+  }, [refetchWalletBalance, refetchHypeBalances]);
 
   React.useEffect(() => {
     refetchOpenOrders();
