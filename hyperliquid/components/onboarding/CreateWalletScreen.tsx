@@ -63,7 +63,7 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
         <View style={styles.card}>
           {isWalletCreated ? (
             <View style={styles.successContent}>
-              <Text style={styles.successTitle}>Owner Address</Text>
+              <Text style={styles.successTitle}>Address</Text>
               <View style={styles.addressContainer}>
                 <Text style={styles.addressText}>{truncatedOwnerAddress}</Text>
                 <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
@@ -73,7 +73,7 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
               <View style={styles.instructionsContainer}>
                 <Text style={styles.instructionsTitle}>Next Steps:</Text>
                 <Text style={styles.instructionsText}>
-                  1. Copy the owner address above{"\n"}
+                  1. Copy the address above{"\n"}
                   2. Go to{" "}
                   <Text style={styles.linkText}>https://app.hyperliquid-testnet.xyz/API</Text>
                   {"\n"}
