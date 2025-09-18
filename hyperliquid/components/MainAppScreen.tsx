@@ -270,9 +270,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
         ) : (
           <Text style={styles.errorText}>Unable to fetch price</Text>
         )}
-        <Text style={styles.apiWarning}>
-          Note: Register as API wallet on Hyperliquid testnet before trading
-        </Text>
       </View>
 
       {renderOrderBookSection()}
@@ -843,12 +840,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 8,
     marginBottom: 16,
-  },
-  apiWarning: {
-    fontSize: 11,
-    color: "#EF4444",
-    textAlign: "center",
-    marginTop: 8,
   },
   pendingBanner: {
     backgroundColor: "rgba(15, 20, 25, 0.8)",
