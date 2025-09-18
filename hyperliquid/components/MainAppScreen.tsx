@@ -202,9 +202,14 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     const interval = setInterval(() => {
       refetchWalletBalance();
       refetchHypeBalances();
+      refetchOpenOrders();
     }, 5000);
     return () => clearInterval(interval);
-  }, [refetchWalletBalance, refetchHypeBalances]);
+  }, [refetchWalletBalance, refetchHypeBalances, refetchOpenOrders]);
+
+  React.useEffect(() => {
+    refetchOpenOrders();
+  }, [refetchOpenOrders]);
 
   React.useEffect(() => {
     setSwapAmount("");
