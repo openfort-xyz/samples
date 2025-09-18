@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useOpenfort, useOpenfortClient, useUser, useWallets } from "@openfort/react-native";
+import Constants from "expo-constants";
 
 import { CreateWalletScreen } from "./onboarding/CreateWalletScreen";
 import { FundHyperliquidScreen } from "./onboarding/FundHyperliquidScreen";
@@ -24,7 +25,9 @@ export const UserScreen: React.FC = () => {
   const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
 
   const hyperliquidAccountAddress = useMemo(() => {
-    return process.env.HYPERLIQUID_WALLET_ADDRESS as `0x${string}`;
+    const address = Constants.expoConfig?.extra?.hyperliquidWalletAddress as `0x${string}`;
+    console.log('Hyperliquid wallet address from env:', address);
+    return address;
   }, []);
 
   const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
@@ -108,6 +111,7 @@ export const UserScreen: React.FC = () => {
           {logoutButton}
           <FundHyperliquidScreen
             walletAddress={activeWallet?.address}
+            hyperliquidAddress={hyperliquidAccountAddress}
             walletBalance={walletBalance}
             hyperliquidBalance={Number(hypeBalances?.account?.usdcBalance ?? 0)}
             isLoading={walletBalanceLoading || hypeBalancesLoading}

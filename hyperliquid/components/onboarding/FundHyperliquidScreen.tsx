@@ -7,6 +7,7 @@ import { GradientButton } from "../ui";
 
 interface FundHyperliquidScreenProps {
   walletAddress?: string;
+  hyperliquidAddress?: string;
   walletBalance?: number | null;
   hyperliquidBalance?: number | null;
   isLoading: boolean;
@@ -17,6 +18,7 @@ interface FundHyperliquidScreenProps {
 
 export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
   walletAddress,
+  hyperliquidAddress,
   walletBalance,
   hyperliquidBalance,
   isLoading,
@@ -24,18 +26,18 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
   step,
   totalSteps,
 }) => {
-  const truncated = React.useMemo(() => {
-    if (!walletAddress) return null;
-    return `${walletAddress.slice(0, 6)}…${walletAddress.slice(-4)}`;
-  }, [walletAddress]);
+  const truncatedHyperliquid = React.useMemo(() => {
+    if (!hyperliquidAddress) return null;
+    return `${hyperliquidAddress.slice(0, 6)}…${hyperliquidAddress.slice(-4)}`;
+  }, [hyperliquidAddress]);
 
   const hasExchangeBalance = (hyperliquidBalance ?? 0) > 0;
   const hasWalletBalance = (walletBalance ?? 0) > 0;
 
   const copyToClipboard = async () => {
-    if (walletAddress) {
-      await Clipboard.setStringAsync(walletAddress);
-      Alert.alert("Copied!", "Wallet address copied to clipboard");
+    if (hyperliquidAddress) {
+      await Clipboard.setStringAsync(hyperliquidAddress);
+      Alert.alert("Copied!", "Hyperliquid wallet address copied to clipboard");
     }
   };
 
@@ -52,47 +54,36 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Fund your Hyperliquid account</Text>
+          <Text style={styles.title}>Your Hyperliquid account</Text>
           <Text style={styles.subtitle}>
-            Send USDC from your wallet to Hyperliquid testnet. Once the balance shows up, continue to trading.
+            Your Hyperliquid wallet already has USDC available for trading. Continue when ready.
           </Text>
         </View>
 
         <View style={styles.statusRow}>
           <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Wallet balance</Text>
+            <Text style={styles.statusLabel}>USDC (Spot) Balance</Text>
             <View style={styles.statusValueRow}>
-              <Text style={styles.statusValue}>{isLoading ? "—" : `${walletBalance?.toFixed(2) ?? "0.00"} USDC`}</Text>
-              <Text style={[styles.statusBadge, hasWalletBalance ? styles.readyBadge : styles.pendingBadge]}>
-                {hasWalletBalance ? "Ready" : "Needs funds"}
-              </Text>
-            </View>
-            <Text style={styles.statusHint}>Ensure your wallet holds testnet USDC before depositing. Get Arbitrum testnet USDC from https://faucet.circle.com/</Text>
-          </View>
-
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Hyperliquid balance</Text>
-            <View style={styles.statusValueRow}>
-              <Text style={styles.statusValue}>{isLoading ? "—" : `${hyperliquidBalance?.toFixed(2) ?? "0.00"} USDC`}</Text>
+              <Text style={styles.statusValue}>{isLoading ? "—" : `${hyperliquidBalance?.toFixed(8) ?? "0.00000000"} USDC`}</Text>
               <Text style={[styles.statusBadge, hasExchangeBalance ? styles.readyBadge : styles.pendingBadge]}>
-                {hasExchangeBalance ? "Ready" : "Awaiting"}
+                {hasExchangeBalance ? "Ready" : "No Funds"}
               </Text>
             </View>
-            <Text style={styles.statusHint}>Deposits arrive within seconds on the Hyperliquid testnet.</Text>
+            <Text style={styles.statusHint}>Your Hyperliquid account USDC balance available for trading.</Text>
           </View>
         </View>
 
         <View style={styles.addressCard}>
-          <Text style={styles.addressLabel}>Wallet address</Text>
+          <Text style={styles.addressLabel}>Hyperliquid wallet address</Text>
           <View style={styles.addressRow}>
-            <Text style={styles.addressValue}>{truncated ?? "—"}</Text>
-            {walletAddress && (
+            <Text style={styles.addressValue}>{truncatedHyperliquid ?? "—"}</Text>
+            {hyperliquidAddress && (
               <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
                 <Text style={styles.copyButtonText}>Copy</Text>
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.addressHint}>Use this address when requesting funds or initiating transfers.</Text>
+          <Text style={styles.addressHint}>This is your Hyperliquid account address where USDC balances are held.</Text>
         </View>
 
         <View style={styles.card}>
