@@ -53,7 +53,7 @@ export default function LoginScreen() {
               title="Continue as Guest"
               onPress={handleGuestLogin}
             />
-            <View style={styles.divider}>
+            {/* <View style={styles.divider}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
               <View style={styles.dividerLine} />
@@ -63,7 +63,7 @@ export default function LoginScreen() {
               onPress={handleOAuthLogin}
               style={styles.googleButton}
               textStyle={styles.googleButtonText}
-            />
+            /> */}
           </View>
           {error && (
             <View style={styles.errorContainer}>
