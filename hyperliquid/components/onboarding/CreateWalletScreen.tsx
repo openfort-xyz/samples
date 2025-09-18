@@ -11,6 +11,7 @@ interface CreateWalletScreenProps {
   step: number;
   totalSteps: number;
   walletAddress?: string;
+  walletOwnerAddress?: string;
   onContinue?: () => void;
 }
 
@@ -19,23 +20,23 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
   onCreateWallet,
   step,
   totalSteps,
-  walletAddress,
+  walletOwnerAddress,
   onContinue,
 }) => {
   const [hasCopied, setHasCopied] = useState(false);
 
   const copyToClipboard = async () => {
-    if (walletAddress) {
-      await Clipboard.setStringAsync(walletAddress);
+    if (walletOwnerAddress) {
+      await Clipboard.setStringAsync(walletOwnerAddress);
       setHasCopied(true);
     }
   };
 
-  const truncatedAddress = walletAddress
-    ? `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`
+  const truncatedOwnerAddress = walletOwnerAddress
+    ? `${walletOwnerAddress.slice(0, 6)}...${walletOwnerAddress.slice(-4)}`
     : "";
 
-  const isWalletCreated = !!walletAddress;
+  const isWalletCreated = !!walletOwnerAddress;
   return (
     <View style={styles.container}>
       <LinearGradient
@@ -64,7 +65,7 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
             <View style={styles.successContent}>
               <Text style={styles.successTitle}>Owner Address</Text>
               <View style={styles.addressContainer}>
-                <Text style={styles.addressText}>{truncatedAddress}</Text>
+                <Text style={styles.addressText}>{truncatedOwnerAddress}</Text>
                 <TouchableOpacity style={styles.copyButton} onPress={copyToClipboard}>
                   <Text style={styles.copyButtonText}>{hasCopied ? "Copied!" : "Copy"}</Text>
                 </TouchableOpacity>

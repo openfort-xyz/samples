@@ -103,6 +103,7 @@ export const UserScreen: React.FC = () => {
             step={onboardingStep}
             totalSteps={TOTAL_STEP_COUNT}
             walletAddress={activeWallet?.address}
+            walletOwnerAddress={activeWallet?.ownerAddress}
             onContinue={handleContinueToFunding}
           />
         </View>
