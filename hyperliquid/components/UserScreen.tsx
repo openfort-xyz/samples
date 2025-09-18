@@ -49,11 +49,6 @@ export const UserScreen: React.FC = () => {
     return index >= 0 ? index + 1 : TOTAL_STEP_COUNT;
   }, [currentScreen]);
 
-  useEffect(() => {
-    if (activeWallet && currentScreen === "create-wallet") {
-      setCurrentScreen("fund-exchange");
-    }
-  }, [activeWallet, currentScreen]);
 
   useEffect(() => {
     if (currentScreen === "fund-exchange") {
@@ -83,6 +78,10 @@ export const UserScreen: React.FC = () => {
     setCurrentScreen("trading");
   }, []);
 
+  const handleContinueToFunding = useCallback(() => {
+    setCurrentScreen("fund-exchange");
+  }, []);
+
   const logoutButton = (
     <TouchableOpacity onPress={logout} style={[styles.logoutButton, { top: insets.top + 10 }]}>
       <Text style={styles.logoutText}>Logout</Text>
@@ -103,6 +102,8 @@ export const UserScreen: React.FC = () => {
             onCreateWallet={handleCreateWallet}
             step={onboardingStep}
             totalSteps={TOTAL_STEP_COUNT}
+            walletAddress={activeWallet?.address}
+            onContinue={handleContinueToFunding}
           />
         </View>
       );
