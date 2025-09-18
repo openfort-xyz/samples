@@ -394,10 +394,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
         <Text style={styles.sectionSubheading}>
           Double-check the details below. Price estimates use the latest Hyperliquid mid price.
         </Text>
-        <Text style={styles.apiOnboardingNote}>
-          Note: Before trading, your wallet owner address must be registered as an API wallet on Hyperliquid.
-          Visit https://app.hyperliquid-testnet.xyz/API to complete the onboarding process.
-        </Text>
 
         <View style={styles.summaryCard}>
           <Text style={styles.summaryLabel}>Swap summary</Text>
