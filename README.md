@@ -2,58 +2,120 @@
 
 # Openfort Samples
 
-Cloneable starter templates & example repos to help kickstart your next project on Openfort.
+This repository contains comprehensive samples demonstrating how to integrate Openfort's embedded wallet infrastructure with popular DeFi protocols and blockchain applications. Each sample showcases different use cases and implementation patterns for building Web3 applications.
 
-## Using Examples
+## 📁 Sample Projects
 
-Each directory in this repository is a standalone example that you can clone and use as a starting point for your next project.
+### 🏛️ [Aave Integration](./aave/)
+**Languages:** TypeScript, React, Node.js
+**Stack:** Vite + React frontend, Express.js backend
+**Purpose:** Demonstrates DeFi lending and borrowing operations using Openfort embedded wallets with the Aave protocol. Shows how to interact with lending pools, manage collateral, and execute DeFi transactions with gas sponsorship.
 
-Within each directory, you'll find a `README.md` file with instructions on how to clone the example and get started.
+**Key Features:**
+- Aave protocol integration for lending/borrowing
+- React + Vite frontend with Tailwind CSS
+- Express.js backend for Shield encryption sessions
+- CORS-enabled API for wallet operations
+- Multi-language support (Catalan documentation)
 
+### 📈 [Hyperliquid Trading](./hyperliquid/)
+**Languages:** TypeScript, React Native
+**Stack:** Expo React Native
+**Purpose:** Mobile trading application for Hyperliquid's decentralized exchange. Demonstrates how to combine Openfort's embedded wallets with perpetual trading, real-time price feeds, and order management.
 
-## Invisble Wallet 
+**Key Features:**
+- Real-time HYPE/USDC price feeds with charts
+- Market buy/sell order placement
+- Testnet trading with 1000 mock USDC
+- Balance tracking across wallet and exchange
+- Mobile-optimized trading interface
+- Integration with Hyperliquid's official SDK
 
-### Web
+### 🔄 [Morpho Blue Vault](./morpho/)
+**Languages:** TypeScript, React, Node.js
+**Stack:** Vite + React frontend, Express.js backend
+**Purpose:** Web application for interacting with Morpho Blue lending vaults on Base. Shows vault supply/withdrawal operations with yield optimization strategies.
 
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Openfort Kit Examples](https://github.com/openfort-xyz/openfort-kit/tree/main/examples)                                    | Collection of Embedded Wallet examples using Openfort Kit                                        |
-| [Openfort JS Examples](https://github.com/openfort-xyz/openfort-js/tree/main/examples/apps)                                     | Embedded Wallet examples in JavaScript environments like NextJS                                  |
-| [Openfort Node Example](https://github.com/openfort-xyz/openfort-node/tree/main/example)                                    | Node.js backend integration example for Embedded Wallet                                         |
-| [Firebase Auth in NextJS](https://github.com/openfort-xyz/embedded-wallet-firebase-auth-sample-nextjs)                                                | Firebase authentication-based Embedded Wallet example                                           |
-| [Bridge with Relay.link](https://github.com/openfort-xyz/reservoir0x-relay-embeddedwallet)  | Sample to make bridging with Openfort JS, Wagmi and Relay.link | 
+**Key Features:**
+- Morpho Blue vault interactions on Base mainnet
+- USDC supply and withdrawal operations
+- GraphQL integration for vault APY data
+- Real-time balance and position tracking
+- Wagmi + Viem for blockchain interactions
+- Shield encryption session management
 
-### Mobile
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [React Native Sample](https://github.com/openfort-xyz/react-native-auth-sample)                                        | Authentication example in React Native (Embedded Wallet)                                         |
-| [Sample Telegram Mini-app Embedded Wallet](https://github.com/openfort-xyz/sample-telegram-mini-app-Embedded-Wallet)        | Embedded Wallet mini-app example for Telegram                                                   |
-| [Sample Telegram](https://github.com/openfort-xyz/sample-telegram)                                                          | Blockchain mini-app example for Telegram (Embedded Wallet)                                      |
-| [Openfort Frames V2 Demo](https://github.com/smarthug/openfort-frames-v2-demo) | Demo to show how to use Openfort Frames V2 |
+### 💸 [USDC Transfer Demo](./usdc-transfer/)
+**Languages:** TypeScript, React Native
+**Stack:** Expo React Native
+**Purpose:** Mobile application demonstrating basic ERC-20 token transfers using Openfort's embedded wallet infrastructure. Perfect for understanding wallet creation, faucet integration, and gasless transactions.
 
-### Unity
+**Key Features:**
+- Dual wallet system for testing transfers
+- Circle USDC faucet integration
+- Real-time balance updates with polling
+- Gasless transactions via Ethereum Provider Policy
+- Multi-chain support (Ethereum Sepolia, Base Sepolia)
+- ERC-20 token operations with 6-decimal precision
 
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Openfort Unity Samples](https://github.com/openfort-xyz/openfort-csharp-unity/tree/main/sample)                               | Quick start guide for Embedded Wallet in Unity   [video](https://youtu.be/IZ7-bLpvTPA?si=sK7LOOUfZ4GgOxrs)
-| [Sample Unity WebGL](https://github.com/openfort-xyz/sample-unity-webgl-embedded-signer)                    | Embedded Wallet Signer demo for Unity WebGL                                                     |
-                                               
+## 🚀 Getting Started
 
+Each sample is completely self-contained with its own setup instructions, environment configuration, and dependencies. Navigate to any sample directory and follow the `README.md` for detailed setup instructions.
 
-## Cross-app Wallet
-### Web
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Ecosystem Sample](https://github.com/openfort-xyz/ecosystem-sample)                                                         | Demo app using ecosystem SDK to create an ecosystem wallet                       |
-| [Ecosystem Sample with third party auth](https://github.com/openfort-xyz/ecosystem-sample/tree/feat/third-party-auth)                                                         | Demo app using ecosystem SDK with third party auth (Firebase) to create an ecosystem wallet                       |
+### Prerequisites
+- **Node.js** 18+ and npm/yarn
+- **Openfort Dashboard Account** with configured API keys
+- **Platform-specific tools:**
+  - For mobile samples: Expo CLI, iOS Simulator/Android Emulator
+  - For web samples: Modern web browser
 
-### Unity
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Ecosystem Wallet Unity Example](https://github.com/openfort-xyz/mobile-wallet-protocol-unity-client/tree/main/Project)                              | Sample Unity application that integrates with any ecosystem wallet                                |
+### Common Setup Pattern
+1. **Environment Configuration** - Copy `.env.example` to `.env.local` and configure Openfort credentials
+2. **Install Dependencies** - Run `npm install` in respective directories
+3. **Start Development** - Use `npm run dev` for web or `npm start` for mobile
+4. **Configure Openfort Dashboard** - Set up gas policies, Shield keys, and recovery endpoints
 
+## 🔧 Technology Stack Overview
 
-### Mobile
-| Example Name                                                                                                              | Description                                                                                     | 
-| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
-| [Ecosystem Wallet Expo Example](https://github.com/openfort-xyz/ecosystem-wallet-expo-example)                              | Sample Expo application that integrates with any ecosystem wallet                                |
+| Sample | Frontend | Backend | Blockchain | Key Libraries |
+|--------|----------|---------|------------|---------------|
+| **Aave** | React + Vite | Express.js | Ethereum | `@aave/react`, `wagmi`, `viem` |
+| **Hyperliquid** | React Native | - | Arbitrum Sepolia | `@nktkas/hyperliquid`, `@openfort/react-native` |
+| **Morpho** | React + Vite | Express.js | Base | `wagmi`, `viem`, `graphql-request` |
+| **USDC Transfer** | React Native | - | Ethereum Sepolia | `@openfort/react-native`, `expo` |
+
+## 📚 What You'll Learn
+
+- **Embedded Wallet Integration** - How to integrate Openfort's wallet infrastructure
+- **DeFi Protocol Interactions** - Working with Aave, Morpho, and DEX protocols
+- **Gas Sponsorship** - Implementing gasless transactions for better UX
+- **Multi-chain Development** - Supporting multiple networks and tokens
+- **Mobile Web3** - Building React Native apps with blockchain functionality
+- **Real-time Data** - Polling balances, prices, and transaction states
+- **Security Best Practices** - Shield encryption and secure key management
+
+## 🌐 Supported Networks
+
+- **Ethereum Sepolia** (Testnet)
+- **Base Sepolia** (Testnet)
+- **Base Mainnet**
+- **Arbitrum Sepolia** (Testnet)
+- **Hyperliquid Testnet**
+
+## 💡 Use Cases Demonstrated
+
+1. **DeFi Lending** (Aave) - Supply, borrow, and manage collateral
+2. **Perpetual Trading** (Hyperliquid) - Place orders and manage positions
+3. **Yield Farming** (Morpho) - Optimize yields through lending vaults
+4. **Token Transfers** (USDC) - Basic wallet operations and ERC-20 handling
+
+## 🔗 External Resources
+
+- [Openfort Documentation](https://docs.openfort.io/)
+- [Openfort Dashboard](https://dashboard.openfort.io/)
+- [Aave Documentation](https://docs.aave.com/)
+- [Hyperliquid Documentation](https://hyperliquid.gitbook.io/)
+- [Morpho Documentation](https://docs.morpho.org/)
+
+---
+
+Each sample includes comprehensive error handling, development best practices, and production-ready patterns. Start with the **USDC Transfer** sample for basic wallet operations, then progress to the DeFi samples for more advanced integrations.
