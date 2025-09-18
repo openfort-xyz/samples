@@ -23,12 +23,16 @@ export const UserScreen: React.FC = () => {
 
   const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
 
+  const hyperliquidAccountAddress = useMemo(() => {
+    return process.env.HYPERLIQUID_WALLET_ADDRESS as `0x${string}`;
+  }, []);
+
   const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
   const {
     balances: hypeBalances,
     isLoading: hypeBalancesLoading,
     refetch: refetchHypeBalances,
-  } = useHypeBalances(activeWallet?.address as `0x${string}` | undefined);
+  } = useHypeBalances(hyperliquidAccountAddress);
   const {
     balance: walletBalance,
     loading: walletBalanceLoading,

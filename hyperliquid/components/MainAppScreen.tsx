@@ -70,10 +70,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   );
 
   const hypeTokenBalance = React.useMemo(() => {
-    const position = hypeBalances?.account?.assetPositions?.find(
-      (pos: any) => pos.coin === HYPE_SYMBOL
-    );
-    return parseFloat(position?.total || "0");
+    return parseFloat(hypeBalances?.positions?.hypePosition?.total || "0");
   }, [hypeBalances]);
 
   React.useEffect(() => {
@@ -98,15 +95,15 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   const balanceCards = (
     <View style={styles.balanceRow}>
       <View style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>Wallet USDC</Text>
+        <Text style={styles.balanceLabel}>USDC (Spot)</Text>
         <Text style={styles.balanceValue}>
-          {walletBalanceLoading ? "—" : `${(walletBalance ?? 0).toFixed(2)} USDC`}
+          {hypeBalancesLoading ? "—" : `${hyperliquidUsdcBalance.toFixed(8)} USDC`}
         </Text>
       </View>
       <View style={styles.balanceCard}>
-        <Text style={styles.balanceLabel}>Hyperliquid USDC</Text>
+        <Text style={styles.balanceLabel}>HYPE Balance</Text>
         <Text style={styles.balanceValue}>
-          {hypeBalancesLoading ? "—" : `${hyperliquidUsdcBalance.toFixed(2)} USDC`}
+          {hypeBalancesLoading ? "—" : `${hypeTokenBalance.toFixed(8)} HYPE`}
         </Text>
       </View>
     </View>
