@@ -4,25 +4,25 @@ This repository contains comprehensive samples demonstrating how to integrate Op
 
 ## 📁 Sample Projects
 
-### [Aave Integration](./aave/)
-**Languages:** TypeScript, React, Node.js
-**Stack:** Vite + React frontend, Express.js backend
-**Purpose:** Demonstrates DeFi lending and borrowing operations using Openfort embedded wallets with the Aave protocol. Shows how to interact with lending pools, manage collateral, and execute DeFi transactions with gas sponsorship.
+### [Yield on Aave](./aave/)
+- **Languages:** TypeScript, React, Node.js
+- **Stack:** Vite + React frontend, Express.js backend
+- **Purpose:** Demonstrates DeFi lending and borrowing operations using Openfort embedded wallets with the Aave protocol. Shows how to interact with lending pools, manage collateral, and execute DeFi transactions with gas sponsorship.
 
-### [Hyperliquid Trading](./hyperliquid/)
-**Languages:** TypeScript, React Native
-**Stack:** Expo React Native
-**Purpose:** Mobile trading application for Hyperliquid's decentralized exchange. Demonstrates how to combine Openfort's embedded wallets with perpetual trading, real-time price feeds, and order management.
+### [Trade on Hyperliquid](./hyperliquid/)
+- **Languages:** TypeScript, React Native
+- **Stack:** Expo React Native
+- **Purpose:** Mobile trading application for Hyperliquid's decentralized exchange. Demonstrates how to combine Openfort's embedded wallets with perpetual trading, real-time price feeds, and order management.
 
-### [Morpho Blue Vault](./morpho/)
-**Languages:** TypeScript, React, Node.js
-**Stack:** Vite + React frontend, Express.js backend
-**Purpose:** Web application for interacting with Morpho Blue lending vaults on Base. Shows vault supply/withdrawal operations with yield optimization strategies.
+### [Yield on Morpho](./morpho/)
+- **Languages:** TypeScript, React, Node.js
+- **Stack:** Vite + React frontend, Express.js backend
+- **Purpose:** Web application for interacting with Morpho Blue lending vaults on Base. Shows vault supply/withdrawal operations with yield optimization strategies.
 
-### [USDC Transfer Demo](./usdc-transfer/)
-**Languages:** TypeScript, React Native
-**Stack:** Expo React Native
-**Purpose:** Mobile application demonstrating basic ERC-20 token transfers using Openfort's embedded wallet infrastructure. Perfect for understanding wallet creation, faucet integration, and gasless transactions.
+### [USDC Transfer](./usdc-transfer/)
+- **Languages:** TypeScript, React Native
+- **Stack:** Expo React Native
+- **Purpose:** Mobile application demonstrating basic ERC-20 token transfers using Openfort's embedded wallet infrastructure. Perfect for understanding wallet creation, faucet integration, and gasless transactions.
 
 ## Getting Started
 
@@ -48,5 +48,5 @@ Each sample is completely self-contained with its own setup instructions, enviro
 | **Aave** | React + Vite | Express.js | Ethereum | `@aave/react`, `wagmi`, `viem` |
 | **Hyperliquid** | React Native | - | Arbitrum Sepolia | `@nktkas/hyperliquid`, `@openfort/react-native` |
 | **Morpho** | React + Vite | Express.js | Base | `wagmi`, `viem`, `graphql-request` |
-| **USDC Transfer** | React Native | - | Ethereum Sepolia | `@openfort/react-native`, `expo` |
+| **USDC** | React Native | - | Ethereum Sepolia | `@openfort/react-native`, `expo` |
 
