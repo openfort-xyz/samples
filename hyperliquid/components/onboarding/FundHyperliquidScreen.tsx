@@ -1,5 +1,5 @@
 import React from "react";
-import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity, Alert } from "react-native";
+import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Clipboard from 'expo-clipboard';
 
@@ -36,7 +36,6 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
   const copyToClipboard = async () => {
     if (hyperliquidAddress) {
       await Clipboard.setStringAsync(hyperliquidAddress);
-      Alert.alert("Copied!", "Hyperliquid wallet address copied to clipboard");
     }
   };
 

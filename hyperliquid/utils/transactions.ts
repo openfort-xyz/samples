@@ -27,7 +27,7 @@ export interface TransactionHandlers {
     transferAmount: string,
     walletBalance: any,
     activeWallet: any,
-    exportPrivateKey: () => Promise<string>,
+    _exportPrivateKey: () => Promise<string>,
     setIsTransferring: (loading: boolean) => void,
     setTransferAmount: (amount: string) => void,
     refetch: () => void
@@ -63,27 +63,12 @@ export const transactionHandlers: TransactionHandlers = {
 
     setIsBuying(true);
     try {
-      Alert.alert('Buy Order Initiated', `Buying ${HYPE_SYMBOL} with ${amount} USDC...`);
-
       const result = await buy(activeWallet, amount, DEFAULT_SLIPPAGE, {
         openfortClient,
       });
 
       if (result) {
         setBuyAmount('');
-
-        if (result.status === 'filled') {
-          Alert.alert(
-            'Buy Order Complete',
-            `Filled ${result.totalSize} ${HYPE_SYMBOL} at ~${result.avgPrice} USDC`
-          );
-        } else {
-          Alert.alert(
-            'Buy Order Resting',
-            `Waiting for fill: ${result.requestedSize} ${HYPE_SYMBOL} @ ${result.requestedPrice} USDC`
-          );
-        }
-
         return result;
       }
 
@@ -96,7 +81,6 @@ export const transactionHandlers: TransactionHandlers = {
     } finally {
       setIsBuying(false);
     }
-    return null;
   },
 
   handleSell: async (
@@ -135,19 +119,6 @@ export const transactionHandlers: TransactionHandlers = {
 
       if (result) {
         setSellAmount('');
-
-        if (result.status === 'filled') {
-          Alert.alert(
-            'Sell Order Complete',
-            `Filled ${result.totalSize} ${HYPE_SYMBOL} at ~${result.avgPrice} USDC`
-          );
-        } else {
-          Alert.alert(
-            'Sell Order Resting',
-            `Waiting for fill: ${result.requestedSize} ${HYPE_SYMBOL} @ ${result.requestedPrice} USDC`
-          );
-        }
-
         return result;
       }
 
@@ -160,14 +131,13 @@ export const transactionHandlers: TransactionHandlers = {
     } finally {
       setIsSelling(false);
     }
-    return null;
   },
 
   handleTransfer: async (
     transferAmount,
     walletBalance,
     activeWallet,
-    exportPrivateKey,
+    _exportPrivateKey,
     setIsTransferring,
     setTransferAmount,
     refetch
@@ -202,7 +172,6 @@ export const transactionHandlers: TransactionHandlers = {
       if (success) {
         setTransferAmount('');
         refetch();
-        Alert.alert('Transfer Complete', `Successfully transferred ${amount} USDC`);
         return true;
       }
       Alert.alert('Transfer Failed', 'Failed to transfer funds. Please try again.');
@@ -214,7 +183,6 @@ export const transactionHandlers: TransactionHandlers = {
     } finally {
       setIsTransferring(false);
     }
-    return false;
   }
 };
 
