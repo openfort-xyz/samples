@@ -110,127 +110,63 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   );
 
   const renderOverview = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionHeading}>Welcome to the Hyperliquid swapper</Text>
-      <Text style={styles.sectionSubheading}>
-        We will walk you through swapping USDC and {HYPE_SYMBOL} using your embedded wallet. Each screen
-        highlights one action, so you always know what to do next.
-      </Text>
-      <Text style={styles.apiOnboardingNote}>
-        Note: Before trading, your wallet owner address must be registered as an API wallet on Hyperliquid.
-        Visit https://app.hyperliquid-testnet.xyz/API to complete the onboarding process.
-      </Text>
-
-      <View style={styles.chartCard}>
+    <>
+      <View style={styles.priceSection}>
         {hypeUsdcLoading ? (
           <View style={styles.loadingRow}>
             <ActivityIndicator color="#00D4AA" />
-            <Text style={styles.loadingText}>Fetching live price…</Text>
+            <Text style={styles.loadingText}>Fetching price…</Text>
           </View>
         ) : hypeUsdcPrice ? (
           <>
             <Text style={styles.priceValue}>${hypeUsdcPrice.toFixed(4)}</Text>
             <Text style={styles.priceLabel}>HYPE / USDC mid price</Text>
-            {priceHistory.length > 1 ? (
-              <LineChart
-                data={{
-                  labels: timestamps,
-                  datasets: [
-                    {
-                      data: priceHistory,
-                    },
-                  ],
-                }}
-                width={width - 136}
-                height={160}
-                chartConfig={{
-                  backgroundColor: "transparent",
-                  backgroundGradientFrom: "rgba(15, 20, 25, 0)",
-                  backgroundGradientTo: "rgba(15, 20, 25, 0)",
-                  decimalPlaces: 4,
-                  color: (opacity = 1) => `rgba(0, 212, 170, ${opacity})`,
-                  labelColor: (opacity = 1) => `rgba(139, 148, 158, ${opacity})`,
-                  style: {
-                    borderRadius: 16,
-                  },
-                  propsForDots: {
-                    r: "3",
-                    strokeWidth: "1",
-                    stroke: "#00D4AA",
-                  },
-                  propsForBackgroundLines: {
-                    strokeDasharray: "5,5",
-                    stroke: "rgba(139, 148, 158, 0.2)",
-                    strokeWidth: 1,
-                  },
-                }}
-                bezier
-                style={styles.chart}
-                withHorizontalLabels
-                withVerticalLabels
-                withDots
-                withShadow={false}
-                withInnerLines
-                withOuterLines={false}
-              />
-            ) : (
-              <Text style={styles.chartEmpty}>Collecting price data…</Text>
-            )}
           </>
         ) : (
-          <Text style={styles.errorText}>Unable to fetch price feed</Text>
+          <Text style={styles.errorText}>Unable to fetch price</Text>
         )}
+        <Text style={styles.apiWarning}>
+          Note: Register as API wallet on Hyperliquid testnet before trading
+        </Text>
       </View>
 
       {balanceCards}
 
-      <GradientButton
-        title="Start a swap"
-        onPress={() => {
-          resetForNewSwap();
-          setFlowStep("direction");
-        }}
-      />
-    </View>
-  );
+      <View style={styles.swapOptionsSection}>
+        <Text style={styles.swapHeading}>Choose your swap</Text>
 
-  const renderDirection = () => (
-    <View style={styles.section}>
-      <Text style={styles.sectionHeading}>Choose your swap</Text>
-      <Text style={styles.sectionSubheading}>
-        Pick the direction you want to trade. You can always change it later.
-      </Text>
+        <View style={styles.swapButtons}>
+          <TouchableOpacity
+            style={[styles.swapButton, swapDirection === "buy" && styles.swapButtonSelected]}
+            onPress={() => setSwapDirection("buy")}
+          >
+            <Text style={styles.swapButtonTitle}>USDC → {HYPE_SYMBOL}</Text>
+            <Text style={styles.swapButtonSubtitle}>Buy {HYPE_SYMBOL} with USDC</Text>
+          </TouchableOpacity>
 
-      <View style={styles.directionRow}>
-        <TouchableOpacity
-          style={[styles.optionCard, swapDirection === "buy" && styles.optionCardSelected]}
-          onPress={() => setSwapDirection("buy")}
-        >
-          <Text style={styles.optionTitle}>USDC → {HYPE_SYMBOL}</Text>
-          <Text style={styles.optionSubtitle}>Spend USDC balance to buy {HYPE_SYMBOL}.</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.swapButton, swapDirection === "sell" && styles.swapButtonSelected]}
+            onPress={() => setSwapDirection("sell")}
+          >
+            <Text style={styles.swapButtonTitle}>{HYPE_SYMBOL} → USDC</Text>
+            <Text style={styles.swapButtonSubtitle}>Sell {HYPE_SYMBOL} for USDC</Text>
+          </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity
-          style={[styles.optionCard, swapDirection === "sell" && styles.optionCardSelected]}
-          onPress={() => setSwapDirection("sell")}
-        >
-          <Text style={styles.optionTitle}>{HYPE_SYMBOL} → USDC</Text>
-          <Text style={styles.optionSubtitle}>Sell your {HYPE_SYMBOL} position back to USDC.</Text>
-        </TouchableOpacity>
+        <GradientButton
+          title="Continue"
+          onPress={() => {
+            if (!swapDirection) {
+              Alert.alert("Select a swap", "Please choose a direction to continue.");
+              return;
+            }
+            setFlowStep("amount");
+          }}
+        />
       </View>
-
-      <GradientButton
-        title="Continue"
-        onPress={() => {
-          if (!swapDirection) {
-            Alert.alert("Select a swap", "Please choose a direction to continue.");
-            return;
-          }
-          setFlowStep("amount");
-        }}
-      />
-    </View>
+    </>
   );
+
 
   const renderAmount = () => {
     const isBuy = swapDirection === "buy";
@@ -408,7 +344,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           title="Swap again"
           onPress={() => {
             resetForNewSwap();
-            setFlowStep("direction");
+            setFlowStep("overview");
           }}
         />
       </View>
@@ -419,8 +355,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     switch (flowStep) {
       case "overview":
         return renderOverview();
-      case "direction":
-        return renderDirection();
       case "amount":
         return renderAmount();
       case "confirm":
@@ -642,5 +576,59 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: "rgba(239, 68, 68, 0.3)",
+  },
+  priceSection: {
+    backgroundColor: "rgba(26, 31, 46, 0.86)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(0, 212, 170, 0.15)",
+    padding: 20,
+    alignItems: "center",
+    gap: 8,
+    marginBottom: 16,
+  },
+  apiWarning: {
+    fontSize: 11,
+    color: "#EF4444",
+    textAlign: "center",
+    marginTop: 8,
+  },
+  swapOptionsSection: {
+    backgroundColor: "rgba(26, 31, 46, 0.86)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(0, 212, 170, 0.15)",
+    padding: 20,
+    gap: 16,
+  },
+  swapHeading: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    textAlign: "center",
+  },
+  swapButtons: {
+    gap: 12,
+  },
+  swapButton: {
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    backgroundColor: "rgba(15, 20, 25, 0.75)",
+  },
+  swapButtonSelected: {
+    borderColor: "rgba(0, 212, 170, 0.6)",
+    backgroundColor: "rgba(0, 212, 170, 0.12)",
+  },
+  swapButtonTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+    marginBottom: 4,
+  },
+  swapButtonSubtitle: {
+    fontSize: 13,
+    color: "#8B949E",
   },
 });
