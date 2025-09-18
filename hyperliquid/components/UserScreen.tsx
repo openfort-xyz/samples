@@ -137,6 +137,7 @@ export const UserScreen: React.FC = () => {
             refetchHypeBalances={refetchHypeBalances}
             hypeUsdcPrice={hypeUsdcPrice}
             hypeUsdcLoading={hypeUsdcLoading}
+            hyperliquidAccountAddress={hyperliquidAccountAddress}
           />
         </View>
       );

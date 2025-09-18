@@ -2,6 +2,7 @@ import { Alert } from 'react-native';
 
 import { HYPE_SYMBOL, DEFAULT_SLIPPAGE } from '../constants/hyperliquid';
 import { transfer, buy, sell, DEFAULT_MIN_HYPE_ORDER_SIZE } from '../services/HyperliquidClient';
+import type { OrderPlacementResult } from '../services/HyperliquidClient';
 
 export interface TransactionHandlers {
   handleBuy: (
@@ -11,7 +12,7 @@ export interface TransactionHandlers {
     hypeBalances: any,
     setIsBuying: (loading: boolean) => void,
     setBuyAmount: (amount: string) => void
-  ) => Promise<boolean>;
+  ) => Promise<OrderPlacementResult | null>;
 
   handleSell: (
     activeWallet: any,
@@ -20,7 +21,7 @@ export interface TransactionHandlers {
     hypeBalances: any,
     setIsSelling: (loading: boolean) => void,
     setSellAmount: (amount: string) => void
-  ) => Promise<boolean>;
+  ) => Promise<OrderPlacementResult | null>;
 
   handleTransfer: (
     transferAmount: string,
@@ -44,7 +45,7 @@ export const transactionHandlers: TransactionHandlers = {
   ) => {
     if (!buyAmount || parseFloat(buyAmount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid USDC amount to buy');
-      return false;
+      return null;
     }
 
     const amount = parseFloat(buyAmount);
@@ -52,38 +53,50 @@ export const transactionHandlers: TransactionHandlers = {
 
     if (amount > currentHypeBalance) {
       Alert.alert('Insufficient Balance', 'Buy amount exceeds Hyperliquid USDC balance');
-      return false;
+      return null;
     }
 
     if (amount < 1) {
       Alert.alert('Minimum Amount', 'Minimum buy amount is $1 USDC');
-      return false;
+      return null;
     }
 
     setIsBuying(true);
     try {
       Alert.alert('Buy Order Initiated', `Buying ${HYPE_SYMBOL} with ${amount} USDC...`);
 
-      const success = await buy(activeWallet, amount, DEFAULT_SLIPPAGE, {
+      const result = await buy(activeWallet, amount, DEFAULT_SLIPPAGE, {
         openfortClient,
       });
 
-      if (success) {
+      if (result) {
         setBuyAmount('');
-        Alert.alert('Buy Order Complete', `Successfully bought ${HYPE_SYMBOL} with ${amount} USDC`);
-        return true;
-      } else {
-        Alert.alert('Buy Order Failed', 'Failed to execute buy order');
-        return false;
+
+        if (result.status === 'filled') {
+          Alert.alert(
+            'Buy Order Complete',
+            `Filled ${result.totalSize} ${HYPE_SYMBOL} at ~${result.avgPrice} USDC`
+          );
+        } else {
+          Alert.alert(
+            'Buy Order Resting',
+            `Waiting for fill: ${result.requestedSize} ${HYPE_SYMBOL} @ ${result.requestedPrice} USDC`
+          );
+        }
+
+        return result;
       }
+
+      Alert.alert('Buy Order Failed', 'Failed to execute buy order');
+      return null;
     } catch (error) {
       console.error('Buy error:', error);
       Alert.alert('Buy Order Failed', `Failed to execute buy order: ${error instanceof Error ? error.message : 'Unknown error'}`);
-      return false;
+      return null;
     } finally {
       setIsBuying(false);
     }
-    return false;
+    return null;
   },
 
   handleSell: async (
@@ -96,7 +109,7 @@ export const transactionHandlers: TransactionHandlers = {
   ) => {
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
       Alert.alert('Invalid Amount', `Please enter a valid ${HYPE_SYMBOL} amount to sell`);
-      return false;
+      return null;
     }
 
     const amount = parseFloat(sellAmount);
@@ -105,35 +118,49 @@ export const transactionHandlers: TransactionHandlers = {
 
     if (amount > currentHypeBalance) {
       Alert.alert('Insufficient Balance', `Sell amount exceeds ${HYPE_SYMBOL} balance`);
-      return false;
+      return null;
     }
 
     if (amount < DEFAULT_MIN_HYPE_ORDER_SIZE) {
       Alert.alert('Minimum Amount', `Minimum sell amount is ${DEFAULT_MIN_HYPE_ORDER_SIZE} ${HYPE_SYMBOL}`);
-      return false;
+      return null;
     }
 
     setIsSelling(true);
 
     try {
-      const success = await sell(activeWallet, amount, DEFAULT_SLIPPAGE, {
+      const result = await sell(activeWallet, amount, DEFAULT_SLIPPAGE, {
         openfortClient,
       });
 
-      if (success) {
-        Alert.alert('Success', `${HYPE_SYMBOL} sell order placed successfully!`);
+      if (result) {
         setSellAmount('');
-        return true;
+
+        if (result.status === 'filled') {
+          Alert.alert(
+            'Sell Order Complete',
+            `Filled ${result.totalSize} ${HYPE_SYMBOL} at ~${result.avgPrice} USDC`
+          );
+        } else {
+          Alert.alert(
+            'Sell Order Resting',
+            `Waiting for fill: ${result.requestedSize} ${HYPE_SYMBOL} @ ${result.requestedPrice} USDC`
+          );
+        }
+
+        return result;
       }
-      return false;
+
+      Alert.alert('Sell Order Failed', `Failed to sell ${HYPE_SYMBOL}`);
+      return null;
     } catch (error) {
       console.error('Sell error:', error);
       Alert.alert('Sell Error', error instanceof Error ? error.message : `Failed to sell ${HYPE_SYMBOL}`);
-      return false;
+      return null;
     } finally {
       setIsSelling(false);
     }
-    return false;
+    return null;
   },
 
   handleTransfer: async (

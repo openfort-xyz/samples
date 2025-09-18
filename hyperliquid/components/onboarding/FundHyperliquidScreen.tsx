@@ -32,7 +32,6 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
   }, [hyperliquidAddress]);
 
   const hasExchangeBalance = (hyperliquidBalance ?? 0) > 0;
-  const hasWalletBalance = (walletBalance ?? 0) > 0;
 
   const copyToClipboard = async () => {
     if (hyperliquidAddress) {

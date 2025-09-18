@@ -1,8 +1,10 @@
 import "../polyfills";
 import * as Hyperliquid from "@nktkas/hyperliquid";
 import { actionSorter, createL1ActionHash } from "@nktkas/hyperliquid/signing";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ethers } from "ethers";
+
+import type { Book, FrontendOrder } from "@nktkas/hyperliquid";
 
 import {
   HYPE_ASSET_ID,
@@ -61,6 +63,28 @@ type EmbeddedWalletSigner = {
 let hypeSizingPromise: Promise<HypeSizing> | null = null;
 
 const FILL_LOOKBACK_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+
+const ORDER_BOOK_SIG_FIGS = 4;
+
+export type OrderPlacementResult =
+    | {
+        status: "filled";
+        side: "buy" | "sell";
+        orderId: number;
+        avgPrice: string;
+        totalSize: string;
+        requestedPrice: string;
+        requestedSize: string;
+        timestamp: number;
+    }
+    | {
+        status: "resting";
+        side: "buy" | "sell";
+        orderId: number;
+        requestedPrice: string;
+        requestedSize: string;
+        timestamp: number;
+    };
 
 const fetchRecentFillForOrder = async (
     userAddress: string | undefined,
@@ -259,9 +283,24 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
     const [price, setPrice] = useState<number | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasLoadedRef = useRef(false);
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     useEffect(() => {
         const fetchPrice = async () => {
+            if (!isMountedRef.current) {
+                return;
+            }
+
+            if (!hasLoadedRef.current) {
+                setIsLoading(true);
+            }
             try {
                 // Use HTTP transport instead of WebSocket for better reliability in React Native
                 const allMids = await infoClient.allMids();
@@ -269,12 +308,21 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
                 if (!value) {
                     throw new Error(`Asset ${HYPE_MARKET_ID} not found`);
                 }
+                if (!isMountedRef.current) {
+                    return;
+                }
                 setPrice(Number(value));
                 setError(null);
+                hasLoadedRef.current = true;
             } catch (err) {
+                if (!isMountedRef.current) {
+                    return;
+                }
                 setError(err instanceof Error ? err.message : 'Unknown error');
             } finally {
-                setIsLoading(false);
+                if (isMountedRef.current) {
+                    setIsLoading(false);
+                }
             }
         };
 
@@ -287,7 +335,150 @@ export const useHypeUsdc = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
         return () => clearInterval(interval);
     }, [intervalMs]);
 
-    return { price, isLoading, error };
+    return { price, isLoading: !hasLoadedRef.current ? isLoading : false, error };
+};
+
+export const useHypeOrderBook = (intervalMs = PRICE_POLL_INTERVAL_MS) => {
+    const [book, setBook] = useState<Book | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const hasLoadedRef = useRef(false);
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
+    useEffect(() => {
+        const fetchOrderBook = async () => {
+            if (!isMountedRef.current) {
+                return;
+            }
+
+            if (!hasLoadedRef.current) {
+                setIsLoading(true);
+            }
+
+            try {
+                const snapshot = await infoClient.l2Book({
+                    coin: HYPE_SYMBOL,
+                    nSigFigs: ORDER_BOOK_SIG_FIGS,
+                });
+
+                if (!isMountedRef.current) {
+                    return;
+                }
+
+                setBook(snapshot);
+                setError(null);
+                hasLoadedRef.current = true;
+            } catch (err) {
+                if (!isMountedRef.current) {
+                    return;
+                }
+
+                console.error('Failed to fetch Hyperliquid order book:', err);
+                setError(err instanceof Error ? err.message : 'Unknown error');
+            } finally {
+                if (isMountedRef.current) {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        fetchOrderBook();
+        const interval = setInterval(fetchOrderBook, intervalMs);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [intervalMs]);
+
+    return { book, isLoading: !hasLoadedRef.current ? isLoading : false, error };
+};
+
+export const useHypeOpenOrders = (
+    address: `0x${string}` | undefined,
+    intervalMs = PRICE_POLL_INTERVAL_MS
+) => {
+    const [orders, setOrders] = useState<FrontendOrder[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const hasLoadedRef = useRef(false);
+    const isMountedRef = useRef(true);
+
+    useEffect(() => {
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
+
+    const fetchOpenOrders = useCallback(async () => {
+        if (!isMountedRef.current) {
+            return;
+        }
+
+        if (!address) {
+            setOrders([]);
+            setError(null);
+            hasLoadedRef.current = false;
+            setIsLoading(false);
+            return;
+        }
+
+        if (!hasLoadedRef.current) {
+            setIsLoading(true);
+        }
+
+        try {
+            const response = await infoClient.frontendOpenOrders({ user: address });
+            if (!isMountedRef.current) {
+                return;
+            }
+            setOrders(Array.isArray(response) ? response : []);
+            setError(null);
+            hasLoadedRef.current = true;
+        } catch (err) {
+            if (!isMountedRef.current) {
+                return;
+            }
+            console.error('Failed to fetch Hyperliquid open orders:', err);
+            setError(err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+            if (isMountedRef.current) {
+                setIsLoading(false);
+            }
+        }
+    }, [address]);
+
+    useEffect(() => {
+        const run = async () => {
+            await fetchOpenOrders();
+        };
+
+        run();
+
+        if (!address) {
+            return undefined;
+        }
+
+        const interval = setInterval(() => {
+            run();
+        }, intervalMs);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [address, intervalMs, fetchOpenOrders]);
+
+    return {
+        orders,
+        isLoading: !hasLoadedRef.current ? isLoading : false,
+        error,
+        refetch: fetchOpenOrders,
+    };
 };
 
 // Hyperliquid account + positions balances
@@ -390,7 +581,7 @@ export const buy = async (
     amount: number,
     slippage: number = DEFAULT_SLIPPAGE,
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
-): Promise<boolean> => {
+): Promise<OrderPlacementResult> => {
     try {
         console.log('=== DEBUG: Buy function called ===');
         console.log('activeWallet object:', JSON.stringify(activeWallet, null, 2));
@@ -508,11 +699,29 @@ export const buy = async (
                 console.log('- Filled size:', firstStatus.filled.totalSz);
                 console.log('- Average price:', firstStatus.filled.avgPx);
                 await fetchRecentFillForOrder(activeWallet?.address, firstStatus.filled.oid);
-                return true;
+                const timestamp = Date.now();
+                return {
+                    status: 'filled',
+                    side: 'buy',
+                    orderId: firstStatus.filled.oid,
+                    avgPrice: firstStatus.filled.avgPx,
+                    totalSize: firstStatus.filled.totalSz,
+                    requestedPrice: buyPriceStr,
+                    requestedSize: quantityStr,
+                    timestamp,
+                };
             } else if ('resting' in firstStatus) {
                 console.log('Order placed but not filled immediately');
                 console.log('- Order ID:', firstStatus.resting.oid);
-                return true;
+                const timestamp = Date.now();
+                return {
+                    status: 'resting',
+                    side: 'buy',
+                    orderId: firstStatus.resting.oid,
+                    requestedPrice: buyPriceStr,
+                    requestedSize: quantityStr,
+                    timestamp,
+                };
             } else if ('error' in firstStatus) {
                 throw new Error(`Order failed: ${firstStatus.error}`);
             }
@@ -532,7 +741,7 @@ export const sell = async (
     amount: number,
     slippage: number = DEFAULT_SLIPPAGE,
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
-): Promise<boolean> => {
+): Promise<OrderPlacementResult> => {
     try {
         console.log('Attempting to sell', amount, 'HYPE');
 
@@ -637,11 +846,29 @@ export const sell = async (
                 console.log('- Filled size:', firstStatus.filled.totalSz);
                 console.log('- Average price:', firstStatus.filled.avgPx);
                 await fetchRecentFillForOrder(activeWallet?.address, firstStatus.filled.oid);
-                return true;
+                const timestamp = Date.now();
+                return {
+                    status: 'filled',
+                    side: 'sell',
+                    orderId: firstStatus.filled.oid,
+                    avgPrice: firstStatus.filled.avgPx,
+                    totalSize: firstStatus.filled.totalSz,
+                    requestedPrice: sellPriceStr,
+                    requestedSize: quantityStr,
+                    timestamp,
+                };
             } else if ('resting' in firstStatus) {
                 console.log('Sell order placed but not filled immediately');
                 console.log('- Order ID:', firstStatus.resting.oid);
-                return true;
+                const timestamp = Date.now();
+                return {
+                    status: 'resting',
+                    side: 'sell',
+                    orderId: firstStatus.resting.oid,
+                    requestedPrice: sellPriceStr,
+                    requestedSize: quantityStr,
+                    timestamp,
+                };
             } else if ('error' in firstStatus) {
                 throw new Error(`Sell order failed: ${firstStatus.error}`);
             }
