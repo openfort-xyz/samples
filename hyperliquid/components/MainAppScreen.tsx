@@ -427,8 +427,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                 openfortClient,
                 amountToSwap,
                 hypeBalances,
-                setIsProcessing,
-                setSwapAmount
+                setIsProcessing
               );
               if (result) {
                 const computedPrice = (() => {
@@ -464,6 +463,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                   avgPrice: result.avgPrice,
                   totalSize: result.totalSize,
                 });
+                setSwapAmount("");
                 setFlowStep("result");
                 return;
               }
@@ -473,8 +473,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                 openfortClient,
                 amountToSwap,
                 hypeBalances,
-                setIsProcessing,
-                setSwapAmount
+                setIsProcessing
               );
               if (result) {
                 const computedPrice = (() => {
@@ -510,6 +509,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                   avgPrice: result.avgPrice,
                   totalSize: result.totalSize,
                 });
+                setSwapAmount("");
                 setFlowStep("result");
                 return;
               }

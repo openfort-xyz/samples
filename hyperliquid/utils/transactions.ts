@@ -10,8 +10,7 @@ export interface TransactionHandlers {
     openfortClient: any,
     buyAmount: string,
     hypeBalances: any,
-    setIsBuying: (loading: boolean) => void,
-    setBuyAmount: (amount: string) => void
+    setIsBuying: (loading: boolean) => void
   ) => Promise<OrderPlacementResult | null>;
 
   handleSell: (
@@ -19,8 +18,7 @@ export interface TransactionHandlers {
     openfortClient: any,
     sellAmount: string,
     hypeBalances: any,
-    setIsSelling: (loading: boolean) => void,
-    setSellAmount: (amount: string) => void
+    setIsSelling: (loading: boolean) => void
   ) => Promise<OrderPlacementResult | null>;
 
   handleTransfer: (
@@ -40,8 +38,7 @@ export const transactionHandlers: TransactionHandlers = {
     openfortClient: any,
     buyAmount,
     hypeBalances,
-    setIsBuying,
-    setBuyAmount
+    setIsBuying
   ) => {
     if (!buyAmount || parseFloat(buyAmount) <= 0) {
       Alert.alert('Invalid Amount', 'Please enter a valid USDC amount to buy');
@@ -73,7 +70,6 @@ export const transactionHandlers: TransactionHandlers = {
       });
 
       if (result) {
-        setBuyAmount('');
         return result;
       }
 
@@ -93,8 +89,7 @@ export const transactionHandlers: TransactionHandlers = {
     openfortClient: any,
     sellAmount,
     hypeBalances,
-    setIsSelling,
-    setSellAmount
+    setIsSelling
   ) => {
     if (!sellAmount || parseFloat(sellAmount) <= 0) {
       Alert.alert('Invalid Amount', `Please enter a valid ${HYPE_SYMBOL} amount to sell`);
@@ -127,7 +122,6 @@ export const transactionHandlers: TransactionHandlers = {
       });
 
       if (result) {
-        setSellAmount('');
         return result;
       }
 
