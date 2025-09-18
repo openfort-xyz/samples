@@ -13,7 +13,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { LineChart } from "react-native-chart-kit";
 import { UserWallet } from "@openfort/react-native";
 
-import { GradientButton } from "./ui";
+import { CustomButton, GradientButton } from "./ui";
 import { usePriceChart } from "../hooks/usePriceChart";
 import { transactionHandlers } from "../utils/transactions";
 import { HYPE_SYMBOL } from "../constants/hyperliquid";
@@ -210,6 +210,8 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           }}
           disabled={!isValid}
         />
+
+        <CustomButton title="Back" onPress={() => setFlowStep("overview")} />
       </View>
     );
   };
@@ -250,6 +252,15 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
             </Text>
           </View>
         </View>
+
+        <CustomButton
+          title="Back"
+          onPress={() => {
+            setIsProcessing(false);
+            setFlowStep("amount");
+          }}
+          disabled={isProcessing}
+        />
 
         <GradientButton
           title={isProcessing ? "Swapping…" : "Swap now"}
