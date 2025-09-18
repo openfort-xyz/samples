@@ -28,9 +28,8 @@ export const UserScreen: React.FC = () => {
 
   const hyperliquidAccountAddress = useMemo(() => {
     const address = Constants.expoConfig?.extra?.hyperliquidWalletAddress as `0x${string}`;
-    console.log('Hyperliquid wallet address from env:', address);
     return address;
-  }, []);
+  }, [Constants.expoConfig?.extra?.hyperliquidWalletAddress]);
 
   const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
   const {
@@ -75,7 +74,7 @@ export const UserScreen: React.FC = () => {
         Alert.alert("Wallet Creation Failed", error?.message ?? "Please try again later.");
       },
       onSuccess: ({ wallet }: any) => {
-        Alert.alert("Wallet Created", `Address: ${wallet?.address}`);
+        console.log("Wallet created", wallet);
       },
     });
   }, [wallets]);

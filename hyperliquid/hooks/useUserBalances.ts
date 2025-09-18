@@ -40,7 +40,6 @@ export const useWalletBalance = (walletAddress?: string) => {
 
   useEffect(() => {
     if (!walletAddress) return;
-    console.log("fetching balance");
     fetchBalance();
   }, [walletAddress, fetchBalance]);
 

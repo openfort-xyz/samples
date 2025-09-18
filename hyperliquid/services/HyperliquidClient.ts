@@ -127,11 +127,7 @@ const fetchRecentFillForOrder = async (
 const fetchHypeSizing = async (): Promise<HypeSizing> => {
     try {
         const spotMeta = await infoClient.spotMeta();
-        console.log('Full spotMeta response:', JSON.stringify(spotMeta, null, 2));
         const token = spotMeta.tokens.find((t: any) => t.index === 1035);
-        console.log('Found token at index 1035:', JSON.stringify(token, null, 2));
-        console.log('Token details - Name:', token?.name, 'Full Name:', token?.fullName);
-        console.log('All token properties:', token ? Object.keys(token) : 'token is undefined');
         if (!token) {
             throw new Error('HYPE token metadata not found in spotMeta response');
         }
@@ -594,10 +590,6 @@ export const buy = async (
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<OrderPlacementResult> => {
     try {
-        console.log('=== DEBUG: Buy function called ===');
-        console.log('activeWallet object:', JSON.stringify(activeWallet, null, 2));
-        console.log('activeWallet.address:', activeWallet?.address);
-        console.log('Expected address: 0x4ce1bd61AcBdA517F03B336665b793987265fCd1');
         console.log('Attempting to buy HYPE with', amount, 'USDC');
 
         const allMids = await infoClient.allMids();
@@ -776,7 +768,7 @@ export const sell = async (
             .replace(/\.0+$/, '')
             .replace(/(\.\d*[1-9])0+$/, '$1');
 
-        console.log('Price calculation debug:');
+        console.log('Price calculation for sell:');
         console.log('- Raw sell price:', sellPriceRaw);
         console.log('- Rounded to', tickDecimals, 'decimals:', sellPriceRounded);
         console.log('- Final price string:', sellPriceStr);
