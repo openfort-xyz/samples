@@ -104,7 +104,9 @@ const fetchHypeSizing = async (): Promise<HypeSizing> => {
         const spotMeta = await infoClient.spotMeta();
         console.log('Full spotMeta response:', JSON.stringify(spotMeta, null, 2));
         const token = spotMeta.tokens.find((t: any) => t.index === 1035);
-        console.log('Found HYPE token metadata:', JSON.stringify(token, null, 2));
+        console.log('Found token at index 1035:', JSON.stringify(token, null, 2));
+        console.log('Token details - Name:', token?.name, 'Full Name:', token?.fullName);
+        console.log('All token properties:', token ? Object.keys(token) : 'token is undefined');
         if (!token) {
             throw new Error('HYPE token metadata not found in spotMeta response');
         }
@@ -406,11 +408,13 @@ export const buy = async (
         console.log('HYPE sizing details:', { szDecimals, priceDecimals, minSize, assetId: assetIdForOrder });
 
         const buyPriceRaw = parseFloat(hypePrice) * (1 + slippage);
-        const priceScale = Math.pow(10, priceDecimals);
+        // Force 3 decimal places for tick size compatibility
+        const tickDecimals = 3;
+        const priceScale = Math.pow(10, tickDecimals);
         const buyPriceRounded = Math.round(buyPriceRaw * priceScale) / priceScale;
         const buyPrice = Math.max(buyPriceRounded, buyPriceRaw); // ensure we don't undercut mid
         const buyPriceStr = buyPrice
-            .toFixed(priceDecimals)
+            .toFixed(tickDecimals)
             .replace(/\.0+$/, '')
             .replace(/(\.\d*[1-9])0+$/, '$1');
 
@@ -541,13 +545,20 @@ export const sell = async (
         const assetIdForOrder = assetId ?? HYPE_ASSET_ID;
 
         const sellPriceRaw = parseFloat(hypePrice) * (1 - slippage);
-        const priceScale = Math.pow(10, priceDecimals);
+        // Force 3 decimal places for tick size compatibility (observed from working buy orders)
+        const tickDecimals = 3;
+        const priceScale = Math.pow(10, tickDecimals);
         const sellPriceRounded = Math.round(sellPriceRaw * priceScale) / priceScale;
         const sellPrice = Math.max(sellPriceRounded, sellPriceRaw);
         const sellPriceStr = sellPrice
-            .toFixed(priceDecimals)
+            .toFixed(tickDecimals)
             .replace(/\.0+$/, '')
             .replace(/(\.\d*[1-9])0+$/, '$1');
+
+        console.log('Price calculation debug:');
+        console.log('- Raw sell price:', sellPriceRaw);
+        console.log('- Rounded to', tickDecimals, 'decimals:', sellPriceRounded);
+        console.log('- Final price string:', sellPriceStr);
 
         if (amount < minSize) {
             throw new Error(`Order size too small. Hyperliquid requires at least ${minSize} ${HYPE_SYMBOL} per order.`);
