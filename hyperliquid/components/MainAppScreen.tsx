@@ -2,7 +2,6 @@ import React from "react";
 import {
   Alert,
   ActivityIndicator,
-  Dimensions,
   StyleSheet,
   Text,
   TextInput,
@@ -10,25 +9,29 @@ import {
   View,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { LineChart } from "react-native-chart-kit";
 import { UserWallet } from "@openfort/react-native";
 
 import { CustomButton, GradientButton } from "./ui";
-import { usePriceChart } from "../hooks/usePriceChart";
 import { transactionHandlers } from "../utils/transactions";
+import { useHypeOrderBook, useHypeOpenOrders } from "../services/HyperliquidClient";
 import { HYPE_SYMBOL } from "../constants/hyperliquid";
-
-const { width } = Dimensions.get("window");
 
 type FlowStep = "overview" | "direction" | "amount" | "confirm" | "result";
 type SwapDirection = "buy" | "sell";
+type SwapStatus = "filled" | "resting";
 
 type SwapResult = {
+  status: SwapStatus;
   direction: SwapDirection;
   inputAmount: string;
   outputAmount: string | null;
   priceAtExecution: number | null;
   timestamp: number;
+  orderId?: number;
+  requestedPrice?: string;
+  requestedSize?: string;
+  avgPrice?: string;
+  totalSize?: string;
 };
 
 interface MainAppScreenProps {
@@ -42,6 +45,7 @@ interface MainAppScreenProps {
   refetchHypeBalances: () => void;
   hypeUsdcPrice: number | null;
   hypeUsdcLoading: boolean;
+  hyperliquidAccountAddress?: `0x${string}`;
 }
 
 export const MainAppScreen: React.FC<MainAppScreenProps> = ({
@@ -55,6 +59,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   refetchHypeBalances,
   hypeUsdcPrice,
   hypeUsdcLoading,
+  hyperliquidAccountAddress,
 }) => {
   const [flowStep, setFlowStep] = React.useState<FlowStep>("overview");
   const [swapDirection, setSwapDirection] = React.useState<SwapDirection | null>(null);
@@ -62,7 +67,17 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   const [isProcessing, setIsProcessing] = React.useState(false);
   const [swapResult, setSwapResult] = React.useState<SwapResult | null>(null);
 
-  const { priceHistory, timestamps } = usePriceChart(hypeUsdcPrice, hypeUsdcLoading);
+  const {
+    book: orderBook,
+    isLoading: orderBookLoading,
+    error: orderBookError,
+  } = useHypeOrderBook();
+  const {
+    orders: openOrders,
+    isLoading: openOrdersLoading,
+    error: openOrdersError,
+    refetch: refetchOpenOrders,
+  } = useHypeOpenOrders(hyperliquidAccountAddress);
 
   const hyperliquidUsdcBalance = React.useMemo(
     () => Number(hypeBalances?.account?.usdcBalance ?? 0),
@@ -72,6 +87,116 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   const hypeTokenBalance = React.useMemo(() => {
     return parseFloat(hypeBalances?.positions?.hypePosition?.total || "0");
   }, [hypeBalances]);
+
+  const hasOpenOrders = openOrders.length > 0;
+  const visibleOpenOrders = React.useMemo(() => openOrders.slice(0, 3), [openOrders]);
+  const orderBookBids = React.useMemo(() => orderBook?.levels?.[0]?.slice(0, 5) ?? [], [orderBook]);
+  const orderBookAsks = React.useMemo(() => orderBook?.levels?.[1]?.slice(0, 5) ?? [], [orderBook]);
+
+  const formatNumeric = React.useCallback(
+    (value: string | number | undefined | null, decimals = 3) => {
+      if (value === undefined || value === null) {
+        return "—";
+      }
+      const numeric = typeof value === "number" ? value : parseFloat(value);
+      if (Number.isNaN(numeric)) {
+        return typeof value === "string" ? value : "—";
+      }
+      return numeric.toFixed(decimals);
+    },
+    []
+  );
+
+  const renderPendingOrdersBanner = () => {
+    if (openOrdersLoading && !hasOpenOrders) {
+      return (
+        <View style={styles.pendingBanner}>
+          <ActivityIndicator color="#00D4AA" size="small" />
+          <Text style={styles.pendingBannerText}>Checking open orders…</Text>
+        </View>
+      );
+    }
+
+    if (openOrdersError && !hasOpenOrders) {
+      return (
+        <View style={[styles.pendingBanner, styles.pendingBannerError]}>
+          <Text style={styles.pendingOrderErrorText}>Unable to refresh open orders.</Text>
+        </View>
+      );
+    }
+
+    if (!hasOpenOrders) {
+      return null;
+    }
+
+    return (
+      <View style={styles.pendingBanner}>
+        <Text style={styles.pendingBannerTitle}>Waiting on trade</Text>
+        {visibleOpenOrders.map((order) => (
+          <View key={`${order.oid}-${order.timestamp}`} style={styles.pendingOrderRow}>
+            <Text style={styles.pendingOrderText}>
+              {order.side === "B" ? "Buy" : "Sell"} {formatNumeric(order.sz, 4)} {HYPE_SYMBOL} @ {formatNumeric(order.limitPx, 3)} USDC
+            </Text>
+            <Text style={styles.pendingOrderSubtext}>
+              Placed {new Date(order.timestamp).toLocaleTimeString()}
+            </Text>
+          </View>
+        ))}
+        {openOrders.length > visibleOpenOrders.length && (
+          <Text style={styles.pendingOrderFootnote}>
+            +{openOrders.length - visibleOpenOrders.length} more resting orders
+          </Text>
+        )}
+      </View>
+    );
+  };
+
+  const renderOrderBookSection = () => {
+    // Filter open orders to show only user's orders, separated by side
+    const userBids = openOrders.filter(order => order.side === "B").slice(0, 5);
+    const userAsks = openOrders.filter(order => order.side === "A").slice(0, 5);
+
+    return (
+      <View style={styles.orderBookSection}>
+        <View style={styles.orderBookHeader}>
+          <Text style={styles.orderBookTitle}>My orders (top 5)</Text>
+          {openOrdersLoading && <ActivityIndicator color="#00D4AA" size="small" />}
+        </View>
+        {openOrdersError ? (
+          <Text style={styles.orderBookErrorText}>Unable to load your orders.</Text>
+        ) : (
+          <View style={styles.orderBookColumns}>
+            <View style={styles.orderBookColumn}>
+              <Text style={styles.orderBookColumnTitle}>My Bids</Text>
+              {userBids.length === 0 && !openOrdersLoading ? (
+                <Text style={styles.orderBookEmpty}>No bids</Text>
+              ) : (
+                userBids.map((order, index) => (
+                  <View key={`bid-${order.oid}-${index}`} style={styles.orderBookRow}>
+                    <Text style={[styles.orderBookPrice, styles.orderBookBid]}>{formatNumeric(order.limitPx, 3)}</Text>
+                    <Text style={styles.orderBookSize}>{formatNumeric(order.sz, 3)} {HYPE_SYMBOL}</Text>
+                  </View>
+                ))
+              )}
+            </View>
+            <View style={styles.orderBookColumn}>
+              <Text style={styles.orderBookColumnTitle}>My Asks</Text>
+              {userAsks.length === 0 && !openOrdersLoading ? (
+                <Text style={styles.orderBookEmpty}>No asks</Text>
+              ) : (
+                userAsks.map((order, index) => (
+                  <View key={`ask-${order.oid}-${index}`} style={styles.orderBookRow}>
+                    <Text style={[styles.orderBookPrice, styles.orderBookAsk]}>{formatNumeric(order.limitPx, 3)}</Text>
+                    <Text style={styles.orderBookSize}>{formatNumeric(order.sz, 3)} {HYPE_SYMBOL}</Text>
+                  </View>
+                ))
+              )}
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   React.useEffect(() => {
     const interval = setInterval(() => {
@@ -111,6 +236,8 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
 
   const renderOverview = () => (
     <>
+      {renderPendingOrdersBanner()}
+
       <View style={styles.priceSection}>
         {hypeUsdcLoading ? (
           <View style={styles.loadingRow}>
@@ -129,6 +256,8 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           Note: Register as API wallet on Hyperliquid testnet before trading
         </Text>
       </View>
+
+      {renderOrderBookSection()}
 
       {balanceCards}
 
@@ -278,7 +407,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
             const expectedOutput = estimatedOutput;
 
             if (swapDirection === "buy") {
-              const success = await transactionHandlers.handleBuy(
+              const result = await transactionHandlers.handleBuy(
                 activeWallet,
                 openfortClient,
                 amountToSwap,
@@ -286,20 +415,45 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                 setIsProcessing,
                 setSwapAmount
               );
-              if (success) {
-                await Promise.allSettled([refetchWalletBalance(), refetchHypeBalances()]);
+              if (result) {
+                const computedPrice = (() => {
+                  if (result.status === "filled") {
+                    const avg = parseFloat(result.avgPrice ?? "");
+                    if (!Number.isNaN(avg)) {
+                      return avg;
+                    }
+                  }
+                  const limitPx = parseFloat(result.requestedPrice ?? "");
+                  if (!Number.isNaN(limitPx)) {
+                    return limitPx;
+                  }
+                  return hypeUsdcPrice ?? null;
+                })();
+
+                await Promise.allSettled([
+                  refetchWalletBalance(),
+                  refetchHypeBalances(),
+                  refetchOpenOrders(),
+                ]);
+
                 setSwapResult({
+                  status: result.status,
                   direction: "buy",
                   inputAmount: amountToSwap,
                   outputAmount: expectedOutput ?? null,
-                  priceAtExecution: hypeUsdcPrice,
-                  timestamp: Date.now(),
+                  priceAtExecution: computedPrice,
+                  timestamp: result.timestamp,
+                  orderId: result.orderId,
+                  requestedPrice: result.requestedPrice,
+                  requestedSize: result.requestedSize,
+                  avgPrice: result.avgPrice,
+                  totalSize: result.totalSize,
                 });
                 setFlowStep("result");
                 return;
               }
             } else {
-              const success = await transactionHandlers.handleSell(
+              const result = await transactionHandlers.handleSell(
                 activeWallet,
                 openfortClient,
                 amountToSwap,
@@ -307,14 +461,39 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                 setIsProcessing,
                 setSwapAmount
               );
-              if (success) {
-                await Promise.allSettled([refetchWalletBalance(), refetchHypeBalances()]);
+              if (result) {
+                const computedPrice = (() => {
+                  if (result.status === "filled") {
+                    const avg = parseFloat(result.avgPrice ?? "");
+                    if (!Number.isNaN(avg)) {
+                      return avg;
+                    }
+                  }
+                  const limitPx = parseFloat(result.requestedPrice ?? "");
+                  if (!Number.isNaN(limitPx)) {
+                    return limitPx;
+                  }
+                  return hypeUsdcPrice ?? null;
+                })();
+
+                await Promise.allSettled([
+                  refetchWalletBalance(),
+                  refetchHypeBalances(),
+                  refetchOpenOrders(),
+                ]);
+
                 setSwapResult({
+                  status: result.status,
                   direction: "sell",
                   inputAmount: amountToSwap,
                   outputAmount: expectedOutput ?? null,
-                  priceAtExecution: hypeUsdcPrice,
-                  timestamp: Date.now(),
+                  priceAtExecution: computedPrice,
+                  timestamp: result.timestamp,
+                  orderId: result.orderId,
+                  requestedPrice: result.requestedPrice,
+                  requestedSize: result.requestedSize,
+                  avgPrice: result.avgPrice,
+                  totalSize: result.totalSize,
                 });
                 setFlowStep("result");
                 return;
@@ -329,11 +508,38 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   };
 
   const renderResult = () => {
-    const isBuy = swapResult?.direction === "buy";
-    const headline = isBuy ? "Swap complete" : "Sell order complete";
-    const summaryText = isBuy
-      ? `Swapped ${swapResult?.inputAmount ?? "0"} USDC for about ${swapResult?.outputAmount ?? "—"} ${HYPE_SYMBOL}`
-      : `Swapped ${swapResult?.inputAmount ?? "0"} ${HYPE_SYMBOL} for about ${swapResult?.outputAmount ?? "—"} USDC`;
+    if (!swapResult) {
+      return null;
+    }
+
+    const isBuy = swapResult.direction === "buy";
+    const isResting = swapResult.status === "resting";
+    const headline = isResting
+      ? "Waiting on trade"
+      : isBuy
+        ? "Swap complete"
+        : "Sell order complete";
+    const summaryText = isResting
+      ? `Your ${isBuy ? "buy" : "sell"} order is resting on Hyperliquid as a GTC limit order. We'll keep it listed above until it fills.`
+      : isBuy
+        ? `Swapped ${swapResult.inputAmount} USDC for about ${swapResult.outputAmount ?? "—"} ${HYPE_SYMBOL}`
+        : `Swapped ${swapResult.inputAmount} ${HYPE_SYMBOL} for about ${swapResult.outputAmount ?? "—"} USDC`;
+
+    const priceLabel = isResting ? "Limit price" : "Avg price";
+    const priceValue = isResting
+      ? `${formatNumeric(swapResult.requestedPrice, 4)} USDC`
+      : `${formatNumeric(swapResult.avgPrice ?? swapResult.priceAtExecution, 4)} USDC`;
+
+    const sizeLabel = isResting ? "Order size" : "Filled size";
+    const sizeValue = `${formatNumeric(
+      swapResult.totalSize ?? swapResult.requestedSize ?? swapResult.outputAmount,
+      4
+    )} ${HYPE_SYMBOL}`;
+
+    const timeLabel = isResting ? "Placed at" : "Filled at";
+    const timestampValue = swapResult.timestamp
+      ? new Date(swapResult.timestamp).toLocaleTimeString()
+      : "—";
 
     return (
       <View style={styles.section}>
@@ -341,18 +547,27 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
         <Text style={styles.sectionSubheading}>{summaryText}</Text>
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Price used</Text>
-          <Text style={styles.summaryValueSmall}>
-            {swapResult?.priceAtExecution ? `$${swapResult.priceAtExecution.toFixed(4)} / ${HYPE_SYMBOL}` : "—"}
-          </Text>
-          <Text style={styles.summaryLabel}>Timestamp</Text>
-          <Text style={styles.summaryValueSmall}>
-            {swapResult?.timestamp ? new Date(swapResult.timestamp).toLocaleTimeString() : "—"}
-          </Text>
+          <Text style={styles.summaryLabel}>{isResting ? "Limit details" : "Fill details"}</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryKey}>{priceLabel}</Text>
+            <Text style={styles.summaryValueSmall}>{priceValue}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryKey}>{sizeLabel}</Text>
+            <Text style={styles.summaryValueSmall}>{sizeValue}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryKey}>Order ID</Text>
+            <Text style={styles.summaryValueSmall}>{swapResult.orderId ?? "—"}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryKey}>{timeLabel}</Text>
+            <Text style={styles.summaryValueSmall}>{timestampValue}</Text>
+          </View>
         </View>
 
         <GradientButton
-          title="Swap again"
+          title={isResting ? "Back to overview" : "Swap again"}
           onPress={() => {
             resetForNewSwap();
             setFlowStep("overview");
@@ -603,6 +818,121 @@ const styles = StyleSheet.create({
     color: "#EF4444",
     textAlign: "center",
     marginTop: 8,
+  },
+  pendingBanner: {
+    backgroundColor: "rgba(15, 20, 25, 0.8)",
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: "rgba(0, 212, 170, 0.25)",
+    padding: 16,
+    gap: 10,
+    marginBottom: 16,
+  },
+  pendingBannerTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  pendingBannerText: {
+    fontSize: 14,
+    color: "#8B949E",
+  },
+  pendingBannerError: {
+    borderColor: "rgba(239, 68, 68, 0.4)",
+    backgroundColor: "rgba(239, 68, 68, 0.12)",
+  },
+  pendingOrderErrorText: {
+    fontSize: 14,
+    color: "#F87171",
+    textAlign: "center",
+  },
+  pendingOrderRow: {
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.06)",
+    backgroundColor: "rgba(15, 20, 25, 0.6)",
+    padding: 12,
+    gap: 4,
+  },
+  pendingOrderText: {
+    color: "#FFFFFF",
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  pendingOrderSubtext: {
+    color: "#8B949E",
+    fontSize: 12,
+  },
+  pendingOrderFootnote: {
+    fontSize: 12,
+    color: "#8B949E",
+  },
+  orderBookSection: {
+    backgroundColor: "rgba(26, 31, 46, 0.86)",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "rgba(0, 212, 170, 0.15)",
+    padding: 20,
+    gap: 16,
+    marginBottom: 16,
+  },
+  orderBookHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  orderBookTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#FFFFFF",
+  },
+  orderBookColumns: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  orderBookColumn: {
+    flex: 1,
+    gap: 8,
+  },
+  orderBookColumnTitle: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#8B949E",
+    textTransform: "uppercase",
+    letterSpacing: 0.6,
+  },
+  orderBookRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.08)",
+    backgroundColor: "rgba(15, 20, 25, 0.7)",
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  orderBookPrice: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  orderBookBid: {
+    color: "#22C55E",
+  },
+  orderBookAsk: {
+    color: "#F87171",
+  },
+  orderBookSize: {
+    fontSize: 13,
+    color: "#FFFFFF",
+  },
+  orderBookEmpty: {
+    fontSize: 13,
+    color: "#8B949E",
+  },
+  orderBookErrorText: {
+    fontSize: 13,
+    color: "#F87171",
   },
   swapOptionsSection: {
     backgroundColor: "rgba(26, 31, 46, 0.86)",
