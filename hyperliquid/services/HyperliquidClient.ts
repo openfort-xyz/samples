@@ -103,7 +103,7 @@ const fetchHypeSizing = async (): Promise<HypeSizing> => {
     try {
         const spotMeta = await infoClient.spotMeta();
         console.log('Full spotMeta response:', JSON.stringify(spotMeta, null, 2));
-        const token = spotMeta.tokens.find((t: any) => t.name === HYPE_SYMBOL);
+        const token = spotMeta.tokens.find((t: any) => t.index === 1035);
         console.log('Found HYPE token metadata:', JSON.stringify(token, null, 2));
         if (!token) {
             throw new Error('HYPE token metadata not found in spotMeta response');
