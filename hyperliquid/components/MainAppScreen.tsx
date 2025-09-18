@@ -84,8 +84,24 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     [hypeBalances]
   );
 
+  const hyperliquidUsdcAvailableBalance = React.useMemo(() => {
+    const usdcPosition = hypeBalances?.account?.assetPositions?.find((pos: any) => pos.coin === "USDC");
+    if (!usdcPosition) return 0;
+    const total = parseFloat(usdcPosition.total || "0");
+    const hold = parseFloat(usdcPosition.hold || "0");
+    return Math.max(0, total - hold);
+  }, [hypeBalances]);
+
   const hypeTokenBalance = React.useMemo(() => {
     return parseFloat(hypeBalances?.positions?.hypePosition?.total || "0");
+  }, [hypeBalances]);
+
+  const hypeAvailableBalance = React.useMemo(() => {
+    const position = hypeBalances?.positions?.hypePosition;
+    if (!position) return 0;
+    const total = parseFloat(position.total || "0");
+    const hold = parseFloat(position.hold || "0");
+    return Math.max(0, total - hold);
   }, [hypeBalances]);
 
   const hasOpenOrders = openOrders.length > 0;
@@ -315,8 +331,8 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     const label = isBuy ? "Amount (USDC)" : `Amount (${HYPE_SYMBOL})`;
     const placeholder = isBuy ? "10.00" : "0.10";
     const availableBalance = isBuy
-      ? `${hyperliquidUsdcBalance.toFixed(2)} USDC available on Hyperliquid`
-      : `${hypeTokenBalance.toFixed(4)} ${HYPE_SYMBOL} ready to sell`;
+      ? `${hyperliquidUsdcAvailableBalance.toFixed(2)} USDC available on Hyperliquid`
+      : `${hypeAvailableBalance.toFixed(4)} ${HYPE_SYMBOL} ready to sell`;
 
     const parsed = parseFloat(swapAmount);
     const isValid = !Number.isNaN(parsed) && parsed > 0;

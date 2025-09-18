@@ -49,10 +49,15 @@ export const transactionHandlers: TransactionHandlers = {
     }
 
     const amount = parseFloat(buyAmount);
-    const currentHypeBalance = parseFloat(hypeBalances?.account?.usdcBalance || '0');
 
-    if (amount > currentHypeBalance) {
-      Alert.alert('Insufficient Balance', 'Buy amount exceeds Hyperliquid USDC balance');
+    // Calculate available USDC balance (total - hold) for buying
+    const usdcPosition = hypeBalances?.account?.assetPositions?.find((pos: any) => pos.coin === "USDC");
+    const totalUsdcBalance = parseFloat(usdcPosition?.total || '0');
+    const holdUsdcBalance = parseFloat(usdcPosition?.hold || '0');
+    const availableUsdcBalance = Math.max(0, totalUsdcBalance - holdUsdcBalance);
+
+    if (amount > availableUsdcBalance) {
+      Alert.alert('Insufficient Balance', `Buy amount exceeds available USDC balance. ${holdUsdcBalance > 0 ? `${holdUsdcBalance.toFixed(2)} USDC is locked in open orders.` : ''}`);
       return null;
     }
 
@@ -97,11 +102,15 @@ export const transactionHandlers: TransactionHandlers = {
     }
 
     const amount = parseFloat(sellAmount);
-    const hypePosition = hypeBalances?.account?.assetPositions?.find((pos: any) => pos.coin === HYPE_SYMBOL);
-    const currentHypeBalance = parseFloat(hypePosition?.total || '0');
 
-    if (amount > currentHypeBalance) {
-      Alert.alert('Insufficient Balance', `Sell amount exceeds ${HYPE_SYMBOL} balance`);
+    // Calculate available balance (total - hold) for selling
+    const hypePosition = hypeBalances?.positions?.hypePosition;
+    const totalBalance = parseFloat(hypePosition?.total || '0');
+    const holdBalance = parseFloat(hypePosition?.hold || '0');
+    const availableBalance = Math.max(0, totalBalance - holdBalance);
+
+    if (amount > availableBalance) {
+      Alert.alert('Insufficient Balance', `Sell amount exceeds available ${HYPE_SYMBOL} balance. ${holdBalance > 0 ? `${holdBalance.toFixed(4)} ${HYPE_SYMBOL} is locked in open orders.` : ''}`);
       return null;
     }
 
