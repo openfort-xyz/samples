@@ -33,12 +33,14 @@ type HypeSizing = {
     szDecimals: number;
     priceDecimals: number;
     minSize: number;
+    assetId: number | null;
 };
 
 const DEFAULT_HYPE_SIZING: HypeSizing = {
     szDecimals: DEFAULT_HYPE_SZ_DECIMALS,
     priceDecimals: DEFAULT_HYPE_PRICE_DECIMALS,
     minSize: DEFAULT_HYPE_SIZE_STEP,
+    assetId: HYPE_ASSET_ID,
 };
 
 export const DEFAULT_MIN_HYPE_ORDER_SIZE = DEFAULT_HYPE_SIZING.minSize;
@@ -57,6 +59,46 @@ type EmbeddedWalletSigner = {
 
 let hypeSizingPromise: Promise<HypeSizing> | null = null;
 
+const FILL_LOOKBACK_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
+
+const fetchRecentFillForOrder = async (
+    userAddress: string | undefined,
+    oid: number
+) => {
+    if (!userAddress) {
+        return null;
+    }
+
+    try {
+        const startTime = Math.max(0, Date.now() - FILL_LOOKBACK_WINDOW_MS);
+        const fills = await infoClient.userFillsByTime({
+            user: userAddress as `0x${string}`,
+            startTime,
+            aggregateByTime: false,
+        });
+
+        const matchedFill = fills.find((fill: any) => fill.oid === oid);
+        if (matchedFill) {
+            console.log('Matched fill details for order:', {
+                coin: matchedFill.coin,
+                price: matchedFill.px,
+                size: matchedFill.sz,
+                fee: matchedFill.fee,
+                feeToken: matchedFill.feeToken,
+                txHash: matchedFill.hash,
+                timestamp: new Date(matchedFill.time).toISOString(),
+            });
+        } else {
+            console.warn(`No fill record found for order oid ${oid} within ${FILL_LOOKBACK_WINDOW_MS / 1000}s window.`);
+        }
+
+        return matchedFill ?? null;
+    } catch (error) {
+        console.warn('Unable to fetch recent fill details:', error);
+        return null;
+    }
+};
+
 const fetchHypeSizing = async (): Promise<HypeSizing> => {
     try {
         const spotMeta = await infoClient.spotMeta();
@@ -71,10 +113,16 @@ const fetchHypeSizing = async (): Promise<HypeSizing> => {
         const priceDecimals = Math.max(0, MAX_PRICE_DECIMALS_SPOT - szDecimals);
         const minSize = Number((1 / Math.pow(10, szDecimals)).toFixed(szDecimals));
 
+        const assetId = typeof token.index === 'number' ? 10000 + token.index : HYPE_ASSET_ID;
+        if (assetId !== HYPE_ASSET_ID) {
+            console.log(`Resolved dynamic HYPE asset id ${assetId} (token index ${token.index})`);
+        }
+
         return {
             szDecimals,
             priceDecimals,
             minSize,
+            assetId,
         };
     } catch (error) {
         console.warn('Failed to fetch HYPE sizing metadata, falling back to defaults:', error);
@@ -353,8 +401,9 @@ export const buy = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const { szDecimals, priceDecimals, minSize } = await getHypeSizing();
-        console.log('HYPE sizing details:', { szDecimals, priceDecimals, minSize });
+        const { szDecimals, priceDecimals, minSize, assetId } = await getHypeSizing();
+        const assetIdForOrder = assetId ?? HYPE_ASSET_ID;
+        console.log('HYPE sizing details:', { szDecimals, priceDecimals, minSize, assetId: assetIdForOrder });
 
         const buyPriceRaw = parseFloat(hypePrice) * (1 + slippage);
         const priceScale = Math.pow(10, priceDecimals);
@@ -391,9 +440,10 @@ export const buy = async (
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
         console.log('- Buy price (with slippage):', buyPriceStr, 'USDC');
         console.log('- Quantity:', quantityStr, 'HYPE');
+        console.log('- Asset ID:', assetIdForOrder);
 
         const orderWire = {
-            a: HYPE_ASSET_ID,
+            a: assetIdForOrder,
             b: true,
             p: buyPriceStr,
             s: quantityStr,
@@ -452,6 +502,7 @@ export const buy = async (
                 console.log('Order filled successfully!');
                 console.log('- Filled size:', firstStatus.filled.totalSz);
                 console.log('- Average price:', firstStatus.filled.avgPx);
+                await fetchRecentFillForOrder(activeWallet?.address, firstStatus.filled.oid);
                 return true;
             } else if ('resting' in firstStatus) {
                 console.log('Order placed but not filled immediately');
@@ -486,7 +537,8 @@ export const sell = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const { szDecimals, priceDecimals, minSize } = await getHypeSizing();
+        const { szDecimals, priceDecimals, minSize, assetId } = await getHypeSizing();
+        const assetIdForOrder = assetId ?? HYPE_ASSET_ID;
 
         const sellPriceRaw = parseFloat(hypePrice) * (1 - slippage);
         const priceScale = Math.pow(10, priceDecimals);
@@ -510,10 +562,11 @@ export const sell = async (
         console.log('Calculated sell order:');
         console.log('- Mid price:', parseFloat(hypePrice).toFixed(6), 'USDC');
         console.log('- Sell price (with slippage):', sellPriceStr, 'USDC');
+        console.log('- Asset ID:', assetIdForOrder);
         console.log('- Quantity:', quantityStr, 'HYPE');
 
         const orderWire = {
-            a: HYPE_ASSET_ID,
+            a: assetIdForOrder,
             b: false,
             p: sellPriceStr,
             s: quantityStr,
@@ -571,6 +624,7 @@ export const sell = async (
                 console.log('Sell order filled successfully!');
                 console.log('- Filled size:', firstStatus.filled.totalSz);
                 console.log('- Average price:', firstStatus.filled.avgPx);
+                await fetchRecentFillForOrder(activeWallet?.address, firstStatus.filled.oid);
                 return true;
             } else if ('resting' in firstStatus) {
                 console.log('Sell order placed but not filled immediately');
