@@ -10,4 +10,4 @@ export const HYPE_SYMBOL = "HYPE";
 
 export const PRICE_POLL_INTERVAL_MS = 3000;
 
-export const DEFAULT_SLIPPAGE = 0.01; // 1% default slippage for trades
+export const DEFAULT_SLIPPAGE = 0.05; // 5% default slippage for trades
