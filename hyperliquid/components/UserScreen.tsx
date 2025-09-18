@@ -25,6 +25,8 @@ export const UserScreen: React.FC = () => {
   const insets = useSafeAreaInsets();
 
   const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
+  const [hasRequestedWalletCreation, setHasRequestedWalletCreation] = useState(false);
+  const [walletCreationError, setWalletCreationError] = useState<string | null>(null);
 
   const hyperliquidAccountAddress = useMemo(() => {
     const address = Constants.expoConfig?.extra?.hyperliquidWalletAddress as `0x${string}`;
@@ -63,16 +65,57 @@ export const UserScreen: React.FC = () => {
   }, [currentScreen, refetchWalletBalance, refetchHypeBalances]);
 
   const handleCreateWallet = useCallback(() => {
+    setWalletCreationError(null);
+    setHasRequestedWalletCreation(true);
     wallets.createWallet({
       recoveryPassword: "password",
       onError: (error: any) => {
-        Alert.alert("Wallet Creation Failed", error?.message ?? "Please try again later.");
+        const message = error?.message ?? "Please try again later.";
+        setWalletCreationError(message);
+        Alert.alert(
+          "Wallet Creation Failed",
+          message,
+          [
+            {
+              text: "Retry",
+              onPress: () => setHasRequestedWalletCreation(false),
+            },
+            {
+              text: "Dismiss",
+              style: "cancel",
+            },
+          ],
+        );
       },
       onSuccess: ({ wallet }: any) => {
         console.log("Wallet created", wallet);
       },
     });
   }, [wallets]);
+
+  useEffect(() => {
+    if (
+      currentScreen === "create-wallet" &&
+      !activeWallet &&
+      !isCreating &&
+      !hasRequestedWalletCreation
+    ) {
+      handleCreateWallet();
+    }
+  }, [
+    currentScreen,
+    activeWallet,
+    isCreating,
+    hasRequestedWalletCreation,
+    handleCreateWallet,
+  ]);
+
+  useEffect(() => {
+    if (currentScreen !== "create-wallet") {
+      setHasRequestedWalletCreation(false);
+      setWalletCreationError(null);
+    }
+  }, [currentScreen]);
 
   const handleContinueToTrading = useCallback(() => {
     setCurrentScreen("trading");
@@ -99,12 +142,12 @@ export const UserScreen: React.FC = () => {
           {logoutButton}
           <CreateWalletScreen
             isCreating={isCreating}
-            onCreateWallet={handleCreateWallet}
             step={onboardingStep}
             totalSteps={TOTAL_STEP_COUNT}
-            walletAddress={activeWallet?.address}
             walletOwnerAddress={activeWallet?.ownerAddress}
             onContinue={handleContinueToFunding}
+            errorMessage={walletCreationError ?? undefined}
+            onRetryCreateWallet={handleCreateWallet}
           />
         </View>
       );

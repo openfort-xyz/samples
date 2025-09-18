@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import * as Clipboard from 'expo-clipboard';
@@ -7,23 +7,28 @@ import { GradientButton } from "../ui";
 
 interface CreateWalletScreenProps {
   isCreating: boolean;
-  onCreateWallet: () => void;
   step: number;
   totalSteps: number;
-  walletAddress?: string;
   walletOwnerAddress?: string;
   onContinue?: () => void;
+  errorMessage?: string;
+  onRetryCreateWallet?: () => void;
 }
 
 export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
   isCreating,
-  onCreateWallet,
   step,
   totalSteps,
   walletOwnerAddress,
   onContinue,
+  errorMessage,
+  onRetryCreateWallet,
 }) => {
   const [hasCopied, setHasCopied] = useState(false);
+
+  useEffect(() => {
+    setHasCopied(false);
+  }, [walletOwnerAddress]);
 
   const copyToClipboard = async () => {
     if (walletOwnerAddress) {
@@ -51,12 +56,12 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
 
         <View style={styles.header}>
           <Text style={styles.title}>
-            {isWalletCreated ? "Wallet Created Successfully!" : "Create your trading wallet"}
+            {isWalletCreated ? "Wallet Created Successfully!" : "Setting up your trading wallet"}
           </Text>
           <Text style={styles.subtitle}>
             {isWalletCreated
               ? "Your trading wallet has been created. Copy the address below and add it to Hyperliquid testnet API."
-              : "Provision an embedded Openfort wallet that Hyperliquid will use for signing trades."}
+              : "We are provisioning an embedded Openfort wallet that Hyperliquid will use for signing trades."}
           </Text>
         </View>
 
@@ -89,19 +94,27 @@ export const CreateWalletScreen: React.FC<CreateWalletScreenProps> = ({
               )}
             </View>
           ) : (
-            <>
-              <GradientButton
-                title={isCreating ? "Creating wallet…" : "Create Wallet"}
-                onPress={onCreateWallet}
-                disabled={isCreating}
-              />
-              {isCreating && (
+            <View style={styles.pendingContent}>
+              {errorMessage ? (
+                <>
+                  <Text style={styles.errorTitle}>We could not create your wallet</Text>
+                  <Text style={styles.errorText}>{errorMessage}</Text>
+                  {onRetryCreateWallet && (
+                    <GradientButton
+                      title="Try Again"
+                      onPress={onRetryCreateWallet}
+                    />
+                  )}
+                </>
+              ) : (
                 <View style={styles.progressRow}>
                   <ActivityIndicator color="#00D4AA" />
-                  <Text style={styles.progressText}>Generating secure keys…</Text>
+                  <Text style={styles.progressText}>
+                    {isCreating ? "Generating secure keys…" : "Preparing your wallet…"}
+                  </Text>
                 </View>
               )}
-            </>
+            </View>
           )}
         </View>
 
@@ -169,10 +182,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
+    justifyContent: "center",
   },
   progressText: {
     color: "#8B949E",
     fontSize: 14,
+    textAlign: "center",
+  },
+  pendingContent: {
+    gap: 20,
+    alignItems: "center",
   },
   hint: {
     fontSize: 14,
@@ -238,5 +257,17 @@ const styles = StyleSheet.create({
   linkText: {
     color: "#00D4AA",
     textDecorationLine: "underline",
+  },
+  errorTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#F87171",
+    textAlign: "center",
+  },
+  errorText: {
+    fontSize: 14,
+    color: "#FCA5A5",
+    textAlign: "center",
+    lineHeight: 20,
   },
 });
