@@ -30,13 +30,25 @@ An Expo React Native application that showcases how to combine Openfort's embedd
 
 ## Setup
 
-### 1. Environment Variables
+### 1. Hyperliquid Prerequisites
+
+Before running this sample, you need to set up Hyperliquid testnet access:
+
+1. **Login to Hyperliquid**: Create an account and login at [Hyperliquid](https://app.hyperliquid.xyz/)
+
+2. **Deposit USDC on Mainnet**: You must deposit at least **5 USDC** on the Hyperliquid mainnet to gain access to the testnet faucet
+
+3. **Get Testnet Funds**: Once you have deposited 5 USDC on mainnet, claim 1000 mock USDC from the testnet faucet at: https://app.hyperliquid-testnet.xyz/drip
+
+4. **Note Your Wallet Address**: Copy the address of your logged-in Hyperliquid wallet for the next step
+
+### 2. Environment Variables
 
 ```bash
 cp .env.example .env.local
 ```
 
-Populate the new file with your Openfort credentials:
+Populate the new file with your Openfort credentials and Hyperliquid wallet address:
 
 ```env
 OPENFORT_PROJECT_PUBLISHABLE_KEY=pk_test_your_publishable_key
@@ -44,9 +56,10 @@ OPENFORT_SHIELD_PUBLISHABLE_KEY=pk_test_your_shield_key
 OPENFORT_SHIELD_ENCRYPTION_KEY=shield_encryption_key
 OPENFORT_SHIELD_RECOVERY_BASE_URL=https://your-recovery-api.com
 OPENFORT_ETHEREUM_PROVIDER_POLICY_ID=pol_your_policy_id
+HYPERLIQUID_WALLET_ADDRESS=your_wallet_address_here
 ```
 
-### 2. Install & Run
+### 3. Install & Run
 
 ```bash
 npm install
