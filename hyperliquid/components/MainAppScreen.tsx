@@ -395,15 +395,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           </View>
         </View>
 
-        <CustomButton
-          title="Back"
-          onPress={() => {
-            setIsProcessing(false);
-            setFlowStep("amount");
-          }}
-          disabled={isProcessing}
-        />
-
         <GradientButton
           title={isProcessing ? "Swapping…" : "Swap now"}
           onPress={async () => {
@@ -515,6 +506,15 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           }}
           disabled={isProcessing}
           variant={swapDirection === "sell" ? "danger" : "primary"}
+        />
+
+        <CustomButton
+          title="Back"
+          onPress={() => {
+            setIsProcessing(false);
+            setFlowStep("amount");
+          }}
+          disabled={isProcessing}
         />
       </View>
     );
