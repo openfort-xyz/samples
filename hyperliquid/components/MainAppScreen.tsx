@@ -173,7 +173,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
                 userBids.map((order, index) => (
                   <View key={`bid-${order.oid}-${index}`} style={styles.orderBookRow}>
                     <Text style={[styles.orderBookPrice, styles.orderBookBid]}>{formatNumeric(order.limitPx, 3)}</Text>
-                    <Text style={styles.orderBookSize}>{formatNumeric(order.sz, 3)} {HYPE_SYMBOL}</Text>
+                    <Text style={styles.orderBookSize}>{formatNumeric(parseFloat(order.limitPx) * parseFloat(order.sz), 3)} USDC</Text>
                   </View>
                 ))
               )}
