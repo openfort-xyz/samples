@@ -614,7 +614,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
         style={styles.backgroundGradient}
       />
       <View style={styles.wrapper}>
-        <Text style={styles.heading}>Hyperliquid guided swap</Text>
+        <Text style={styles.heading}>HYPE/USDC Swap</Text>
         {renderCurrentStep()}
       </View>
     </View>
