@@ -2,6 +2,7 @@ import React from "react";
 import {
   Alert,
   ActivityIndicator,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -169,46 +170,48 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
 
   const renderOrderBookSection = () => {
     // Filter open orders to show only user's orders, separated by side
-    const userBids = openOrders.filter(order => order.side === "B").slice(0, 5);
-    const userAsks = openOrders.filter(order => order.side === "A").slice(0, 5);
+    const userBids = openOrders.filter(order => order.side === "B");
+    const userAsks = openOrders.filter(order => order.side === "A");
 
     return (
       <View style={styles.orderBookSection}>
         <View style={styles.orderBookHeader}>
-          <Text style={styles.orderBookTitle}>My orders (top 5)</Text>
+          <Text style={styles.orderBookTitle}>My orders</Text>
         </View>
-        {openOrdersError ? (
-          <Text style={styles.orderBookErrorText}>Unable to load your orders.</Text>
-        ) : (
-          <View style={styles.orderBookColumns}>
-            <View style={styles.orderBookColumn}>
-              <Text style={styles.orderBookColumnTitle}>My Bids</Text>
-              {userBids.length === 0 && !openOrdersLoading ? (
-                <Text style={styles.orderBookEmpty}>No bids</Text>
-              ) : (
-                userBids.map((order, index) => (
-                  <View key={`bid-${order.oid}-${index}`} style={styles.orderBookRow}>
-                    <Text style={[styles.orderBookPrice, styles.orderBookBid]}>{formatNumeric(order.limitPx, 3)}</Text>
-                    <Text style={styles.orderBookSize}>{formatNumeric(parseFloat(order.limitPx) * parseFloat(order.sz), 3)} USDC</Text>
-                  </View>
-                ))
-              )}
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {openOrdersError ? (
+            <Text style={styles.orderBookErrorText}>Unable to load your orders.</Text>
+          ) : (
+            <View style={styles.orderBookColumns}>
+              <View style={styles.orderBookColumn}>
+                <Text style={styles.orderBookColumnTitle}>My Bids</Text>
+                {userBids.length === 0 && !openOrdersLoading ? (
+                  <Text style={styles.orderBookEmpty}>No bids</Text>
+                ) : (
+                  userBids.map((order, index) => (
+                    <View key={`bid-${order.oid}-${index}`} style={styles.orderBookRow}>
+                      <Text style={[styles.orderBookPrice, styles.orderBookBid]}>{formatNumeric(order.limitPx, 3)}</Text>
+                      <Text style={styles.orderBookSize}>{formatNumeric(parseFloat(order.limitPx) * parseFloat(order.sz), 3)} USDC</Text>
+                    </View>
+                  ))
+                )}
+              </View>
+              <View style={styles.orderBookColumn}>
+                <Text style={styles.orderBookColumnTitle}>My Asks</Text>
+                {userAsks.length === 0 && !openOrdersLoading ? (
+                  <Text style={styles.orderBookEmpty}>No asks</Text>
+                ) : (
+                  userAsks.map((order, index) => (
+                    <View key={`ask-${order.oid}-${index}`} style={styles.orderBookRow}>
+                      <Text style={[styles.orderBookPrice, styles.orderBookAsk]}>{formatNumeric(order.limitPx, 3)}</Text>
+                      <Text style={styles.orderBookSize}>{formatNumeric(order.sz, 3)} {HYPE_SYMBOL}</Text>
+                    </View>
+                  ))
+                )}
+              </View>
             </View>
-            <View style={styles.orderBookColumn}>
-              <Text style={styles.orderBookColumnTitle}>My Asks</Text>
-              {userAsks.length === 0 && !openOrdersLoading ? (
-                <Text style={styles.orderBookEmpty}>No asks</Text>
-              ) : (
-                userAsks.map((order, index) => (
-                  <View key={`ask-${order.oid}-${index}`} style={styles.orderBookRow}>
-                    <Text style={[styles.orderBookPrice, styles.orderBookAsk]}>{formatNumeric(order.limitPx, 3)}</Text>
-                    <Text style={styles.orderBookSize}>{formatNumeric(order.sz, 3)} {HYPE_SYMBOL}</Text>
-                  </View>
-                ))
-              )}
-            </View>
-          </View>
-        )}
+          )}
+        </ScrollView>
       </View>
     );
   };
@@ -897,6 +900,7 @@ const styles = StyleSheet.create({
     padding: 20,
     gap: 16,
     marginBottom: 16,
+    maxHeight: 300,
   },
   orderBookHeader: {
     flexDirection: "row",
