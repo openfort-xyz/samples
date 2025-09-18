@@ -52,7 +52,7 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Your Hyperliquid account</Text>
+          <Text style={styles.title}>Add balance</Text>
           <Text style={styles.subtitle}>
             Your Hyperliquid wallet already has USDC available for trading. Continue when ready.
           </Text>
@@ -85,9 +85,6 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
         </View>
 
         <View style={styles.card}>
-          <Text style={styles.callout}>
-            Ready to move on once both balances show the expected USDC amounts.
-          </Text>
           <GradientButton
             title={hasExchangeBalance ? "Continue to trading" : "I have funded my account"}
             onPress={onContinue}

@@ -23,7 +23,6 @@ function Providers() {
       publishableKey={publishableKey}
       walletConfig={{
         shieldPublishableKey,
-        shieldEncryptionKey,
         ethereumProviderPolicyId,
         getEncryptionSession: getEncryptionSessionFromEndpoint,
         debug: false,
