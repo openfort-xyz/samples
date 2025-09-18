@@ -9,3 +9,5 @@ export const HYPE_MARKET_ID = `@1035` as const; // Raw index for price queries
 export const HYPE_SYMBOL = "HYPE";
 
 export const PRICE_POLL_INTERVAL_MS = 3000;
+
+export const DEFAULT_SLIPPAGE = 0.1; // 10% default slippage for trades

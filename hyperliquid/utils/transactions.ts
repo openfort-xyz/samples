@@ -1,6 +1,6 @@
 import { Alert } from 'react-native';
 
-import { HYPE_SYMBOL } from '../constants/hyperliquid';
+import { HYPE_SYMBOL, DEFAULT_SLIPPAGE } from '../constants/hyperliquid';
 import { transfer, buy, sell, DEFAULT_MIN_HYPE_ORDER_SIZE } from '../services/HyperliquidClient';
 
 export interface TransactionHandlers {
@@ -64,7 +64,7 @@ export const transactionHandlers: TransactionHandlers = {
     try {
       Alert.alert('Buy Order Initiated', `Buying ${HYPE_SYMBOL} with ${amount} USDC...`);
 
-      const success = await buy(activeWallet, amount, 0.02, {
+      const success = await buy(activeWallet, amount, DEFAULT_SLIPPAGE, {
         openfortClient,
       });
 
@@ -116,7 +116,7 @@ export const transactionHandlers: TransactionHandlers = {
     setIsSelling(true);
 
     try {
-      const success = await sell(activeWallet, amount, 0.01, {
+      const success = await sell(activeWallet, amount, DEFAULT_SLIPPAGE, {
         openfortClient,
       });
 

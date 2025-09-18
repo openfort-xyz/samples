@@ -10,6 +10,7 @@ import {
   HYPE_SYMBOL,
   HYPERLIQUID_TESTNET_HTTP_URL,
   PRICE_POLL_INTERVAL_MS,
+  DEFAULT_SLIPPAGE,
 } from "../constants/hyperliquid";
 
 // Removed WebSocket transport - using HTTP transport for better React Native compatibility
@@ -387,7 +388,7 @@ export const transfer = async (
 export const buy = async (
     activeWallet: any,
     amount: number,
-    slippage: number = 0.01,
+    slippage: number = DEFAULT_SLIPPAGE,
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<boolean> => {
     try {
@@ -403,9 +404,9 @@ export const buy = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const { szDecimals, priceDecimals, minSize, assetId } = await getHypeSizing();
+        const { szDecimals, minSize, assetId } = await getHypeSizing();
         const assetIdForOrder = assetId ?? HYPE_ASSET_ID;
-        console.log('HYPE sizing details:', { szDecimals, priceDecimals, minSize, assetId: assetIdForOrder });
+        console.log('HYPE sizing details:', { szDecimals, minSize, assetId: assetIdForOrder });
 
         const buyPriceRaw = parseFloat(hypePrice) * (1 + slippage);
         // Force 3 decimal places for tick size compatibility
@@ -453,7 +454,7 @@ export const buy = async (
             s: quantityStr,
             r: false,
             t: {
-                limit: { tif: "Gtc" },
+                limit: { tif: "Gtc" as const },
             },
         };
         console.log('Order wire structure:', JSON.stringify(orderWire, null, 2));
@@ -529,7 +530,7 @@ export const buy = async (
 export const sell = async (
     activeWallet: any,
     amount: number,
-    slippage: number = 0.01,
+    slippage: number = DEFAULT_SLIPPAGE,
     options?: { openfortClient?: { embeddedWallet?: EmbeddedWalletSigner } }
 ): Promise<boolean> => {
     try {
@@ -541,7 +542,7 @@ export const sell = async (
             throw new Error('HYPE price not found in market data');
         }
 
-        const { szDecimals, priceDecimals, minSize, assetId } = await getHypeSizing();
+        const { szDecimals, minSize, assetId } = await getHypeSizing();
         const assetIdForOrder = assetId ?? HYPE_ASSET_ID;
 
         const sellPriceRaw = parseFloat(hypePrice) * (1 - slippage);
@@ -583,7 +584,7 @@ export const sell = async (
             s: quantityStr,
             r: false,
             t: {
-                limit: { tif: "Gtc" },
+                limit: { tif: "Gtc" as const },
             },
         };
 
