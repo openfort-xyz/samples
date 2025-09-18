@@ -1,5 +1,6 @@
 import { OpenfortProvider } from "@openfort/react-native";
 import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { EnvValidationWrapper } from "../components/envValidation/EnvValidationWrapper";
 import { SUPPORTED_CHAINS } from "../constants/network";
@@ -39,8 +40,10 @@ function Providers() {
 
 export default function RootLayout() {
   return (
-    <EnvValidationWrapper>
-      <Providers />
-    </EnvValidationWrapper>
+    <SafeAreaProvider>
+      <EnvValidationWrapper>
+        <Providers />
+      </EnvValidationWrapper>
+    </SafeAreaProvider>
   );
 }

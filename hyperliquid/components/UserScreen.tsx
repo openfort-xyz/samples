@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useOpenfort, useOpenfortClient, useUser, useWallets } from "@openfort/react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Constants from "expo-constants";
 
 import { CreateWalletScreen } from "./onboarding/CreateWalletScreen";
@@ -21,6 +22,7 @@ export const UserScreen: React.FC = () => {
   const openfortClient = useOpenfortClient();
   const wallets = useWallets({ throwOnError: true });
   const { activeWallet, isCreating } = wallets;
+  const insets = useSafeAreaInsets();
 
   const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
 
@@ -83,7 +85,7 @@ export const UserScreen: React.FC = () => {
   }, []);
 
   const logoutButton = (
-    <TouchableOpacity onPress={logout} style={styles.logoutButton}>
+    <TouchableOpacity onPress={logout} style={[styles.logoutButton, { top: insets.top + 10 }]}>
       <Text style={styles.logoutText}>Logout</Text>
     </TouchableOpacity>
   );
@@ -151,7 +153,6 @@ const styles = StyleSheet.create({
   },
   logoutButton: {
     position: "absolute",
-    top: 20,
     right: 20,
     zIndex: 10,
     paddingHorizontal: 16,
