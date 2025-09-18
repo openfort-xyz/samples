@@ -63,7 +63,7 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
           <View style={styles.statusCard}>
             <Text style={styles.statusLabel}>USDC (Spot) Balance</Text>
             <View style={styles.statusValueRow}>
-              <Text style={styles.statusValue}>{isLoading ? "—" : `${hyperliquidBalance?.toFixed(8) ?? "0.00000000"} USDC`}</Text>
+              <Text style={styles.statusValue}>{`${hyperliquidBalance?.toFixed(8) ?? "0.00000000"} USDC`}</Text>
               <Text style={[styles.statusBadge, hasExchangeBalance ? styles.readyBadge : styles.pendingBadge]}>
                 {hasExchangeBalance ? "Ready" : "No Funds"}
               </Text>
@@ -86,22 +86,13 @@ export const FundHyperliquidScreen: React.FC<FundHyperliquidScreenProps> = ({
         </View>
 
         <View style={styles.card}>
-          {isLoading ? (
-            <View style={styles.progressRow}>
-              <ActivityIndicator color="#00D4AA" />
-              <Text style={styles.progressText}>Checking balances…</Text>
-            </View>
-          ) : (
-            <>
-              <Text style={styles.callout}>
-                Ready to move on once both balances show the expected USDC amounts.
-              </Text>
-              <GradientButton
-                title={hasExchangeBalance ? "Continue to trading" : "I have funded my account"}
-                onPress={onContinue}
-              />
-            </>
-          )}
+          <Text style={styles.callout}>
+            Ready to move on once both balances show the expected USDC amounts.
+          </Text>
+          <GradientButton
+            title={hasExchangeBalance ? "Continue to trading" : "I have funded my account"}
+            onPress={onContinue}
+          />
         </View>
       </View>
     </View>

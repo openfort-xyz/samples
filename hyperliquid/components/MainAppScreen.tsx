@@ -108,11 +108,11 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
   );
 
   const renderPendingOrdersBanner = () => {
-    if (openOrdersLoading && !hasOpenOrders) {
+    if (openOrdersLoading && !hasOpenOrders && openOrders.length === 0) {
       return (
         <View style={styles.pendingBanner}>
           <ActivityIndicator color="#00D4AA" size="small" />
-          <Text style={styles.pendingBannerText}>Checking open orders…</Text>
+          <Text style={styles.pendingBannerText}>Loading orders…</Text>
         </View>
       );
     }
@@ -160,7 +160,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
       <View style={styles.orderBookSection}>
         <View style={styles.orderBookHeader}>
           <Text style={styles.orderBookTitle}>My orders (top 5)</Text>
-          {openOrdersLoading && <ActivityIndicator color="#00D4AA" size="small" />}
         </View>
         {openOrdersError ? (
           <Text style={styles.orderBookErrorText}>Unable to load your orders.</Text>
@@ -227,13 +226,13 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>USDC (Spot)</Text>
         <Text style={styles.balanceValue}>
-          {hypeBalancesLoading ? "—" : `${hyperliquidUsdcBalance.toFixed(8)} USDC`}
+          {hyperliquidUsdcBalance.toFixed(8)} USDC
         </Text>
       </View>
       <View style={styles.balanceCard}>
         <Text style={styles.balanceLabel}>HYPE Balance</Text>
         <Text style={styles.balanceValue}>
-          {hypeBalancesLoading ? "—" : `${hypeTokenBalance.toFixed(8)} HYPE`}
+          {hypeTokenBalance.toFixed(8)} HYPE
         </Text>
       </View>
     </View>
