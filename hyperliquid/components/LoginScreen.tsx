@@ -31,11 +31,19 @@ export default function LoginScreen() {
     signUpGuest();
   };
 
-  const handleOAuthLogin = async () => {
+  const handleGoogleLogin = async () => {
     try {
       await initOAuth({ provider: "google" as OAuthProvider })
     } catch (error) {
-      console.error("Error logging in with OAuth:", error);
+      console.error("Error logging in with Google:", error);
+    }
+  };
+
+  const handleAppleLogin = async () => {
+    try {
+      await initOAuth({ provider: "apple" as OAuthProvider })
+    } catch (error) {
+      console.error("Error logging in with Apple:", error);
     }
   };
 
@@ -53,17 +61,23 @@ export default function LoginScreen() {
               title="Continue as Guest"
               onPress={handleGuestLogin}
             />
-            {/* <View style={styles.divider}>
+            <View style={styles.divider}>
               <View style={styles.dividerLine} />
               <Text style={styles.dividerText}>or</Text>
               <View style={styles.dividerLine} />
             </View>
             <CustomButton
               title="Continue with Google"
-              onPress={handleOAuthLogin}
+              onPress={handleGoogleLogin}
               style={styles.googleButton}
               textStyle={styles.googleButtonText}
-            /> */}
+            />
+            <CustomButton
+              title="Continue with Apple"
+              onPress={handleAppleLogin}
+              style={styles.appleButton}
+              textStyle={styles.appleButtonText}
+            />
           </View>
           {error && (
             <View style={styles.errorContainer}>
@@ -147,6 +161,13 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 255, 255, 0.1)',
   },
   googleButtonText: {
+    color: '#FFFFFF',
+  },
+  appleButton: {
+    backgroundColor: '#000000',
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  appleButtonText: {
     color: '#FFFFFF',
   },
   divider: {
