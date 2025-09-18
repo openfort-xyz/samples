@@ -3,13 +3,12 @@ import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useOpenfort, useOpenfortClient, useUser, useWallets } from "@openfort/react-native";
 
 import { CreateWalletScreen } from "./onboarding/CreateWalletScreen";
-import { GenerateSignerScreen } from "./onboarding/GenerateSignerScreen";
 import { FundHyperliquidScreen } from "./onboarding/FundHyperliquidScreen";
 import { MainAppScreen } from "./MainAppScreen";
 import { useWalletBalance } from "../hooks/useUserBalances";
 import { useHypeBalances, useHypeUsdc } from "../services/HyperliquidClient";
 
-const ONBOARDING_SCREENS = ["create-wallet", "generate-signer", "fund-exchange"] as const;
+const ONBOARDING_SCREENS = ["create-wallet", "fund-exchange"] as const;
 type OnboardingScreen = (typeof ONBOARDING_SCREENS)[number];
 type Screen = OnboardingScreen | "trading";
 
@@ -23,8 +22,6 @@ export const UserScreen: React.FC = () => {
   const { activeWallet, isCreating } = wallets;
 
   const [currentScreen, setCurrentScreen] = useState<Screen>("create-wallet");
-  const [isGeneratingSigner, setIsGeneratingSigner] = useState(false);
-  const [hasGeneratedSigner, setHasGeneratedSigner] = useState(false);
 
   const { price: hypeUsdcPrice, isLoading: hypeUsdcLoading } = useHypeUsdc();
   const {
@@ -46,15 +43,9 @@ export const UserScreen: React.FC = () => {
 
   useEffect(() => {
     if (activeWallet && currentScreen === "create-wallet") {
-      setCurrentScreen("generate-signer");
-    }
-  }, [activeWallet, currentScreen]);
-
-  useEffect(() => {
-    if (hasGeneratedSigner && currentScreen === "generate-signer") {
       setCurrentScreen("fund-exchange");
     }
-  }, [hasGeneratedSigner, currentScreen]);
+  }, [activeWallet, currentScreen]);
 
   useEffect(() => {
     if (currentScreen === "fund-exchange") {
@@ -80,27 +71,6 @@ export const UserScreen: React.FC = () => {
     });
   }, [wallets]);
 
-  const handleGenerateSigner = useCallback(async () => {
-    if (!activeWallet?.address) return;
-    setIsGeneratingSigner(true);
-    try {
-      if (!openfortClient?.embeddedWallet?.exportPrivateKey) {
-        throw new Error("Embedded wallet client unavailable");
-      }
-      const signer = await openfortClient.embeddedWallet.exportPrivateKey();
-      if (!signer) {
-        throw new Error("Unable to export signer");
-      }
-      setHasGeneratedSigner(true);
-      Alert.alert("Signer ready", "Hyperliquid can now place orders with this wallet.");
-    } catch (error: any) {
-      console.error("Failed to export signer", error);
-      Alert.alert("Signer failed", error?.message ?? "Please try again.");
-    } finally {
-      setIsGeneratingSigner(false);
-    }
-  }, [activeWallet?.address, openfortClient]);
-
   const handleContinueToTrading = useCallback(() => {
     setCurrentScreen("trading");
   }, []);
@@ -123,19 +93,6 @@ export const UserScreen: React.FC = () => {
           <CreateWalletScreen
             isCreating={isCreating}
             onCreateWallet={handleCreateWallet}
-            step={onboardingStep}
-            totalSteps={TOTAL_STEP_COUNT}
-          />
-        </View>
-      );
-    case "generate-signer":
-      return (
-        <View style={styles.screenWrapper}>
-          {logoutButton}
-          <GenerateSignerScreen
-            isGenerating={isGeneratingSigner}
-            onGenerateSigner={handleGenerateSigner}
-            walletAddress={activeWallet?.address}
             step={onboardingStep}
             totalSteps={TOTAL_STEP_COUNT}
           />
