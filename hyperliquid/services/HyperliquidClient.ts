@@ -453,7 +453,7 @@ export const buy = async (
             s: quantityStr,
             r: false,
             t: {
-                limit: { tif: "Ioc" },
+                limit: { tif: "Gtc" },
             },
         };
         console.log('Order wire structure:', JSON.stringify(orderWire, null, 2));
@@ -583,7 +583,7 @@ export const sell = async (
             s: quantityStr,
             r: false,
             t: {
-                limit: { tif: "Ioc" },
+                limit: { tif: "Gtc" },
             },
         };
 
