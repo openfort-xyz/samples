@@ -236,8 +236,6 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
 
   const renderOverview = () => (
     <>
-      {renderPendingOrdersBanner()}
-
       <View style={styles.priceSection}>
         {hypeUsdcLoading ? (
           <View style={styles.loadingRow}>
@@ -261,41 +259,52 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
 
       {balanceCards}
 
-      <View style={styles.swapOptionsSection}>
-        <Text style={styles.swapHeading}>Choose your swap</Text>
-
-        <View style={styles.swapButtons}>
-          <TouchableOpacity
-            style={[styles.swapButton, swapDirection === "buy" && styles.swapButtonSelected]}
-            onPress={() => setSwapDirection("buy")}
-          >
-            <Text style={styles.swapButtonTitle}>USDC → {HYPE_SYMBOL}</Text>
-            <Text style={styles.swapButtonSubtitle}>Buy {HYPE_SYMBOL} with USDC</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.swapButton, swapDirection === "sell" && styles.swapButtonSelected]}
-            onPress={() => setSwapDirection("sell")}
-          >
-            <Text style={styles.swapButtonTitle}>{HYPE_SYMBOL} → USDC</Text>
-            <Text style={styles.swapButtonSubtitle}>Sell {HYPE_SYMBOL} for USDC</Text>
-          </TouchableOpacity>
-        </View>
-
-        <GradientButton
-          title="Continue"
-          onPress={() => {
-            if (!swapDirection) {
-              Alert.alert("Select a swap", "Please choose a direction to continue.");
-              return;
-            }
-            setFlowStep("amount");
-          }}
-        />
-      </View>
+      <GradientButton
+        title="Swap HYPE/USDC"
+        onPress={() => setFlowStep("direction")}
+      />
     </>
   );
 
+  const renderDirection = () => (
+    <View style={styles.section}>
+      <Text style={styles.sectionHeading}>Choose your swap</Text>
+      <Text style={styles.sectionSubheading}>
+        Select the direction for your trade. You can buy HYPE with USDC or sell HYPE for USDC.
+      </Text>
+
+      <View style={styles.swapButtons}>
+        <TouchableOpacity
+          style={[styles.swapButton, swapDirection === "buy" && styles.swapButtonSelected]}
+          onPress={() => setSwapDirection("buy")}
+        >
+          <Text style={styles.swapButtonTitle}>USDC → {HYPE_SYMBOL}</Text>
+          <Text style={styles.swapButtonSubtitle}>Buy {HYPE_SYMBOL} with USDC</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.swapButton, swapDirection === "sell" && styles.swapButtonSelected]}
+          onPress={() => setSwapDirection("sell")}
+        >
+          <Text style={styles.swapButtonTitle}>{HYPE_SYMBOL} → USDC</Text>
+          <Text style={styles.swapButtonSubtitle}>Sell {HYPE_SYMBOL} for USDC</Text>
+        </TouchableOpacity>
+      </View>
+
+      <GradientButton
+        title="Continue"
+        onPress={() => {
+          if (!swapDirection) {
+            Alert.alert("Select a swap", "Please choose a direction to continue.");
+            return;
+          }
+          setFlowStep("amount");
+        }}
+      />
+
+      <CustomButton title="Back" onPress={() => setFlowStep("overview")} />
+    </View>
+  );
 
   const renderAmount = () => {
     const isBuy = swapDirection === "buy";
@@ -340,7 +349,7 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
           disabled={!isValid}
         />
 
-        <CustomButton title="Back" onPress={() => setFlowStep("overview")} />
+        <CustomButton title="Back" onPress={() => setFlowStep("direction")} />
       </View>
     );
   };
@@ -581,6 +590,8 @@ export const MainAppScreen: React.FC<MainAppScreenProps> = ({
     switch (flowStep) {
       case "overview":
         return renderOverview();
+      case "direction":
+        return renderDirection();
       case "amount":
         return renderAmount();
       case "confirm":
