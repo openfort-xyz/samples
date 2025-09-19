@@ -1,27 +1,27 @@
 # Aave Sample
 
-Aquest exemple mostra com integrar Openfort amb Aave per crear una aplicació de DeFi amb funcionalitats de lending i borrowing.
+This example shows how to integrate Openfort with Aave to create a DeFi application with lending and borrowing functionalities.
 
-## Estructura del Projecte
+## Project Structure
 
 ```
 samples/aave/
-├── frontend/          # Aplicació React amb Vite
-├── backend/           # Servidor Express.js
-└── README.md         # Aquest fitxer
+├── frontend/          # React application with Vite
+├── backend/           # Express.js server
+└── README.md         # This file
 ```
 
-## Requisits Previs
+## Prerequisites
 
-- Node.js (versió 16 o superior)
-- npm o yarn
-- Compte d'Openfort amb API keys configurades
+- Node.js (version 16 or higher)
+- npm or yarn
+- Openfort account with configured API keys
 
-## Configuració i Instal·lació
+## Configuration and Installation
 
-### 1. Instal·lar Dependències
+### 1. Install Dependencies
 
-Instal·la les dependències tant per al frontend com per al backend:
+Install dependencies for both frontend and backend:
 
 ```bash
 # Backend
@@ -33,18 +33,18 @@ cd ../frontend
 npm install
 ```
 
-### 2. Configurar Variables d'Entorn
+### 2. Configure Environment Variables
 
 #### Backend (.env)
 
-Copia el fitxer `.env.example` a `.env` i omple les variables necessàries:
+Copy the `.env.example` file to `.env` and fill in the necessary variables:
 
 ```bash
 cd backend
 cp .env.example .env
 ```
 
-Edita el fitxer `.env` amb els teus valors:
+Edit the `.env` file with your values:
 
 ```env
 # Openfort Shield Configuration
@@ -63,14 +63,14 @@ BACKEND_URL=http://localhost:3001
 
 #### Frontend (.env)
 
-Copia el fitxer `.env.example` a `.env` i omple les variables necessàries:
+Copy the `.env.example` file to `.env` and fill in the necessary variables:
 
 ```bash
 cd ../frontend
 cp .env.example .env
 ```
 
-Edita el fitxer `.env` amb els teus valors:
+Edit the `.env` file with your values:
 
 ```env
 # Openfort Configuration
@@ -80,57 +80,57 @@ VITE_BACKEND_URL=http://localhost:3001
 VITE_OPENFORT_POLICY_ID=your_policy_id
 ```
 
-## Executar l'Aplicació
+## Running the Application
 
-### 1. Iniciar el Backend
+### 1. Start the Backend
 
 ```bash
 cd backend
 npm run dev
 ```
 
-El servidor backend s'executarà a `http://localhost:3001`
+The backend server will run at `http://localhost:3001`
 
-### 2. Iniciar el Frontend
+### 2. Start the Frontend
 
-En una nova terminal:
+In a new terminal:
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-L'aplicació frontend s'executarà a `http://localhost:5173`
+The frontend application will run at `http://localhost:5173`
 
-## Funcionalitats
+## Features
 
-- **Connexió de Wallet**: Integració amb Openfort Shield per a l'autenticació
-- **Interacció amb Aave**: Operacions de lending i borrowing
-- **Gestió de Tokens**: Visualització de balanços i transaccions
-- **Interface d'Usuari**: Interface moderna amb React i Tailwind CSS
+- **Wallet Connection**: Integration with Openfort Shield for authentication
+- **Aave Interaction**: Lending and borrowing operations
+- **Token Management**: Visualization of balances and transactions
+- **User Interface**: Modern interface with React and Tailwind CSS
 
-## Desenvolupament
+## Development
 
-### Scripts Disponibles
+### Available Scripts
 
 #### Backend
-- `npm start`: Inicia el servidor en mode producció
-- `npm run dev`: Inicia el servidor amb nodemon (mode desenvolupament)
+- `npm start`: Starts the server in production mode
+- `npm run dev`: Starts the server with nodemon (development mode)
 
 #### Frontend
-- `npm run dev`: Inicia el servidor de desenvolupament
-- `npm run build`: Construeix l'aplicació per a producció
-- `npm run lint`: Executa el linter
-- `npm run preview`: Previsualitza la build de producció
+- `npm run dev`: Starts the development server
+- `npm run build`: Builds the application for production
+- `npm run lint`: Runs the linter
+- `npm run preview`: Previews the production build
 
 ## Troubleshooting
 
-1. **Error de CORS**: Assegura't que `CORS_ORIGIN` al backend coincideixi amb la URL del frontend
-2. **Variables d'entorn**: Verifica que totes les variables d'entorn estiguin configurades correctament
-3. **Ports ocupats**: Si els ports 3001 o 5173 estan ocupats, canvia'ls als fitxers de configuració
+1. **CORS Error**: Make sure that `CORS_ORIGIN` in the backend matches the frontend URL
+2. **Environment variables**: Verify that all environment variables are configured correctly
+3. **Occupied ports**: If ports 3001 or 5173 are occupied, change them in the configuration files
 
-## Recursos Addicionals
+## Additional Resources
 
-- [Documentació d'Openfort](https://docs.openfort.xyz)
-- [Documentació d'Aave](https://docs.aave.com)
+- [Openfort Documentation](https://docs.openfort.xyz)
+- [Aave Documentation](https://docs.aave.com)
 - [React + Vite](https://vitejs.dev/guide/)
