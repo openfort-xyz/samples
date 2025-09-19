@@ -10,7 +10,13 @@ export default function LoginScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        <Pressable style={[styles.customButton, styles.primaryButton]} onPress={() => signUpGuest()}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.customButton,
+            styles.primaryButton,
+            pressed && styles.buttonPressed
+          ]}
+          onPress={() => signUpGuest()}>
           <Text style={[styles.buttonText, styles.primaryButtonText]}>Login as Guest</Text>
         </Pressable>
       </View>
@@ -50,5 +56,9 @@ const styles = StyleSheet.create({
   },
   primaryButtonText: {
     color: '#fff',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });

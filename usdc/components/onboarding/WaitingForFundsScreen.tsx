@@ -103,8 +103,11 @@ export const WaitingForFundsScreen = ({ walletB, onNext, onBack, onUpdateBalance
       {/* Action Buttons */}
       <View style={styles.actionsContainer}>
         {hasBalance ? (
-          <Pressable 
-            style={styles.primaryButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.primaryButton,
+              pressed && styles.buttonPressed
+            ]}
             onPress={onNext}
           >
             <Text style={styles.primaryButtonText}>Continue to App</Text>
@@ -122,8 +125,11 @@ export const WaitingForFundsScreen = ({ walletB, onNext, onBack, onUpdateBalance
         
         <View style={styles.secondaryActions}>
           <Text style={styles.troubleText}>Having trouble?</Text>
-          <Pressable 
-            style={styles.secondaryButton}
+          <Pressable
+            style={({ pressed }) => [
+              styles.secondaryButton,
+              pressed && styles.buttonPressed
+            ]}
             onPress={onBack}
           >
             <Text style={styles.secondaryButtonText}>Go Back to Faucet</Text>
@@ -338,5 +344,9 @@ const styles = StyleSheet.create({
     color: '#6772e5',
     fontSize: 14,
     fontWeight: '500',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });

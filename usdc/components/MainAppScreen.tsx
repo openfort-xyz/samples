@@ -94,7 +94,10 @@ export const MainAppScreen = ({
             {activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address}
           </Text>
           <Pressable
-            style={styles.copyButton}
+            style={({ pressed }) => [
+              styles.copyButton,
+              pressed && styles.buttonPressed
+            ]}
             onPress={() => {
               const address = activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address;
               if (address) copyToClipboard(address);
@@ -128,7 +131,10 @@ export const MainAppScreen = ({
             {activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address}
           </Text>
           <Pressable
-            style={styles.copyButton}
+            style={({ pressed }) => [
+              styles.copyButton,
+              pressed && styles.buttonPressed
+            ]}
             onPress={() => {
               const address = activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address;
               if (address) copyToClipboard(address);
@@ -166,7 +172,12 @@ export const MainAppScreen = ({
       <View style={styles.buttonRow}>
         <View style={styles.buttonFlex}>
           <Pressable
-            style={[styles.customButton, styles.secondaryButton, isSwitching && styles.buttonDisabled]}
+            style={({ pressed }) => [
+              styles.customButton,
+              styles.secondaryButton,
+              isSwitching && styles.buttonDisabled,
+              pressed && !isSwitching && styles.buttonPressed
+            ]}
             disabled={isSwitching}
             onPress={async () => {
               const target = activeWallet?.address === walletA?.address ? walletB : walletA;
@@ -188,7 +199,12 @@ export const MainAppScreen = ({
         </View>
         <View style={styles.buttonFlex}>
           <Pressable
-            style={[styles.customButton, styles.primaryButton, (isTransferring || !walletA || !walletB || !transferAmount || !activeWallet) && styles.buttonDisabled]}
+            style={({ pressed }) => [
+              styles.customButton,
+              styles.primaryButton,
+              (isTransferring || !walletA || !walletB || !transferAmount || !activeWallet) && styles.buttonDisabled,
+              pressed && !(isTransferring || !walletA || !walletB || !transferAmount || !activeWallet) && styles.buttonPressed
+            ]}
             disabled={isTransferring || !walletA || !walletB || !transferAmount || !activeWallet}
             onPress={() => {
               const from = activeWallet?.address === walletA?.address ? walletA : walletB;
@@ -204,13 +220,25 @@ export const MainAppScreen = ({
       </View>
 
       <View style={styles.buttonWrap}>
-        <Pressable style={[styles.customButton, styles.secondaryButton]} onPress={updateBalances}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.customButton,
+            styles.secondaryButton,
+            pressed && styles.buttonPressed
+          ]}
+          onPress={updateBalances}>
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>Refresh Balances</Text>
         </Pressable>
       </View>
 
       <View style={styles.buttonWrap}>
-        <Pressable style={[styles.customButton, styles.secondaryButton]} onPress={logout}>
+        <Pressable
+          style={({ pressed }) => [
+            styles.customButton,
+            styles.secondaryButton,
+            pressed && styles.buttonPressed
+          ]}
+          onPress={logout}>
           <Text style={[styles.buttonText, styles.secondaryButtonText]}>Logout</Text>
         </Pressable>
       </View>
@@ -397,5 +425,9 @@ const styles = StyleSheet.create({
     height: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });

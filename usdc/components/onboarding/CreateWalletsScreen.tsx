@@ -36,10 +36,11 @@ const WalletCreationItem = ({
       </Text>
       <View style={styles.buttonWrap}>
         <Pressable
-          style={[
+          style={({ pressed }) => [
             styles.customButton,
             wallet ? styles.successButton : styles.primaryButton,
-            (disabled || !!wallet) && styles.buttonDisabled
+            (disabled || !!wallet) && styles.buttonDisabled,
+            pressed && !(disabled || !!wallet) && styles.buttonPressed
           ]}
           disabled={disabled || !!wallet}
           onPress={onCreateWallet}
@@ -132,7 +133,13 @@ export const CreateWalletsScreen = ({
 
       {walletA && walletB && (
         <View style={styles.buttonWrap}>
-          <Pressable style={[styles.customButton, styles.primaryButton]} onPress={onNext}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.customButton,
+              styles.primaryButton,
+              pressed && styles.buttonPressed
+            ]}
+            onPress={onNext}>
             <Text style={[styles.buttonText, styles.primaryButtonText]}>Next: Get Faucet Funds</Text>
           </Pressable>
         </View>
@@ -229,5 +236,9 @@ const styles = StyleSheet.create({
   },
   successButtonText: {
     color: '#fff',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });

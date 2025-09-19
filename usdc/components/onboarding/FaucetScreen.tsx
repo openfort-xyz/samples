@@ -4,6 +4,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 import { WalletData } from "@/types/wallet";
 
+const CopyIcon = ({ size = 16, color = "#6772e5" }) => (
+  <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <Text style={{ fontSize: size * 0.9, color, fontWeight: '400', lineHeight: size }}>⧉</Text>
+  </View>
+);
+
 interface Props {
   walletB: WalletData | null;
   onNext: () => void;
@@ -34,15 +40,22 @@ export const FaucetScreen = ({ walletB, onNext }: Props) => {
       
       <View style={styles.section}>
         <Text style={styles.label}>Wallet B Address</Text>
-        <Text style={styles.address} numberOfLines={1} ellipsizeMode="middle">{walletB?.address}</Text>
-        <View style={styles.buttonWrap}>
+        <View style={styles.addressContainer}>
+          <Text style={styles.address} numberOfLines={1} ellipsizeMode="middle">{walletB?.address}</Text>
           <Pressable
-            style={[styles.customButton, copied ? styles.successButton : styles.secondaryButton]}
+            style={({ pressed }) => [
+              styles.copyButton,
+              pressed && styles.buttonPressed
+            ]}
             onPress={() => walletB && copyToClipboard(walletB.address)}
           >
-            <Text style={[styles.buttonText, copied ? styles.successButtonText : styles.secondaryButtonText]}>
-              {copied ? "Copied!" : "Copy Address"}
-            </Text>
+            <View style={styles.iconContainer}>
+              {copied ? (
+                <Text style={styles.copiedText}>✓</Text>
+              ) : (
+                <CopyIcon size={16} />
+              )}
+            </View>
           </Pressable>
         </View>
       </View>
@@ -55,7 +68,13 @@ export const FaucetScreen = ({ walletB, onNext }: Props) => {
           4. Paste the address and request $10 USDC
         </Text>
         <View style={styles.buttonWrap}>
-          <Pressable style={[styles.customButton, styles.primaryButton]} onPress={openFaucet}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.customButton,
+              styles.primaryButton,
+              pressed && styles.buttonPressed
+            ]}
+            onPress={openFaucet}>
             <Text style={[styles.buttonText, styles.primaryButtonText]}>Open Circle Faucet</Text>
           </Pressable>
         </View>
@@ -121,9 +140,10 @@ const styles = StyleSheet.create({
     color: '#6772e5',
     padding: 12,
     borderRadius: 6,
-    marginBottom: 8,
     borderWidth: 1,
     borderColor: '#e6ebf1',
+    flex: 1,
+    marginRight: 8,
   },
   instructions: {
     fontSize: 14,
@@ -183,5 +203,37 @@ const styles = StyleSheet.create({
   },
   successButtonText: {
     color: '#fff',
+  },
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  copyButton: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#f6f9fc',
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 32,
+    minHeight: 32,
+  },
+  copiedText: {
+    color: '#00d924',
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 16,
+  },
+  iconContainer: {
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  buttonPressed: {
+    opacity: 0.7,
+    transform: [{ scale: 0.98 }],
   },
 });
