@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { Alert, Button, ScrollView, Text, View, StyleSheet } from "react-native";
+import { Alert, ScrollView, Text, View, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { WalletData } from "@/types/wallet";
 
 interface Props {
@@ -30,13 +31,26 @@ const WalletCreationItem = ({
   return (
     <View style={styles.section}>
       <Text style={styles.label}>{label}</Text>
-      <Text>{wallet?.address ?? "Not created yet"}</Text>
+      <Text style={styles.addressText} numberOfLines={1} ellipsizeMode="middle">
+        {wallet?.address ?? "Not created yet"}
+      </Text>
       <View style={styles.buttonWrap}>
-        <Button
-          title={isCreating ? "Creating..." : wallet ? `${label} Created` : `Create ${label}`}
+        <Pressable
+          style={[
+            styles.customButton,
+            wallet ? styles.successButton : styles.primaryButton,
+            (disabled || !!wallet) && styles.buttonDisabled
+          ]}
           disabled={disabled || !!wallet}
           onPress={onCreateWallet}
-        />
+        >
+          <Text style={[
+            styles.buttonText,
+            wallet ? styles.successButtonText : styles.primaryButtonText
+          ]}>
+            {isCreating ? "Creating..." : wallet ? `${label} Created` : `Create ${label}`}
+          </Text>
+        </Pressable>
       </View>
     </View>
   );
@@ -95,7 +109,8 @@ export const CreateWalletsScreen = ({
   }, [createWallet, onWalletACreated, onWalletBCreated]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Create Your Wallets</Text>
       <Text style={styles.subtitle}>Step 1: Create two wallets</Text>
       
@@ -117,47 +132,102 @@ export const CreateWalletsScreen = ({
 
       {walletA && walletB && (
         <View style={styles.buttonWrap}>
-          <Button
-            title="Next: Get Faucet Funds"
-            onPress={onNext}
-          />
+          <Pressable style={[styles.customButton, styles.primaryButton]} onPress={onNext}>
+            <Text style={[styles.buttonText, styles.primaryButtonText]}>Next: Get Faucet Funds</Text>
+          </Pressable>
         </View>
       )}
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fafbfc',
+  },
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   section: {
     width: '100%',
-    maxWidth: 480,
-    marginBottom: 12,
+    maxWidth: 400,
+    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+    borderRadius: 8,
+    padding: 16,
   },
   label: {
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#424770',
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 8,
     textAlign: 'center',
+    color: '#1a1f36',
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: 32,
     textAlign: 'center',
-    color: '#666',
+    color: '#8898aa',
+    fontWeight: '400',
   },
   buttonWrap: {
     width: '100%',
-    maxWidth: 480,
-    marginTop: 8,
+    maxWidth: 400,
+    marginTop: 12,
+  },
+  addressText: {
+    fontFamily: 'monospace',
+    fontSize: 13,
+    backgroundColor: '#f6f9fc',
+    color: '#6772e5',
+    padding: 12,
+    borderRadius: 6,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+  },
+  customButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  primaryButton: {
+    backgroundColor: '#6772e5',
+    borderColor: '#6772e5',
+  },
+  successButton: {
+    backgroundColor: '#00d924',
+    borderColor: '#00d924',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  primaryButtonText: {
+    color: '#fff',
+  },
+  successButtonText: {
+    color: '#fff',
   },
 });

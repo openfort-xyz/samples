@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { Button, ScrollView, Text, View, StyleSheet, Linking } from "react-native";
+import { ScrollView, Text, View, StyleSheet, Linking, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 import { WalletData } from "@/types/wallet";
 
@@ -26,18 +27,23 @@ export const FaucetScreen = ({ walletB, onNext }: Props) => {
   }, [onNext]);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Get Test USDC</Text>
       <Text style={styles.subtitle}>Step 2: Get faucet funds for Wallet B on Ethereum Sepolia</Text>
       
       <View style={styles.section}>
         <Text style={styles.label}>Wallet B Address</Text>
-        <Text style={styles.address}>{walletB?.address}</Text>
+        <Text style={styles.address} numberOfLines={1} ellipsizeMode="middle">{walletB?.address}</Text>
         <View style={styles.buttonWrap}>
-          <Button
-            title={copied ? "Copied!" : "Copy Address"}
+          <Pressable
+            style={[styles.customButton, copied ? styles.successButton : styles.secondaryButton]}
             onPress={() => walletB && copyToClipboard(walletB.address)}
-          />
+          >
+            <Text style={[styles.buttonText, copied ? styles.successButtonText : styles.secondaryButtonText]}>
+              {copied ? "Copied!" : "Copy Address"}
+            </Text>
+          </Pressable>
         </View>
       </View>
 
@@ -49,10 +55,9 @@ export const FaucetScreen = ({ walletB, onNext }: Props) => {
           4. Paste the address and request $10 USDC
         </Text>
         <View style={styles.buttonWrap}>
-          <Button
-            title="Open Circle Faucet"
-            onPress={openFaucet}
-          />
+          <Pressable style={[styles.customButton, styles.primaryButton]} onPress={openFaucet}>
+            <Text style={[styles.buttonText, styles.primaryButtonText]}>Open Circle Faucet</Text>
+          </Pressable>
         </View>
       </View>
 
@@ -61,69 +66,122 @@ export const FaucetScreen = ({ walletB, onNext }: Props) => {
           Note: After clicking "Open Circle Faucet", you'll be taken to a waiting screen that will automatically detect when funds arrive.
         </Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fafbfc',
+  },
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   section: {
     width: '100%',
-    maxWidth: 480,
-    marginBottom: 12,
+    maxWidth: 400,
+    marginBottom: 16,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+    borderRadius: 8,
+    padding: 16,
   },
   label: {
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#424770',
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 8,
     textAlign: 'center',
+    color: '#1a1f36',
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    marginBottom: 20,
+    marginBottom: 32,
     textAlign: 'center',
-    color: '#666',
+    color: '#8898aa',
+    fontWeight: '400',
   },
   address: {
     fontFamily: 'monospace',
-    fontSize: 12,
-    backgroundColor: '#f5f5f5',
-    padding: 8,
-    borderRadius: 4,
+    fontSize: 13,
+    backgroundColor: '#f6f9fc',
+    color: '#6772e5',
+    padding: 12,
+    borderRadius: 6,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
   },
   instructions: {
     fontSize: 14,
-    lineHeight: 20,
+    lineHeight: 22,
     marginBottom: 16,
+    color: '#525f7f',
   },
   buttonWrap: {
     width: '100%',
-    maxWidth: 480,
-    marginTop: 8,
+    maxWidth: 400,
+    marginTop: 12,
   },
   disclaimer: {
-    marginTop: 20,
+    marginTop: 24,
     padding: 16,
-    backgroundColor: '#f0f9ff',
+    backgroundColor: '#fff',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#0066cc33',
+    borderColor: '#e6ebf1',
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 400,
   },
   disclaimerText: {
     fontSize: 13,
-    color: '#0066cc',
-    lineHeight: 18,
+    color: '#8898aa',
+    lineHeight: 20,
+  },
+  customButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+  },
+  primaryButton: {
+    backgroundColor: '#6772e5',
+    borderColor: '#6772e5',
+  },
+  secondaryButton: {
+    backgroundColor: '#fff',
+    borderColor: '#e6ebf1',
+  },
+  successButton: {
+    backgroundColor: '#00d924',
+    borderColor: '#00d924',
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  primaryButtonText: {
+    color: '#fff',
+  },
+  secondaryButtonText: {
+    color: '#424770',
+  },
+  successButtonText: {
+    color: '#fff',
   },
 });

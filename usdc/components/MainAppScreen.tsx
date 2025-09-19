@@ -1,11 +1,19 @@
 // components/MainAppScreen.tsx
 import React, { useCallback, useState } from "react";
-import { Alert, Button, ScrollView, Text, View, StyleSheet, TextInput } from "react-native";
+import { Alert, ScrollView, Text, View, StyleSheet, TextInput, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import * as Clipboard from "expo-clipboard";
 import { WalletData } from "@/types/wallet";
 import { formatUSDC } from "../utils/format";
 import { UserWallet } from "@openfort/react-native";
 import { transferUSDC } from "../utils/erc20";
 import { CHAIN_IDS, CHAIN_IDS_HEX } from "../constants/network";
+
+const CopyIcon = ({ size = 16, color = "#6772e5" }) => (
+  <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <Text style={{ fontSize: size * 0.9, color, fontWeight: '400', lineHeight: size }}>⧉</Text>
+  </View>
+);
 
 interface MainAppScreenProps {
   walletA: WalletData | null;
@@ -37,6 +45,14 @@ export const MainAppScreen = ({
   setActiveWallet,
 }: MainAppScreenProps) => {
   const [isSwitching, setIsSwitching] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
+
+  const copyToClipboard = useCallback(async (address: string) => {
+    await Clipboard.setStringAsync(address);
+    setCopiedAddress(address);
+    setTimeout(() => setCopiedAddress(null), 2000);
+  }, []);
+
   const onTransfer = useCallback(
     async (fromWallet: WalletData, toAddress: string, amount: string) => {
       if (!fromWallet?.wallet) return;
@@ -64,17 +80,35 @@ export const MainAppScreen = ({
   );
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>USDC Transfer</Text>
 
       <View style={[styles.section, styles.activeSection]}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.label}>Active Wallet</Text>
+          <Text style={styles.label}>Sender Wallet</Text>
           <Text style={styles.badge}>ACTIVE</Text>
         </View>
-        <Text style={[styles.address, styles.addressActive]}>
-          {activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address}
-        </Text>
+        <View style={styles.addressContainer}>
+          <Text style={[styles.address, styles.addressActive]} numberOfLines={1} ellipsizeMode="middle">
+            {activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address}
+          </Text>
+          <Pressable
+            style={styles.copyButton}
+            onPress={() => {
+              const address = activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address;
+              if (address) copyToClipboard(address);
+            }}
+          >
+            <View style={styles.iconContainer}>
+              {copiedAddress === (activeWallet?.address === walletA?.address ? walletA?.address : walletB?.address) ? (
+                <Text style={styles.copiedText}>✓</Text>
+              ) : (
+                <CopyIcon size={16} />
+              )}
+            </View>
+          </Pressable>
+        </View>
         <Text style={styles.balance}>
           {(() => {
             const val = activeWallet?.address === walletA?.address ? walletA?.balance : walletB?.balance;
@@ -88,10 +122,27 @@ export const MainAppScreen = ({
       </View>
 
       <View style={[styles.section, styles.otherSection]}>
-        <Text style={styles.label}>Other Wallet</Text>
-        <Text style={styles.address}>
-          {activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address}
-        </Text>
+        <Text style={styles.label}>Receiver Wallet</Text>
+        <View style={styles.addressContainer}>
+          <Text style={styles.address} numberOfLines={1} ellipsizeMode="middle">
+            {activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address}
+          </Text>
+          <Pressable
+            style={styles.copyButton}
+            onPress={() => {
+              const address = activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address;
+              if (address) copyToClipboard(address);
+            }}
+          >
+            <View style={styles.iconContainer}>
+              {copiedAddress === (activeWallet?.address === walletA?.address ? walletB?.address : walletA?.address) ? (
+                <Text style={styles.copiedText}>✓</Text>
+              ) : (
+                <CopyIcon size={16} />
+              )}
+            </View>
+          </Pressable>
+        </View>
         <Text style={styles.balance}>
           {(() => {
             const val = activeWallet?.address === walletA?.address ? walletB?.balance : walletA?.balance;
@@ -114,8 +165,8 @@ export const MainAppScreen = ({
 
       <View style={styles.buttonRow}>
         <View style={styles.buttonFlex}>
-          <Button
-            title={isSwitching ? "Switching..." : `Switch Active Wallet`}
+          <Pressable
+            style={[styles.customButton, styles.secondaryButton, isSwitching && styles.buttonDisabled]}
             disabled={isSwitching}
             onPress={async () => {
               const target = activeWallet?.address === walletA?.address ? walletB : walletA;
@@ -129,132 +180,222 @@ export const MainAppScreen = ({
                 setIsSwitching(false);
               }
             }}
-          />
+          >
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              {isSwitching ? "Switching..." : "Switch Wallet"}
+            </Text>
+          </Pressable>
         </View>
         <View style={styles.buttonFlex}>
-          <Button
-            title={isTransferring ? "Transferring..." : "Transfer USDC"}
+          <Pressable
+            style={[styles.customButton, styles.primaryButton, (isTransferring || !walletA || !walletB || !transferAmount || !activeWallet) && styles.buttonDisabled]}
             disabled={isTransferring || !walletA || !walletB || !transferAmount || !activeWallet}
             onPress={() => {
               const from = activeWallet?.address === walletA?.address ? walletA : walletB;
               const to = activeWallet?.address === walletA?.address ? walletB : walletA;
               if (from && to) onTransfer(from, to.address, transferAmount);
             }}
-          />
+          >
+            <Text style={[styles.buttonText, styles.primaryButtonText]}>
+              {isTransferring ? "Transferring..." : "Transfer USDC"}
+            </Text>
+          </Pressable>
         </View>
       </View>
 
       <View style={styles.buttonWrap}>
-        <Button title="Refresh Balances" onPress={updateBalances} />
+        <Pressable style={[styles.customButton, styles.secondaryButton]} onPress={updateBalances}>
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Refresh Balances</Text>
+        </Pressable>
       </View>
 
       <View style={styles.buttonWrap}>
-        <Button title="Logout" onPress={logout} />
+        <Pressable style={[styles.customButton, styles.secondaryButton]} onPress={logout}>
+          <Text style={[styles.buttonText, styles.secondaryButtonText]}>Logout</Text>
+        </Pressable>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fafbfc',
+  },
   container: {
     flexGrow: 1,
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
   section: {
     width: '100%',
-    maxWidth: 480,
-    marginBottom: 12,
+    maxWidth: 400,
+    marginBottom: 16,
   },
   label: {
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#424770',
+    marginBottom: 6,
+    letterSpacing: 0.2,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: 28,
+    fontWeight: '600',
+    marginBottom: 32,
     textAlign: 'center',
+    color: '#1a1f36',
+    letterSpacing: -0.5,
   },
   address: {
     fontFamily: 'monospace',
-    fontSize: 12,
-    backgroundColor: '#f5f5f5',
-    padding: 8,
-    borderRadius: 4,
-    marginBottom: 8,
+    fontSize: 13,
+    backgroundColor: '#f6f9fc',
+    color: '#6772e5',
+    padding: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+    flex: 1,
+    marginRight: 8,
   },
   balance: {
     fontSize: 16,
-    fontWeight: '600',
-    color: '#2E8B57',
+    fontWeight: '500',
+    color: '#1a1f36',
   },
   gasBalance: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
+    fontSize: 13,
+    fontWeight: '400',
+    color: '#8898aa',
     marginTop: 4,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    padding: 12,
+    borderColor: '#e6ebf1',
+    borderRadius: 6,
+    padding: 14,
     fontSize: 16,
     marginTop: 4,
+    backgroundColor: '#fff',
+    color: '#1a1f36',
   },
   buttonWrap: {
     width: '100%',
-    maxWidth: 480,
-    marginTop: 8,
+    maxWidth: 400,
+    marginTop: 12,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 6,
+    marginBottom: 8,
   },
   badge: {
-    backgroundColor: '#2E8B57',
+    backgroundColor: '#00d924',
     color: '#fff',
     paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
+    paddingVertical: 3,
+    borderRadius: 4,
     overflow: 'hidden',
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
   activeSection: {
-    backgroundColor: '#f0fff4',
-    borderColor: '#2E8B57',
+    backgroundColor: '#fff',
+    borderColor: '#e6ebf1',
     borderWidth: 1,
     borderRadius: 8,
-    padding: 12,
+    padding: 16,
     shadowColor: '#000',
-    shadowOpacity: 0.07,
-    shadowRadius: 6,
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
     shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    elevation: 1,
   },
   otherSection: {
-    backgroundColor: '#fafafa',
+    backgroundColor: '#fff',
+    borderColor: '#e6ebf1',
+    borderWidth: 1,
     borderRadius: 8,
-    padding: 12,
+    padding: 16,
   },
   addressActive: {
-    backgroundColor: '#e8f7ef',
-    borderColor: '#2E8B57',
+    backgroundColor: '#f8fbff',
+    borderColor: '#d6e3f0',
     borderWidth: 1,
   },
   buttonRow: {
     width: '100%',
-    maxWidth: 480,
+    maxWidth: 400,
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 8,
+    gap: 12,
+    marginTop: 16,
   },
   buttonFlex: {
     flex: 1,
+  },
+  customButton: {
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    width: '100%',
+  },
+  primaryButton: {
+    backgroundColor: '#6772e5',
+    borderColor: '#6772e5',
+  },
+  secondaryButton: {
+    backgroundColor: '#fff',
+    borderColor: '#e6ebf1',
+  },
+  buttonDisabled: {
+    opacity: 0.5,
+  },
+  buttonText: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  primaryButtonText: {
+    color: '#fff',
+  },
+  secondaryButtonText: {
+    color: '#424770',
+  },
+  addressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  copyButton: {
+    padding: 8,
+    borderRadius: 6,
+    backgroundColor: '#f6f9fc',
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 32,
+    minHeight: 32,
+  },
+  copiedText: {
+    color: '#00d924',
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 16,
+  },
+  iconContainer: {
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

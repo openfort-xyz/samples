@@ -1,5 +1,6 @@
 import React from "react";
 import { ActivityIndicator, ScrollView, Text, View, StyleSheet, Pressable } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import * as Clipboard from "expo-clipboard";
 import { WalletData } from "@/types/wallet";
 import { formatUSDC } from "../../utils/format";
@@ -28,7 +29,8 @@ export const WaitingForFundsScreen = ({ walletB, onNext, onBack, onUpdateBalance
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
           {
@@ -128,71 +130,82 @@ export const WaitingForFundsScreen = ({ walletB, onNext, onBack, onUpdateBalance
           </Pressable>
         </View>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fafbfc',
+  },
   container: {
     flexGrow: 1,
-    backgroundColor: '#f5f5f5',
-    paddingVertical: 30,
+    paddingVertical: 24,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 30,
-    paddingHorizontal: 20,
+    marginBottom: 32,
+    paddingHorizontal: 24,
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '600',
+    color: '#1a1f36',
     marginBottom: 8,
+    letterSpacing: -0.5,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: '#8898aa',
     textAlign: 'center',
+    fontWeight: '400',
   },
-  
+
   // Balance Container - The Centerpiece
   balanceContainer: {
     alignItems: 'center',
-    paddingHorizontal: 20,
-    marginBottom: 30,
+    paddingHorizontal: 24,
+    marginBottom: 32,
   },
   balanceCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 30,
+    borderRadius: 8,
+    padding: 32,
     width: '100%',
     maxWidth: 400,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#e6ebf1',
+    shadowColor: '#000',
+    shadowOpacity: 0.04,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   balanceDisplay: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   balanceAmount: {
-    fontSize: 64,
-    fontWeight: 'bold',
-    color: '#999',
+    fontSize: 48,
+    fontWeight: '600',
+    color: '#8898aa',
   },
   balanceAmountSuccess: {
-    color: '#22c55e',
+    color: '#1a1f36',
   },
   balanceCurrency: {
-    fontSize: 22,
-    fontWeight: '600',
-    color: '#999',
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#8898aa',
     marginTop: 4,
   },
   balanceCurrencySuccess: {
-    color: '#22c55e',
+    color: '#424770',
   },
-  
+
   // Status Indicators
   statusIndicator: {
     minHeight: 40,
@@ -202,36 +215,36 @@ const styles = StyleSheet.create({
   loadingIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   loadingText: {
     fontSize: 14,
-    color: '#666',
+    color: '#8898aa',
   },
   successIndicator: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 8,
   },
   successBadge: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#22c55e',
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#00d924',
     alignItems: 'center',
     justifyContent: 'center',
   },
   successIcon: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  successText: {
-    fontSize: 16,
-    color: '#22c55e',
+    fontSize: 14,
     fontWeight: '600',
   },
-  
+  successText: {
+    fontSize: 14,
+    color: '#1a1f36',
+    fontWeight: '500',
+  },
+
   // Wallet Info
   walletInfo: {
     marginTop: 20,
@@ -240,89 +253,90 @@ const styles = StyleSheet.create({
   },
   walletLabel: {
     fontSize: 12,
-    color: '#999',
-    fontWeight: '600',
+    color: '#8898aa',
+    fontWeight: '500',
     textTransform: 'uppercase',
     letterSpacing: 0.5,
     marginBottom: 6,
   },
   addressContainer: {
-    backgroundColor: '#f9f9f9',
-    paddingHorizontal: 14,
+    backgroundColor: '#f6f9fc',
+    paddingHorizontal: 12,
     paddingVertical: 8,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: '#e6ebf1',
   },
   addressText: {
     fontFamily: 'monospace',
     fontSize: 13,
-    color: '#555',
+    color: '#6772e5',
   },
-  
+
   // Actions Container
   actionsContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
   },
   primaryButton: {
-    backgroundColor: '#0066CC',
-    paddingVertical: 14,
-    paddingHorizontal: 28,
-    borderRadius: 8,
+    backgroundColor: '#6772e5',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 6,
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   primaryButtonText: {
     color: '#fff',
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: '500',
   },
-  
+
   // Waiting Info
   waitingInfo: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   infoCard: {
-    backgroundColor: '#f0f7ff',
-    borderRadius: 8,
-    padding: 14,
+    backgroundColor: '#fff',
+    borderRadius: 6,
+    padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#e6ebf1',
   },
   infoIcon: {
-    fontSize: 18,
+    fontSize: 16,
   },
   infoText: {
     fontSize: 14,
-    color: '#0066CC',
+    color: '#525f7f',
     lineHeight: 20,
     flex: 1,
   },
-  
+
   // Secondary Actions
   secondaryActions: {
     alignItems: 'center',
-    paddingTop: 16,
+    paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopColor: '#e6ebf1',
   },
   troubleText: {
     fontSize: 14,
-    color: '#999',
-    marginBottom: 10,
+    color: '#8898aa',
+    marginBottom: 8,
   },
   secondaryButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
   },
   secondaryButtonText: {
-    color: '#666',
-    fontSize: 15,
+    color: '#6772e5',
+    fontSize: 14,
     fontWeight: '500',
-    textDecorationLine: 'underline',
   },
 });
