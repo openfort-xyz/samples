@@ -15,12 +15,12 @@
 ## Environment
 - Backend `.env` must define `NEXT_PUBLIC_SHIELD_API_KEY`, `NEXTAUTH_SHIELD_SECRET_KEY`, `NEXTAUTH_SHIELD_ENCRYPTION_SHARE`, `FRONTEND_URL`, and `BACKEND_URL`.
 - Frontend `.env` must define `VITE_OPENFORT_PUBLISHABLE_KEY`, `VITE_OPENFORT_SHIELD_PUBLIC_KEY`, `VITE_OPENFORT_POLICY_ID`, and `VITE_BACKEND_URL`.
+- Populate both files with real Openfort credentials and policy IDs from the dashboard—placeholder values will fail.
 - Keep the policy ID and Shield credentials synced across backend and frontend when rotating keys.
 
 ## Testing instructions
 - `cd frontend && npm run lint` (TypeScript + ESLint checks)
-- Manually hit `http://localhost:3001/api/session` to confirm Shield configuration before UI testing.
-- Exercise the deposit/borrow flows end-to-end after changing policy IDs or contract addresses.
+- Verify both backend and frontend start without runtime errors after updating environment values.
 
 ## Code style
 - Frontend follows Vite + TypeScript defaults with ESLint (`eslint .`).
