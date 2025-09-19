@@ -3,8 +3,33 @@
 This sample pairs an Openfort embedded wallet front end with a minimal Node.js helper service to interact with a Morpho Blue USDC vault on Base. The React app lets a connected Openfort wallet supply its entire USDC balance to the vault or withdraw everything back, while the backend issues encryption sessions against the Openfort Shield API so wallet secrets never touch the client.
 
 ## Project structure
-- `backend/` – Express server that proxies `create-encryption-session` requests to `shield.openfort.io` and exposes a health check. Uses `dotenv`, enables CORS, and is ready to deploy as-is.
-- `frontend/` – Vite + React + Wagmi app that embeds Openfort, queries vault state via the Morpho GraphQL API, and performs USDC approvals/deposits or share redemptions with viem.
+```
+morpho/
+├── backend/                    # Express.js server
+│   ├── .env.example           # Environment template
+│   ├── package.json           # Backend dependencies
+│   └── server.js              # Express server with Shield proxy
+├── frontend/                   # Vite + React application
+│   ├── public/                # Static assets
+│   ├── src/
+│   │   ├── components/        # React components
+│   │   │   └── env_validation/ # Environment validation
+│   │   ├── contracts/         # Contract ABIs and addresses
+│   │   ├── hooks/             # Custom React hooks
+│   │   ├── lib/               # Utility libraries
+│   │   ├── utils/             # Helper functions
+│   │   ├── App.tsx            # Main App component
+│   │   ├── main.tsx           # React entry point
+│   │   └── Providers.tsx      # Context providers
+│   ├── .env.example           # Frontend environment template
+│   ├── package.json           # Frontend dependencies
+│   └── vite.config.ts         # Vite configuration
+└── README.md                   # This file
+```
+
+**Backend** – Express server that proxies `create-encryption-session` requests to `shield.openfort.io` and exposes a health check. Uses `dotenv`, enables CORS, and is ready to deploy as-is.
+
+**Frontend** – Vite + React + Wagmi app that embeds Openfort, queries vault state via the Morpho GraphQL API, and performs USDC approvals/deposits or share redemptions with viem.
 
 ## Prerequisites
 - Node.js **18 or newer** (provides the global `fetch` used by the backend).
