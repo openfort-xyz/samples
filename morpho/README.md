@@ -1,102 +1,103 @@
 # Openfort × Morpho Sample
 
-This sample pairs an Openfort embedded wallet front end with a minimal Node.js helper service to interact with a Morpho Blue USDC vault on Base. The React app lets a connected Openfort wallet supply its entire USDC balance to the vault or withdraw everything back, while the backend issues encryption sessions against the Openfort Shield API so wallet secrets never touch the client.
+## Overview
+This sample pairs an Openfort embedded wallet frontend with a minimal Express backend to interact with a Morpho Blue USDC vault on Base. Users can authenticate through Shield, view balances, and supply or withdraw USDC from the configured vault using sponsored transactions.
 
-## Project structure
+## Project Structure
 ```
 morpho/
-├── backend/                    # Express.js server
-│   ├── .env.example           # Environment template
-│   ├── package.json           # Backend dependencies
-│   └── server.js              # Express server with Shield proxy
-├── frontend/                   # Vite + React application
-│   ├── public/                # Static assets
-│   ├── src/
-│   │   ├── components/        # React components
-│   │   │   └── env_validation/ # Environment validation
-│   │   ├── contracts/         # Contract ABIs and addresses
-│   │   ├── hooks/             # Custom React hooks
-│   │   ├── lib/               # Utility libraries
-│   │   ├── utils/             # Helper functions
-│   │   ├── App.tsx            # Main App component
-│   │   ├── main.tsx           # React entry point
-│   │   └── Providers.tsx      # Context providers
-│   ├── .env.example           # Frontend environment template
-│   ├── package.json           # Frontend dependencies
-│   └── vite.config.ts         # Vite configuration
-└── README.md                   # This file
+├── backend/                    # Express server exposing Shield helpers and health checks
+│   ├── .env.example            # Backend environment template
+│   └── server.js               # API entry point
+├── frontend/                   # Vite + React application for the user experience
+│   ├── public/                 # Static assets
+│   └── src/                    # Components, hooks, contracts, and utilities
+└── README.md                   # Project documentation
 ```
 
-**Backend** – Express server that proxies `create-encryption-session` requests to `shield.openfort.io` and exposes a health check. Uses `dotenv`, enables CORS, and is ready to deploy as-is.
+## Features
+- Embedded wallet authentication via Openfort Shield with backend-issued encryption sessions
+- Morpho Blue vault supply and withdrawal flows powered by Wagmi/Viem
+- Vault APY fetching through Morpho’s GraphQL API
+- Environment validation gating the UI until required configuration is present
 
-**Frontend** – Vite + React + Wagmi app that embeds Openfort, queries vault state via the Morpho GraphQL API, and performs USDC approvals/deposits or share redemptions with viem.
+## Architecture
+- **Backend (`backend/`)** – Express server that proxies `create-encryption-session` requests to Openfort Shield, handles CORS, and exposes health endpoints.
+- **Frontend (`frontend/`)** – Vite React app with modular hooks for vault data, custom providers, and Tailwind-based UI components.
+- **Shared config** – Environment variables keep Shield credentials, backend URL, and optional policy IDs consistent across both layers.
 
-## Prerequisites
-- Node.js **18 or newer** (provides the global `fetch` used by the backend).
-- Package manager: npm ≥9.
-- Openfort account with:
-  - Publishable key (`pk_…`)
-  - Shield publishable key
-  - Shield API key & secret key
-  - (Optional) policy ID (`pol_…`) when you want to enforce specific provider rules
-- WalletConnect Project ID (optional; falls back to `demo`).
-- Morpho Blue vault address (defaulted to `0xbeeF010f9cb27031ad51e3333f9aF9C6B1228183` in the hooks) and Base RPC endpoint.
+## Setup
 
-## Configuration
-1. **Backend environment** (`backend/.env` based on `backend/.env.example`):
-   - `NEXT_PUBLIC_SHIELD_API_KEY` – Shield API key from the Openfort dashboard.
-   - `NEXTAUTH_SHIELD_SECRET_KEY` – Shield secret key.
-   - `NEXTAUTH_SHIELD_ENCRYPTION_SHARE` – Your encryption share.
-   - `PORT` *(optional, default `3001`)* – Port for the Express server.
-   - `FRONTEND_URL` or `CORS_ORIGIN` – URL allowed by CORS (e.g. `http://localhost:5173`).
-   - `BACKEND_URL` – Public URL of this service (used by the frontend for API calls).
+### Prerequisites
+- Node.js 18+
+- npm ≥ 9
+- Openfort dashboard project with Shield keys, API key, secret key, and optional policy ID
+- Morpho Blue vault address and Base RPC endpoint (defaults provided)
+- Optional WalletConnect Project ID (falls back to `demo` if omitted)
 
-2. **Frontend environment** (`frontend/.env` based on `frontend/.env.example`):
-   - `VITE_OPENFORT_PUBLISHABLE_KEY` – Client publishable key (must start with `pk_`).
-   - `VITE_OPENFORT_SHIELD_PUBLIC_KEY` – Shield publishable key.
-   - `VITE_OPENFORT_POLICY_ID` *(optional)* – Policy for the embedded provider (`pol_…`).
-   - `VITE_WALLET_CONNECT_PROJECT_ID` *(optional)* – WalletConnect V2 project ID (`demo` fallback).
-   - `VITE_BACKEND_URL` – URL of the backend (`http://localhost:3001` when developing).
-   - `VITE_FRONTEND_URL` – Public/preview URL of the frontend (use `http://localhost:5173` locally).
+### Environment Configuration
+- **Backend** (`backend/.env`)
+  1. `cd backend`
+  2. `cp .env.example .env`
+  3. Populate required variables:
+     ```env
+     NEXT_PUBLIC_SHIELD_API_KEY=your_shield_api_key
+     NEXTAUTH_SHIELD_SECRET_KEY=your_shield_secret_key
+     NEXTAUTH_SHIELD_ENCRYPTION_SHARE=your_encryption_share
+     PORT=3001
+     CORS_ORIGIN=http://localhost:5173
+     FRONTEND_URL=http://localhost:5173
+     BACKEND_URL=http://localhost:3001
+     ```
+- **Frontend** (`frontend/.env`)
+  1. `cd frontend`
+  2. `cp .env.example .env`
+  3. Populate required variables:
+     ```env
+     VITE_OPENFORT_PUBLISHABLE_KEY=pk_your_publishable_key
+     VITE_OPENFORT_SHIELD_PUBLIC_KEY=pk_your_shield_public_key
+     VITE_OPENFORT_POLICY_ID=pol_optional_policy
+     VITE_WALLET_CONNECT_PROJECT_ID=walletconnect_project_id
+     VITE_BACKEND_URL=http://localhost:3001
+     VITE_FRONTEND_URL=http://localhost:5173
+     ```
 
-The React app validates these variables on startup. Missing or malformed values render a modal with guidance instead of mounting the wallet providers.
-
-## Install & run
-Open two terminals from `morpho/`:
-
+### Install & Run
 1. **Backend**
    ```bash
    cd backend
    npm install
-   npm run dev           # listens on http://localhost:3001 by default
+   npm run dev           # http://localhost:3001
    ```
-   - `npm start` runs the same server without file watching.
-   - Check health: `curl http://localhost:3001/health`.
-
+   - Use `npm start` for production-style runs.
+   - Health check: `curl http://localhost:3001/health`.
 2. **Frontend**
    ```bash
    cd frontend
    npm install
-   npm run dev -- --host # serves on http://localhost:5173
+   npm run dev -- --host # http://localhost:5173
    ```
-   - Use `npm run build` / `npm run preview` for production builds.
-   - Tailwind styles live in `src/index.css` and component classes.
+   - Additional scripts: `npm run build`, `npm run preview`.
 
-## Flow overview
-1. The user clicks **OpenfortButton** to authenticate; Openfort fetches an encryption session by calling the backend route `POST /api/create-encryption-session`.
-2. After connecting, hooks in `src/hooks` read the wallet's USDC balance and vault position via viem.
-3. "Supply" approves the Morpho vault to spend USDC and deposits the full balance; "Withdraw" redeems all shares back to the wallet.
-4. Vault APY is fetched from `https://blue-api.morpho.org/graphql` using the Morpho Blue SDK.
+## Usage Flow
+1. Start both backend and frontend services.
+2. Authenticate with Openfort; the frontend requests an encryption session from `POST /api/create-encryption-session`.
+3. Inspect wallet balances, vault APY, and current share positions via hooks in `src/hooks`.
+4. Use the Supply action to approve USDC and deposit into the Morpho vault; use Withdraw to redeem all shares.
+5. Modify vault addresses or RPC endpoints as needed through the configuration utilities.
 
-## Customisation tips
-- Adjust the Base RPC endpoint in `frontend/src/lib/rpc.ts` (`SELECTED_BASE_MAINNET_RPC_URL`).
-- Change the target vault address in `frontend/src/hooks/useVaultOperations.ts` & `useVaultApy.ts`.
-- Extend the backend with caching, rate limiting, or authentication if exposing it publicly.
+## Development
+- Run `npm run lint` from `frontend/` before submitting changes.
+- Keep backend route handlers async and lightweight; extend only as needed for production deployments.
+- Tailwind styles live in `frontend/src/index.css`; maintain existing class conventions.
 
 ## Troubleshooting
-- **Modal: "Configuration required"** – Ensure both `.env` files exist and restart the dev servers so Vite picks up changes.
-- **`fetch` is not defined** – Upgrade to Node.js 18+ or add a polyfill (`node-fetch`) in `backend/server.js`.
-- **Transactions stuck** – Try another Base RPC endpoint or increase retry delays in `useVaultOperations`.
-- **CORS errors** – Confirm `FRONTEND_URL`/`CORS_ORIGIN` matches the Vite dev URL (including protocol & port).
+- **Configuration required modal** – Indicates missing or malformed environment variables; update both `.env` files and restart Vite.
+- **`fetch` is not defined`** – Upgrade to Node.js 18+ or add a `node-fetch` polyfill to the backend.
+- **Transactions stuck** – Switch to a different Base RPC endpoint or adjust retry delays in `useVaultOperations`.
+- **CORS errors** – Confirm the frontend host matches `CORS_ORIGIN`/`FRONTEND_URL`.
 
-With the backend and frontend running, openfort sessions will let you supply and withdraw USDC from the configured Morpho vault directly from the browser.
+## Resources
+- [Openfort Documentation](https://docs.openfort.xyz)
+- [Morpho Blue Docs](https://docs.morpho.org/)
+- [Vite Guide](https://vitejs.dev/guide/)
