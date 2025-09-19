@@ -149,6 +149,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     paddingVertical: 24,
+    justifyContent: 'center',
   },
   header: {
     alignItems: 'center',
