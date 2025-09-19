@@ -98,6 +98,6 @@ morpho/
 - **CORS errors** – Confirm the frontend host matches `CORS_ORIGIN`/`FRONTEND_URL`.
 
 ## Resources
-- [Openfort Documentation](https://docs.openfort.xyz)
+- [Openfort Documentation](https://docs.openfort.io)
 - [Morpho Blue Docs](https://docs.morpho.org/)
 - [Vite Guide](https://vitejs.dev/guide/)

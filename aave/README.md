@@ -95,6 +95,6 @@ aave/
 - If ports 3001 or 5173 are occupied, update the values in the env files and project scripts.
 
 ## Resources
-- [Openfort Documentation](https://docs.openfort.xyz)
+- [Openfort Documentation](https://docs.openfort.io)
 - [Aave Documentation](https://docs.aave.com)
 - [Vite Guide](https://vitejs.dev/guide/)

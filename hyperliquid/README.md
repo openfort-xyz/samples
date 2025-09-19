@@ -86,6 +86,6 @@ npm run web         # Optional web preview
 - If Expo cannot find credentials, confirm `.env.local` exists and Metro was restarted after edits.
 
 ## Resources
-- [Openfort Documentation](https://docs.openfort.xyz)
+- [Openfort Documentation](https://docs.openfort.io)
 - [Hyperliquid Testnet](https://app.hyperliquid-testnet.xyz/drip)
 - [Expo React Native](https://expo.dev/)
