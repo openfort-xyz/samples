@@ -11,7 +11,6 @@
 
 ## Testing instructions
 - Follow the sample-specific sections for lint or manual checks.
-- For React Native samples, confirm Expo launches cleanly via `npm start` before shipping changes.
 - For web + backend samples, run the frontend lint target and hit backend health routes manually.
 
 ## Code style
