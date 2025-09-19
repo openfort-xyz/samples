@@ -33,8 +33,19 @@ hyperliquid/
 - Node.js 18+
 - npm or yarn
 - Expo CLI with an iOS Simulator or Android Emulator
-- Hyperliquid mainnet account funded with ≥5 USDC to unlock the testnet faucet
 - Openfort dashboard project with Shield configuration
+
+### Hyperliquid Prerequisites
+
+Before running this sample, you need to set up Hyperliquid testnet access:
+
+1. **Login to Hyperliquid**: Create an account and login at [Hyperliquid](https://app.hyperliquid.xyz/)
+
+2. **Deposit USDC on Mainnet**: You must deposit at least **5 USDC** on the Hyperliquid mainnet to gain access to the testnet faucet
+
+3. **Get Testnet Funds**: Once you have deposited 5 USDC on mainnet, claim 1000 mock USDC from the testnet faucet at: https://app.hyperliquid-testnet.xyz/drip
+
+4. **Note Your Wallet Address**: Copy the address of your logged-in Hyperliquid wallet for the next step
 
 ### Environment Configuration
 1. `cp .env.example .env.local`
