@@ -20,7 +20,7 @@
 ## Testing instructions
 - `cd frontend && npm run lint`
 - Manually validate deposit, borrow, repay, and account display flows after changing API or policy settings.
-- Confirm the backend `/session` endpoints respond with valid Shield payloads before UI testing.
+- Ensure the backend starts cleanly with populated Shield credentials prior to UI testing.
 
 ## Code style
 - Frontend uses Vite + TypeScript; follow existing Tailwind + hooks patterns.
