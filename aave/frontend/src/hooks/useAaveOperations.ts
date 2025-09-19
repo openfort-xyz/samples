@@ -24,7 +24,7 @@ export function useAaveOperations(usdcReserve: any, usdcSupplyData: any, refetch
         amount: {
           erc20: {
             currency: evmAddress(usdcReserve.currencyAddress),
-            value: bigDecimal(1), // 1 USDC
+            value: bigDecimal(0.1), // 0.1 USDC
           },
         },
         sender: evmAddress(walletClient.account.address),

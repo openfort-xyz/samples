@@ -33,8 +33,8 @@ export function ActionButtons({
   onWithdrawFromAave
 }: ActionButtonsProps) {
   const handleSupplyClick = () => {
-    if (!usdcBalance || usdcBalance < BigInt(1000000)) { // 1 USDC = 1,000,000 (6 decimals)
-      alert('Insufficient balance. You need at least 1 USDC to supply to the pool.');
+    if (!usdcBalance || usdcBalance < BigInt(100000)) { // 0.1 USDC = 100,000 (6 decimals)
+      alert('Insufficient balance. You need at least 0.1 USDC to supply to the pool.');
       return;
     }
     onDepositToAave();
@@ -66,7 +66,7 @@ export function ActionButtons({
             ) : (
               <>
                 <span className="mr-2">️↗️</span>
-                Supply 1 USDC to pool
+                Supply 0.1 USDC to pool
               </>
             )}
           </button>

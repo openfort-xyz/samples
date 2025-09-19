@@ -23,7 +23,7 @@ export function ActionButtons({ isSupplying, isWithdrawing, onSupply, onWithdraw
         ) : (
           <>
             <span className="mr-2">️↗️</span>
-            Supply 1 USDC to pool
+            Supply 0.1 USDC to pool
           </>
         )}
       </button>
