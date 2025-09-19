@@ -93,7 +93,7 @@ morpho/
 
 ## Troubleshooting
 - **Configuration required modal** – Indicates missing or malformed environment variables; update both `.env` files and restart Vite.
-- **`fetch` is not defined`** – Upgrade to Node.js 18+ or add a `node-fetch` polyfill to the backend.
+- **`fetch` is not defined** – Upgrade to Node.js 18+ or add a `node-fetch` polyfill to the backend.
 - **Transactions stuck** – Switch to a different Base RPC endpoint or adjust retry delays in `useVaultOperations`.
 - **CORS errors** – Confirm the frontend host matches `CORS_ORIGIN`/`FRONTEND_URL`.
 
