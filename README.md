@@ -1,8 +1,8 @@
-# Openfort Samples
+# Openfort Recipe Hub
 
 This repository contains comprehensive samples demonstrating how to integrate Openfort's embedded wallet infrastructure with popular DeFi protocols and blockchain applications. Each sample showcases different use cases and implementation patterns for building Web3 applications.
 
-## 📁 Sample Projects
+## Recipes
 
 ### [Yield on Aave](./aave/)
 - **Languages:** TypeScript, React, Node.js
@@ -28,6 +28,11 @@ This repository contains comprehensive samples demonstrating how to integrate Op
 
 Each sample is completely self-contained with its own setup instructions, environment configuration, and dependencies. Navigate to any sample directory and follow the `README.md` for detailed setup instructions.
 
+1. **Environment Configuration** - Copy `.env.example` to `.env.local` and configure Openfort credentials
+2. **Install Dependencies** - Run `npm install` in respective directories
+3. **Start Development** - Use `npm run dev` for web or `npm start` for mobile
+4. **Configure Openfort Dashboard** - Set up gas policies, Shield keys, and recovery endpoints
+
 ### Prerequisites
 - **Node.js** 18+ and npm/yarn
 - **Openfort Dashboard Account** with configured API keys
@@ -35,13 +40,7 @@ Each sample is completely self-contained with its own setup instructions, enviro
   - For mobile samples: Expo CLI, iOS Simulator/Android Emulator
   - For web samples: Modern web browser
 
-### Common Setup Pattern
-1. **Environment Configuration** - Copy `.env.example` to `.env.local` and configure Openfort credentials
-2. **Install Dependencies** - Run `npm install` in respective directories
-3. **Start Development** - Use `npm run dev` for web or `npm start` for mobile
-4. **Configure Openfort Dashboard** - Set up gas policies, Shield keys, and recovery endpoints
-
-## 🔧 Technology Stack Overview
+## Stack Overview
 
 | Sample | Frontend | Backend | Blockchain | Key Libraries |
 |--------|----------|---------|------------|---------------|
